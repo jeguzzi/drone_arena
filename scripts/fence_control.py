@@ -13,6 +13,10 @@ import numpy as np
 import math
 from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
 
+from dynamic_reconfigure.server import Server
+from drone_arena.cfg import ArenaConfig
+
+
 F = 2.83
 
 
@@ -70,30 +74,55 @@ class Controller(object):
                          self.has_received_battery)
         self.fence = Polygon(
             [(-2.8, -2.8), (-2.8, 2.8), (2.8, 2.8), (2.8, -2.8)])
-        self.max_height = 2.0
+        # self.max_height = 2.0
         self.inside_fence = False
         self.z = 0
         # self.x_min, self.x_max = (-2, 2)
         # self.y_min, self.y_max = (-2, 2)
-        self.pos_bounds = ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0))
+        # self.pos_bounds = ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0))
+        self.pos_bounds = rospy.get_param(
+            "~pos_bounds",
+            ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0)))
+        self.home = rospy.get_param("~home", (0, 0, 1))
         self.acc_bounds = ((0, 0), (0, 0))
-        self.max_acc_bounds = ((-2, 2), (-2, 2))
-        self.tau = 0.5
-        self.eta = 1
-        self.delay = 0.3
-
+        # self.max_acc_bounds = ((-2, 2), (-2, 2))
+        # self.tau = 0.5
+        # self.eta = 1
+        # self.delay = 0.3
         self.tf_buffer = tf2_ros.Buffer()  # tf buffer length
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
-
         self.target_position = None
         self.target_yaw = None
-        self.s_max = 1.5
+        # self.s_max = 1.5
         self.timer = rospy.Timer(rospy.Duration(0.1), self.update)
-        self.home = (0, 0, 1)
+        self.srv = Server(ArenaConfig, self.callback)
+        self.localized = False
+        self.last_localization = None
         rospy.spin()
 
+    @property
+    def max_height(self):
+        return self.pos_bounds[2][1]
+
+    def callback(self, config, level):
+        self.eta = config['eta']
+        self.tau = config['tau']
+        self.delay = config['delay']
+        a = config['max_acceleration']
+        self.max_acc_bounds = ((-a, a), (-a, a))
+        self.s_max = config['max_acceleration']
+        self.enable_fence = config['enable_fence']
+        return config
+
+    def update_localization_state(self):
+        if self.localized:
+            if (rospy.Time.now() - self.last_localization).to_sec() > 1:
+                self.localized = False
+                self.pub_cmd.publish(Twist())
+
     def update(self, evt):
-        if self.target_position:
+        self.update_localization_state()
+        if self.target_position and self.localized:
             rospy.loginfo("Go to target %s %s", self.target_position,
                           self.target_yaw)
             rospy.loginfo("From %s %s" % (self.position, self.yaw))
@@ -119,6 +148,7 @@ class Controller(object):
             v_yaw = d_yaw / self.tau
             cmd_vel.angular.z = v_yaw
             rospy.loginfo("-> %s" % cmd_vel)
+
             self.pub_cmd.publish(cmd_vel)
 
     def go_home(self):
@@ -146,6 +176,12 @@ class Controller(object):
 
     def has_received_input_cmd(self, msg):
         self.target_position = None
+        if not self.enable_fence:
+            self.pub_cmd.publish(msg)
+            return
+        if not self.localized:
+            self.pub_cmd.publish(Twist())
+            return
         msg.linear.z = min(msg.linear.z, 2 * (self.max_height - self.z))
         # rospy.logwarn("too high")
         if self.inside_fence:
@@ -157,15 +193,19 @@ class Controller(object):
             rospy.logwarn("outside fence, will hover")
 
     def clamp_in_fence_pos(self, pos):
-        return clamp(pos, self.pos_bounds)
+        if self.enable_fence:
+            return clamp(pos, self.pos_bounds)
+        else:
+            return pos
 
     def clamp_in_fence_cmd(self, cmd_vel):
         rospy.loginfo("clamp %s" % cmd_vel)
         a = acc_from_cmd(cmd_vel, self.q)
         print("acc %s" % a)
         a = clamp(a, self.max_acc_bounds)
-        a = clamp(a, self.acc_bounds)
-        print("clamped acc %s" % a)
+        if self.enable_fence:
+            a = clamp(a, self.acc_bounds)
+            print("clamped acc %s" % a)
         t = cmd_from_acc(a, self.q)
         print("clamped twist %s" % t)
         cmd_vel.linear.x = t[0]
@@ -187,6 +227,8 @@ class Controller(object):
         _, _, self.target_yaw = euler_from_quaternion([_o.x, _o.y, _o.z, _o.w])
 
     def has_received_odometry(self, msg):
+        self.last_localization = msg.header.stamp
+        self.localized = True
         _p = msg.pose.pose.position
         p = Point((_p.x, _p.y))
         self.z = _p.z

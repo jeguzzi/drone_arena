@@ -2,6 +2,10 @@
   <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
   <node name='fence' pkg='drone_arena' type='fence_control.py' output="screen" ns="bebop">
     <remap from="odom" to="mocap_odom"/>
+    <param name="tau" value="0.5"/>
+    <param name="eta" value="1.0"/>
+    <rosparam param="pos_bounds">[[-1.8, 1.8], [-1.8, 1.8], [0.5, 2.0]]</rosparam>
+    <rosparam param="home">[0, 0, 1]</rosparam>
   </node>
   <remap from="cmd_vel" to="cmd_vel_input"/>
   <remap from="takeoff" to="takeoff_input"/>

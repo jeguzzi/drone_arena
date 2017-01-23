@@ -19,15 +19,23 @@
   - [x] Repulsion/stopping in tau
   - [x] Add cmd_vel pass through
   - [x] Return to home (and land) for low battery (maybe move in a separate node)
-  - [ ] add bounds for cmd_vel (i.e. max/min accelerations)
+  - [x] add bounds for cmd_vel (i.e. max/min accelerations)
   - [ ] tune eta/tau/delay
+  - [x] add enable/disable
+  - [x] add dyn reconfig
 - [x] Go to point control
   - [ ] Add action interface
   - [x] Add position bounds on target control (i.e. use fence)
   - [x] Add z bounds to target
-- [ ] If not tracked -> land or hover!!!
+
 - [ ] Assisted joystick control
   - [ ] World frame
   - [ ] head frame
   - [ ] modify config of joy_teleop to add new actions for:
     - [ ] mode switching
+- [ ] Safety
+  - What happen if lose connection??
+  - [x] If not tracked -> land or hover!!! (already implemented in opritrack_odom)
+
+- [ ] Multiple bebop_msgs
+  - see https://github.com/tnaegeli/multiple_bebops
