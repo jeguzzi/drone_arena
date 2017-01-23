@@ -1,0 +1,66 @@
+<launch>
+    <group ns="bebop">
+
+      <arg name="cov" default="
+[1e-6, 0, 0, 0, 0, 0,
+ 0, 1e-6, 0, 0, 0, 0,
+ 0, 0, 1e-6, 0, 0, 0,
+ 0, 0, 0, 1e-15, 0, 0,
+ 0, 0, 0, 0, 1e-15, 0,
+ 0, 0, 0, 0, 0, 1e-15]
+"/>
+
+
+      <node pkg="topic_tools" type="transform" name="optitrack_cov"
+       args="/optitrack/bebop pose geometry_msgs/PoseWithCovarianceStamped
+       'geometry_msgs.msg.PoseWithCovarianceStamped(header = m.header, pose=geometry_msgs.msg.PoseWithCovariance(pose=m.pose, covariance=$(arg cov)))' --import geometry_msgs"/>
+
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekfsat" clear_params="true">
+        <param name="frequency" value="30"/>
+        <param name="sensor_timeout" value="0.3"/>
+        <param name="two_d_mode" value="false"/>
+
+        <param name="odom_frame" value="odom"/>
+        <param name="base_link_frame" value="base_link"/>
+        <param name="world_frame" value="World"/>
+        <param name="map_frame" value="World"/>
+        <rosparam param="process_noise_covariance">
+          [0.05, 0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+           0,    0.05, 0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+           0,    0,    0.06, 0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+           0,    0,    0,    3, 0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+           0,    0,    0,    0,    3, 0,    0,     0,     0,    0,    0,    0,    0,    0,    0,
+           0,    0,    0,    0,    0,    6, 0,     0,     0,    0,    0,    0,    0,    0,    0,
+           0,    0,    0,    0,    0,    0,    0.25, 0,     0,    0,    0,    0,    0,    0,    0,
+           0,    0,    0,    0,    0,    0,    0,     0.25, 0,    0,    0,    0,    0,    0,    0,
+           0,    0,    0,    0,    0,    0,    0,     0,     0.4, 0,    0,    0,    0,    0,    0,
+           0,    0,    0,    0,    0,    0,    0,     0,     0,    1, 0,    0,    0,    0,    0,
+           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    1, 0,    0,    0,    0,
+           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    2, 0,    0,    0,
+           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0.01, 0,    0,
+           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0.01, 0,
+           0,    0,    0,    0,    0,    0,    0,     0,     0,    0,    0,    0,    0,    0,    0.015]
+        </rosparam>
+        <!-- ODOMETRY -->
+        <param name="odom0" value="odom"/>
+        <rosparam param="odom0_config">
+            [false, false, false, false, false, false,
+             true, true, true, true, true, true,
+             false, false, false]
+        </rosparam>
+        <param name="odom0_differential" value="true"/>
+
+        <!-- OPTITRACK -->
+        <param name="pose0" value="pose"/>
+        <rosparam param="pose0_config">
+           [true, true, true,
+             true, true, true,
+             false, false, false,
+             false, false, false,
+             false, false, false]
+        </rosparam>
+        <param name="pose0_differential" value="false"/>
+        <remap from="odometry/filtered" to="odom_filtered"/>
+    </node>
+    </group>
+</launch>

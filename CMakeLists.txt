@@ -5,9 +5,10 @@ project(drone_arena)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  bebop_autonomy
+  bebop_msgs
   geometry_msgs
-  nav_msgsrospyc
+  nav_msgs
+  rospy
   tf2_ros
 )
 

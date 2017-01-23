@@ -1,0 +1,12 @@
+<launch>
+  <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
+  <node name='fence' pkg='drone_arena' type='fence_control.py' output="screen" ns="bebop">
+    <remap from="odom" to="mocap_odom"/>
+  </node>
+  <remap from="cmd_vel" to="cmd_vel_input"/>
+  <remap from="takeoff" to="takeoff_input"/>
+  <!-- <remap from="land" to="land_input"/> -->
+  <include file="$(find bebop_tools)/launch/joy_teleop.launch">
+  </include>
+
+</launch>
