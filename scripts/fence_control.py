@@ -16,8 +16,16 @@ from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
 from dynamic_reconfigure.server import Server
 from drone_arena.cfg import ArenaConfig
 
+import diagnostic_updater
+import diagnostic_msgs
 
 F = 2.83
+
+
+def is_stop(cmd_vel):
+    a = np.array([cmd_vel.linear.x, cmd_vel.linear.y, cmd_vel.linear.z,
+                  cmd_vel.angular.x, cmd_vel.angular.y, cmd_vel.angular.z])
+    return np.allclose(a, np.array([0] * 6))
 
 
 # rotate from world to body frame (with quaternion q)
@@ -84,6 +92,7 @@ class Controller(object):
             "~pos_bounds",
             ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0)))
         self.home = rospy.get_param("~home", (0, 0, 1))
+        self.head_frame_id = rospy.get_param('head_frame_id', 'head')
         self.acc_bounds = ((0, 0), (0, 0))
         # self.max_acc_bounds = ((-2, 2), (-2, 2))
         # self.tau = 0.5
@@ -92,13 +101,55 @@ class Controller(object):
         self.tf_buffer = tf2_ros.Buffer()  # tf buffer length
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.target_position = None
-        self.target_yaw = None
+        self.target_yaw = 0.0
         # self.s_max = 1.5
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.update)
+
         self.srv = Server(ArenaConfig, self.callback)
         self.localized = False
         self.last_localization = None
+
+        self.battery_msg = None
+
+        self.updater = diagnostic_updater.Updater()
+        self.updater.setHardwareID("bebop controller")
+        self.updater.add("Localization", self.localization_diagnostics)
+        self.updater.add("Battery", self.battery_diagnostics)
+
+        rospy.Timer(rospy.Duration(1), self.update_diagnostics)
+
+        self.timer = rospy.Timer(rospy.Duration(0.1), self.update)
         rospy.spin()
+
+    def battery_diagnostics(self, stat):
+        if not self.battery_msg:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
+                         "No battery status received")
+        else:
+            d = (rospy.Time.now() - self.battery_msg.header.stamp).to_sec()
+            p = self.battery_msg.percent
+            if d > 60:
+                stat.summary(
+                    diagnostic_msgs.msg.DiagnosticStatus.WARN, "Not updated")
+            elif p < 10:
+                stat.summary(
+                    diagnostic_msgs.msg.DiagnosticStatus.WARN, "Almost empty")
+            else:
+                stat.summary(
+                    diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
+            stat.add("percent", p)
+            stat.add("last updated", "%.0f seconds ago" % d)
+        return stat
+
+    def localization_diagnostics(self, stat):
+        if self.localized:
+            stat.summary(
+                diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
+        else:
+            stat.summary(
+                diagnostic_msgs.msg.DiagnosticStatus.ERROR, "Not localized")
+
+    def update_diagnostics(self, event):
+        self.updater.update()
 
     @property
     def max_height(self):
@@ -110,58 +161,70 @@ class Controller(object):
         self.delay = config['delay']
         a = config['max_acceleration']
         self.max_acc_bounds = ((-a, a), (-a, a))
-        self.s_max = config['max_acceleration']
+        self.s_max = config['max_speed']
         self.enable_fence = config['enable_fence']
+        self.tracked_teleop = config['tracked_teleop']
+        self.teleop_mode = config['teleop_mode']
+
+        # print config['teleop_mode']
+        # print dir(ArenaConfig)
+
         return config
 
     def update_localization_state(self):
         if self.localized:
             if (rospy.Time.now() - self.last_localization).to_sec() > 1:
+                rospy.logwarn("No more localized")
                 self.localized = False
                 self.pub_cmd.publish(Twist())
 
-    def update(self, evt):
-        self.update_localization_state()
-        if self.target_position and self.localized:
-            rospy.loginfo("Go to target %s %s", self.target_position,
-                          self.target_yaw)
-            rospy.loginfo("From %s %s" % (self.position, self.yaw))
-            v_des = ((np.array(self.target_position) - np.array(self.position))
-                     / self.eta)
-            s_des = np.linalg.norm(v_des)
-            if s_des > self.s_max:
-                v_des = v_des / s_des * self.s_max
-                # TODO velocita' diverse per xy e z
-            a_des = (v_des[:2] - np.array(self.velocity)) / self.tau
-            a = clamp(a_des[:2], self.acc_bounds)
-            t = cmd_from_acc(a, self.q)
-            rospy.loginfo("v_des %s, a_des %s, t %s" % (v_des, a_des, t))
-            cmd_vel = Twist()
-            cmd_vel.linear.x = t[0]
-            cmd_vel.linear.y = t[1]
-            cmd_vel.linear.z = v_des[2]
-            d_yaw = self.target_yaw - self.yaw
-            if d_yaw > math.pi:
-                d_yaw = d_yaw - 2*math.pi
-            if d_yaw < -math.pi:
-                d_yaw = d_yaw + 2*math.pi
-            v_yaw = d_yaw / self.tau
-            cmd_vel.angular.z = v_yaw
-            rospy.loginfo("-> %s" % cmd_vel)
+    def update_pose_control(self, target_position, target_yaw):
+        rospy.loginfo("Go to target %s %s", target_position, target_yaw)
+        rospy.loginfo("From %s %s" % (self.position, self.yaw))
+        v_des = ((np.array(target_position) - np.array(self.position))
+                 / self.eta)
+        s_des = np.linalg.norm(v_des)
+        if s_des > self.s_max:
+            v_des = v_des / s_des * self.s_max
+            # TODO velocita' diverse per xy e z
+        a_des = (v_des[:2] - np.array(self.velocity)) / self.tau
+        a = clamp(a_des[:2], self.acc_bounds)
+        t = cmd_from_acc(a, self.q)
+        rospy.loginfo("v_des %s, a_des %s, t %s" % (v_des, a_des, t))
+        cmd_vel = Twist()
+        cmd_vel.linear.x = t[0]
+        cmd_vel.linear.y = t[1]
+        cmd_vel.linear.z = v_des[2]
+        d_yaw = target_yaw - self.yaw
+        if d_yaw > math.pi:
+            d_yaw = d_yaw - 2*math.pi
+        if d_yaw < -math.pi:
+            d_yaw = d_yaw + 2*math.pi
+        v_yaw = d_yaw / self.tau
+        cmd_vel.angular.z = v_yaw
+        rospy.loginfo("-> %s" % cmd_vel)
+        self.pub_cmd.publish(cmd_vel)
 
-            self.pub_cmd.publish(cmd_vel)
+    def update(self, evt):
+        # print "*****"
+        self.update_localization_state()
+        # rospy.loginfo("update %s %s", self.target_position, self.localized)
+        #
+        if self.target_position is not None and self.localized:
+            self.update_pose_control(self.target_position, self.target_yaw)
 
     def go_home(self):
         if self.home:
             self.target_position = self.home
-            rospy.warning("flying home to %s" % self.home)
+            rospy.logwarn("flying home to %s" % self.home)
 
     def has_received_battery(self, msg):
+        self.battery_msg = msg
         if(msg.percent < 2):
             # not really usefull
             self.pub_land.publish(Empty())
         if(msg.percent < 5):
-            rospy.warning("battery nearly deplated")
+            rospy.logwarn("battery nearly deplated")
             self.go_home()
 
     def has_received_land(self, msg):
@@ -182,11 +245,17 @@ class Controller(object):
         if not self.localized:
             self.pub_cmd.publish(Twist())
             return
+        vz = msg.linear.z
+        vyaw = msg.angular.z
         msg.linear.z = min(msg.linear.z, 2 * (self.max_height - self.z))
         # rospy.logwarn("too high")
         if self.inside_fence:
             # TODO apply when outside too
-            self.clamp_in_fence_cmd(msg)
+            a = self.clamp_in_fence_cmd(msg)
+            if self.tracked_teleop and not is_stop(msg):
+                target_pos, target_yaw = self.tracked_teleop_cmd(a, vz, vyaw)
+                self.update_pose_control(target_pos, target_yaw)
+                return
             self.pub_cmd.publish(msg)
         else:
             self.pub_cmd.publish(Twist())
@@ -198,9 +267,25 @@ class Controller(object):
         else:
             return pos
 
+    def tracked_teleop_cmd(self, acc, vz, vyaw):
+        # world frame
+        # d = 1.0
+        v = [0.5 * acc[0], 0.5 * acc[1], vz]
+        target_position = np.array(self.position) + np.array(v)
+        target_yaw = self.yaw + vyaw
+        return target_position, target_yaw
+
     def clamp_in_fence_cmd(self, cmd_vel):
         rospy.loginfo("clamp %s" % cmd_vel)
-        a = acc_from_cmd(cmd_vel, self.q)
+        if self.teleop_mode == ArenaConfig.Arena_Head:
+            _, q = self.tf_buffer.lookup_transform(
+                "World", self.head_frame_id, rospy.Time(0),
+                rospy.Duration(0.1))
+            a = acc_from_cmd(cmd_vel, q)
+        elif self.teleop_mode == ArenaConfig.Arena_World:
+            a = acc_from_cmd(cmd_vel, [0, 0, 0, 1])
+        elif self.teleop_mode == ArenaConfig.Arena_Body:
+            a = acc_from_cmd(cmd_vel, self.q)
         print("acc %s" % a)
         a = clamp(a, self.max_acc_bounds)
         if self.enable_fence:
@@ -211,6 +296,7 @@ class Controller(object):
         cmd_vel.linear.x = t[0]
         cmd_vel.linear.y = t[1]
         rospy.loginfo("to %s" % cmd_vel)
+        return a
 
     # TODO: force target to be inside the fence !!!
     # (shapely, maybe with a margin)

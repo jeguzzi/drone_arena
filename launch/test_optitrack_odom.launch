@@ -2,5 +2,9 @@
 
     <node name='filtered_optitrack' pkg='optitrack2odom' type='optitrack2odom' output="screen">
       <param name="rate" value="20.0"/>
+      <rosparam param="marker_frame">
+        Rigid Body 2: rb2
+        Rigid Body 3: rb3
+      </rosparam>
     </node>
 </launch>
