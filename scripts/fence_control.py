@@ -19,6 +19,10 @@ from drone_arena.cfg import ArenaConfig
 import diagnostic_updater
 import diagnostic_msgs
 
+import actionlib
+from drone_arena.msg import GoToPoseFeedback, GoToPoseResult, GoToPoseAction
+
+
 F = 2.83
 
 
@@ -84,7 +88,15 @@ class Controller(object):
         self.pos_bounds = rospy.get_param(
             "~pos_bounds",
             ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0)))
-        self.home = rospy.get_param("~home", (0, 0, 1))
+        _home = rospy.get_param("~home", (0, 0, 1))
+        self.home_p = _home
+        self.home = PoseStamped()
+        self.home.header.frame_id = 'World'
+        self.home.pose.position.x = _home[0]
+        self.home.pose.position.y = _home[1]
+        self.home.pose.position.z = _home[2]
+        self.home.pose.orientation.w = 1
+
         self.head_frame_id = rospy.get_param('head_frame_id', 'head')
         self.acc_bounds = ((0, 0), (0, 0))
         # self.max_acc_bounds = ((-2, 2), (-2, 2))
@@ -126,9 +138,49 @@ class Controller(object):
                          self.has_received_battery)
 
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
-        self.timer = rospy.Timer(rospy.Duration(0.1), self.update)
+        self.timer = rospy.Timer(rospy.Duration(0.05), self.update)
 
+        self._as = actionlib.SimpleActionServer(
+            'fence_control', GoToPoseAction, execute_cb=self.execute_cb,
+            auto_start=False)
+        self._as.start()
         rospy.spin()
+
+    def is_near(self, position, yaw):
+        d_p = np.linalg.norm(np.array(position) - np.array(self.position))
+        d_y = yaw - self.yaw
+        if d_y > math.pi:
+            d_y = d_y - 2*math.pi
+        if d_y < - math.pi:
+            d_y = d_y + 2*math.pi
+        return (d_p < 0.1 and d_y < 0.2, d_p, d_y)
+
+    def execute_cb(self, goal):
+        rospy.loginfo('Executing action Go To Pose %s' % goal.target_pose)
+        self.go_to_pose(goal.target_pose)
+
+    def go_to_pose(self, target_pose):
+        self.has_received_target(target_pose)
+        p = self.target_position
+        y = self.target_yaw
+        r = rospy.Rate(5.0)
+        feedback = GoToPoseFeedback()
+        result = GoToPoseResult()
+        while(True):
+            if self._as.is_preempt_requested():
+                rospy.loginfo('Preempted')
+                self._as.set_preempted()
+                self.target_position = None
+                self.pub_cmd.publish(Twist())
+                return
+            near, feedback.distance, _ = self.is_near(p, y)
+            if near:
+                rospy.loginfo('Succeeded')
+                self._as.set_succeeded(result)
+                return
+            # publish the feedback
+            self._as.publish_feedback(feedback)
+            r.sleep()
 
     def has_received_enable_tracking(self, msg):
         self.track_head = msg.data
@@ -258,17 +310,26 @@ class Controller(object):
             self.update_pose_control(self.target_position, self.target_yaw,
                                      self.target_velocity)
 
+    # def go_home_and_land(self, msg):
+    #     if self.home:
+    #         rospy.logwarn("flying home to %s" % self.home)
+    #         self.go_to_pose(self.home)
+    #         self.target_position = None
+    #         self.pub_land.publish(Empty())
+
     def go_home(self):
         if self.home:
             self.track_head = False
-            self.target_position = self.home
+            self.target_position = self.home_p
             self.target_velocity = [0, 0, 0]
-            rospy.logwarn("flying home to %s" % self.home)
+            rospy.logwarn("flying home to %s" % self.home_p)
 
     def has_received_battery(self, msg):
         self.battery_msg = msg
         if(msg.percent < 2):
             # not really usefull
+            self.target_position = None
+            self.track_head = False
             self.pub_land.publish(Empty())
         if(msg.percent < 5):
             rospy.logwarn("battery nearly deplated")
@@ -287,6 +348,7 @@ class Controller(object):
 
     def has_received_input_cmd(self, msg):
         self.target_position = None
+        self.track_head = False
         if not self.enable_fence:
             self.pub_cmd.publish(msg)
             return
@@ -363,6 +425,7 @@ class Controller(object):
 
     def has_received_target(self, msg):
         rospy.loginfo("Has received target")
+        self.track_head = False
         # convert in world frame
         transform = self.tf_buffer.lookup_transform(
             "World", msg.header.frame_id, rospy.Time(0), rospy.Duration(0.1))

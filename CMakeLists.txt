@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   tf2_ros
   dynamic_reconfigure
+  actionlib_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -60,18 +61,19 @@ find_package(catkin REQUIRED COMPONENTS
 #   Service2.srv
 # )
 
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+# Generate actions in the 'action' folder
+add_action_files(
+  FILES
+  GoToPose.action
+)
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  geometry_msgs
+  std_msgs
+  actionlib_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -104,7 +106,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES drone_arena
-#  CATKIN_DEPENDS bebop_autonomy geometry_msgs nav_msgsrospyc tf2_ros
+#  CATKIN_DEPENDS bebop_autonomy geometry_msgs nav_msgs rospy tf2_ros actionlib_msgs
 #  DEPENDS system_lib
 )
 

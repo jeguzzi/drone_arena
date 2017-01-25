@@ -1,0 +1,13 @@
+<launch>
+  <node name='planner' pkg='drone_arena' type='test_client.py' output="screen" ns="bebop">
+    <rosparam param="home">[0, 0, 1, 0]</rosparam>
+    <rosparam param="plan">
+      - [2,  2,  1,  -3.14]
+      - [-2, 2,  1,  -1.57]
+      - [-2, -2, 1,   0]
+      - [2,  -2, 1.5,  1.57]
+      - [-2,  2, 0.5,  1.57]
+      - [0,  0,  1,  0]
+    </rosparam>
+  </node>
+</launch>
