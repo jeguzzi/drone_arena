@@ -1,24 +1,29 @@
 version: '2'
 services:
   driver:
-    network_mode: host
     container_name: driver
     image: bebop
     volumes:
       - ./logs:/root/.ros/log:rw
     environment:
       - "ROS_MASTER_URI=http://192.168.201.2:11311"
-      - "ROS_HOSTNAME=192.168.201.4"
+      - "ROS_HOSTNAME=192.168.201.3"
     command: roslaunch bebop_driver bebop_node.launch
-  teleop:
-    privileged: true
-    network_mode: host
-    container_name: teleop
-    image: bebop
+  fence:
+    container_name: fence
+    image: fence
     volumes:
       - ./logs:/root/.ros/log:rw
     environment:
       - "ROS_MASTER_URI=http://192.168.201.2:11311"
-      - "ROS_HOSTNAME=192.168.201.4"
-    command: roslaunch bebop_tools joy_teleop.launch 
-
+      - "ROS_HOSTNAME=192.168.201.3"
+    command: roslaunch drone_arena test_fence_basic.launch
+  plan:
+    container_name: plan
+    image: fence
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    environment:
+      - "ROS_MASTER_URI=http://192.168.201.2:11311"
+      - "ROS_HOSTNAME=192.168.201.3"
+    command: roslaunch drone_arena test_client.launch
