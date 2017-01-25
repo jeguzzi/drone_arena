@@ -4,7 +4,7 @@ import rospy
 from std_msgs.msg import Empty, Bool
 from geometry_msgs.msg import Twist, PoseStamped
 from nav_msgs.msg import Odometry
-from shapely.geometry import Polygon, Point
+# from shapely.geometry import Polygon, Point
 from tf.transformations import quaternion_conjugate, quaternion_multiply
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 import tf2_ros
@@ -76,9 +76,9 @@ class Controller(object):
         self.pub_cmd = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.pub_takeoff = rospy.Publisher('takeoff', Empty, queue_size=1)
         self.pub_land = rospy.Publisher('land', Empty, queue_size=1)
-
-        self.fence = Polygon(
-            [(-2.8, -2.8), (-2.8, 2.8), (2.8, 2.8), (2.8, -2.8)])
+        self.fence_margin = 0.5
+        # self.fence = Polygon(
+        #     [(-2.8, -2.8), (-2.8, 2.8), (2.8, 2.8), (2.8, -2.8)])
         # self.max_height = 2.0
         self.inside_fence = False
         self.z = 0
@@ -274,7 +274,8 @@ class Controller(object):
             target_velocity)
         rospy.logdebug(
             "From %s %s %s" % (self.position, self.yaw, self.velocity))
-        v_des = ((np.array(target_position) - np.array(self.position) - np.array(self.velocity) * self.delay)
+        v_des = ((np.array(target_position) - np.array(self.position) -
+                  np.array(self.velocity) * self.delay)
                  / self.eta + np.array(target_velocity))
         s_des = np.linalg.norm(v_des)
         if s_des > self.s_max:
@@ -436,18 +437,21 @@ class Controller(object):
         _, _, self.target_yaw = euler_from_quaternion([_o.x, _o.y, _o.z, _o.w])
         self.target_velocity = [0, 0, 0]
 
+    def inside_fence_margin(self, position):
+        m = self.fence_margin
+        return all([x > x_min - m and x < x_max + m
+                    for x, (x_min, x_max)
+                    in zip(position[:2], self.pos_bounds[:2])])
+
     def has_received_odometry(self, msg):
         self.last_localization = msg.header.stamp
         _p = msg.pose.pose.position
-        p = Point((_p.x, _p.y))
         self.z = _p.z
-        # rospy.loginfo((self.z, self.max_height))
-        self.inside_fence = self.fence.contains(p)
-        # position = [p.x, p.y]
         _v = msg.twist.twist.linear
         o = msg.pose.pose.orientation
         # position in world_frame
         self.position = [_p.x, _p.y, _p.z]
+        self.inside_fence = self.inside_fence_margin(self.position)
         self.q = [o.x, o.y, o.z, o.w]
         _, _, self.yaw = euler_from_quaternion(self.q)
         # velocity in world frame
