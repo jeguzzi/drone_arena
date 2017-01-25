@@ -4,13 +4,14 @@
     <remap from="odom" to="mocap_odom"/>
     <param name="tau" value="0.5"/>
     <param name="eta" value="1.0"/>
-    <rosparam param="pos_bounds">[[-1.8, 1.8], [-1.8, 1.8], [0.5, 2.0]]</rosparam>
+    <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 2.4], [0.5, 2.0]]</rosparam>
     <rosparam param="home">[0, 0, 1]</rosparam>
   </node>
   <remap from="cmd_vel" to="cmd_vel_input"/>
   <remap from="takeoff" to="takeoff_input"/>
   <!-- <remap from="land" to="land_input"/> -->
   <include file="$(find bebop_tools)/launch/joy_teleop.launch">
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710.yaml" />
   </include>
 
 </launch>

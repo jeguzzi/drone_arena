@@ -29,9 +29,11 @@
   - [x] Add z bounds to target
 
 - [ ] Assisted joystick control
-  - [ ] World frame
-  - [ ] head frame
-  - [ ] modify config of joy_teleop to add new actions for:
+  - [x] World frame
+  - [x] head frame
+  - [x] joy in pos control mode
+    - [ ] not satisfyng yet
+  - [x] modify config of joy_teleop to add new actions for:
     - [ ] mode switching
 - [ ] Safety
   - What happen if lose connection??
@@ -39,3 +41,7 @@
 
 - [ ] Multiple bebop_msgs
   - see https://github.com/tnaegeli/multiple_bebops
+
+
+- [ ] Head tracker
+  - [ ] simple separate node (at first without fence)
