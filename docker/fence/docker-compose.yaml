@@ -4,16 +4,16 @@ services:
     container_name: monitor
     image: docker_ui
     volumes:
-	- ./logs:/root/.ros/log:rw
-	- /var/run/docker.sock:/var/run/docker.sock
+      - ./logs:/root/.ros/log:rw
+      - /var/run/docker.sock:/var/run/docker.sock
     command: roslaunch docker_ui monitor.launch
     environment:
-	- "ifaces=['en0', 'wlx60e3271c3529']"
-    	- "ROS_IP=192.168.201.4"
-    	- "ROS_MASTER_URI=http://192.168.201.2:11311"
+      - "ifaces=['en0', 'wlx60e3271c3529']"
+      - "ROS_IP=192.168.201.4"
+      - "ROS_MASTER_URI=http://192.168.201.2:11311"
     ports:
-	- 8085:8085
-	- 9090:9090
+      - 8085:8085
+      - 9090:9090
   driver:
     network_mode: host
     container_name: driver
