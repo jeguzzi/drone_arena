@@ -62,7 +62,6 @@ class Planner():
             elif state == GoalStatus.PREEMPTED:
                 rospy.loginfo("Goal preempted!")
 
-
     def land_home(self, msg):
         goal = GoToPoseGoal(target_pose=self.home)
         self.client.send_goal(goal)
