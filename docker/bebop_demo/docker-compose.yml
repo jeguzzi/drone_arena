@@ -24,7 +24,7 @@ services:
     depends_on:
       - roscore
   driver:
-    network_mode: *n
+    network_mode: *nm
     image: bebop
     volumes:
       - ./logs:/root/.ros/log:rw
@@ -35,7 +35,7 @@ services:
       - roscore
   controller:
     privileged: true
-    network_mode: *n
+    network_mode: *nm
     image: fence
     volumes:
       - ./logs:/root/.ros/log:rw
@@ -45,7 +45,7 @@ services:
     depends_on:
       - roscore
   land:
-    network_mode: *n
+    network_mode: *nm
     image: bebop
     volumes:
       - ./logs:/root/.ros/log:rw
