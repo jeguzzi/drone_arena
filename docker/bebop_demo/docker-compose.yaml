@@ -13,7 +13,7 @@ services:
     volumes:
       - ./logs:/root/.ros/log:rw
       - /var/run/docker.sock:/var/run/docker.sock
-    command: roslaunch docker_ui monitor.launch video:=true
+    command: roslaunch docker_ui monitor.launch video:=true video_stream:=/bebop/image_raw
     network_mode: *nm
     env_file:
       - ./ros.env
