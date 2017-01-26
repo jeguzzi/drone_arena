@@ -1,6 +1,7 @@
 version: '2'
 services:
   monitor:
+    network_mode: host
     container_name: monitor
     image: docker_ui
     volumes:
@@ -8,7 +9,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     command: roslaunch docker_ui monitor.launch
     environment:
-      - "ifaces=['en0', 'wlx60e3271c3529']"
+      - "ifaces=['eno1', 'wlx60e3271c3529']"
       - "ROS_IP=192.168.201.4"
       - "ROS_MASTER_URI=http://192.168.201.2:11311"
     ports:
