@@ -166,7 +166,7 @@ class Controller(object):
         r = rospy.Rate(5.0)
         feedback = GoToPoseFeedback()
         result = GoToPoseResult()
-        while(True):
+        while(self.target_position):
             if self._as.is_preempt_requested():
                 rospy.loginfo('Preempted')
                 self._as.set_preempted()
@@ -181,9 +181,14 @@ class Controller(object):
             # publish the feedback
             self._as.publish_feedback(feedback)
             r.sleep()
+        if not self.target_position:
+            self._as.set_preempted()
 
     def has_received_enable_tracking(self, msg):
         self.track_head = msg.data
+        if self.track_head:
+            self.target_position = None
+            # Will preempt GoToPose action
 
     def has_received_head(self, msg):
         if self.track_head and self.localized:
