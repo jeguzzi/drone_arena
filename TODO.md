@@ -42,6 +42,9 @@
 - [ ] Multiple bebop_msgs
   - see https://github.com/tnaegeli/multiple_bebops
 
+- [ ] Demo
+  - part of old Juan version
+    - [ ] gestures (for takeoff, land, follow and hover)
 
-- [ ] Head tracker
+- [x] Head tracker
   - [ ] simple separate node (at first without fence)
