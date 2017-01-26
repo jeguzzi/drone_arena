@@ -26,12 +26,13 @@ class Planner():
         self.client = actionlib.SimpleActionClient(
             'fence_control', GoToPoseAction)
         self.home = pose(*rospy.get_param("~home", (0, 0, 1, 0)))
-        poses = [pose(*x) for x in rospy.get_param("~plan", [])]
-        loop = rospy.get_param("~loop", False)
-        if loop:
-            self.plan = cycle(poses)
+        self._poses = [pose(*x) for x in rospy.get_param("~plan", [])]
+        self.loop = rospy.get_param("~loop", False)
+        if self.loop:
+            self.plan = cycle(self._poses)
         else:
-            self.plan = iter(poses)
+            self.plan = iter(self._poses)
+        self.done = False
         rospy.loginfo("home %s", self.home)
         rospy.loginfo("plan %s", self.plan)
         self.current_target = None
@@ -41,6 +42,7 @@ class Planner():
         rospy.Subscriber("start", Empty, self.start_path)
         rospy.Subscriber("stop", Empty, self.stop_path)
         rospy.Subscriber("land_home", Empty, self.land_home)
+        self.land_pub = rospy.Publisher("land", Empty, queue_size=1)
         rospy.loginfo("init done")
         while not rospy.is_shutdown():
             if self.running:
@@ -49,10 +51,11 @@ class Planner():
                         self.next_waypoint = self.plan.next()
                     except StopIteration:
                         self.running = False
+                        self.done = True
                 if self.next_waypoint:
                     goal = GoToPoseGoal(target_pose=self.next_waypoint)
                     self.move(goal)
-            rospy.sleep(1)
+            rospy.sleep(0.2)
 
     def move(self, goal):
         rospy.loginfo("Move to Goal %s", goal)
@@ -76,12 +79,18 @@ class Planner():
         rospy.loginfo("Go home and land")
         goal = GoToPoseGoal(target_pose=self.home)
         self.client.send_goal(goal)
-        self.client.wait_for_result(rospy.Duration(60))
-        rospy.loginfo("landed: %s" % self.client.get_state())
+        if self.client.wait_for_result(rospy.Duration(60)):
+            if self.client.get_state() == GoalStatus.SUCCEEDED:
+                rospy.loginfo("ready to land")
+                self.land_pub.publish(Empty)
 
     def start_path(self, msg):
         rospy.loginfo("(re)Start a path")
         self.running = True
+        if not self.loop and self.done:
+            self.done = False
+            self.next_waypoint = None
+            self.plan = iter(self._poses)
 
     def stop_path(self, msg):
         if self.running:

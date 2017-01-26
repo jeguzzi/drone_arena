@@ -150,9 +150,9 @@ class Controller(object):
         d_p = np.linalg.norm(np.array(position) - np.array(self.position))
         d_y = yaw - self.yaw
         if d_y > math.pi:
-            d_y = d_y - 2*math.pi
+            d_y = d_y - 2 * math.pi
         if d_y < - math.pi:
-            d_y = d_y + 2*math.pi
+            d_y = d_y + 2 * math.pi
         return (d_p < 0.1 and d_y < 0.2, d_p, d_y)
 
     def execute_cb(self, goal):
@@ -166,7 +166,7 @@ class Controller(object):
         r = rospy.Rate(5.0)
         feedback = GoToPoseFeedback()
         result = GoToPoseResult()
-        while(self.target_position):
+        while(self.target_position and self.localized):
             if self._as.is_preempt_requested():
                 rospy.loginfo('Preempted')
                 self._as.set_preempted()
@@ -181,7 +181,7 @@ class Controller(object):
             # publish the feedback
             self._as.publish_feedback(feedback)
             r.sleep()
-        if not self.target_position:
+        if not (self.target_position and self.localized):
             self._as.set_preempted()
 
     def has_received_enable_tracking(self, msg):
@@ -280,8 +280,8 @@ class Controller(object):
         rospy.logdebug(
             "From %s %s %s" % (self.position, self.yaw, self.velocity))
         v_des = ((np.array(target_position) - np.array(self.position) -
-                  np.array(self.velocity) * self.delay)
-                 / self.eta + np.array(target_velocity))
+                  np.array(self.velocity) * self.delay) /
+                 self.eta + np.array(target_velocity))
         s_des = np.linalg.norm(v_des)
         if s_des > self.s_max:
             v_des = v_des / s_des * self.s_max
@@ -299,9 +299,9 @@ class Controller(object):
         cmd_vel.linear.z = v_des[2]
         d_yaw = target_yaw - self.yaw
         if d_yaw > math.pi:
-            d_yaw = d_yaw - 2*math.pi
+            d_yaw = d_yaw - 2 * math.pi
         if d_yaw < -math.pi:
-            d_yaw = d_yaw + 2*math.pi
+            d_yaw = d_yaw + 2 * math.pi
         v_yaw = d_yaw / self.tau
         cmd_vel.angular.z = v_yaw
         rospy.logdebug("-> %s" % cmd_vel)
@@ -348,6 +348,8 @@ class Controller(object):
 
     def has_received_takeoff(self, msg):
         if self.inside_fence:
+            self.target_position = None
+            self.track_head = False
             self.pub_takeoff.publish(Empty())
         else:
             rospy.logwarn("outside fence, will not takeoff")
@@ -406,10 +408,17 @@ class Controller(object):
     def clamp_in_fence_cmd(self, cmd_vel):
         rospy.logdebug("clamp %s" % cmd_vel)
         if self.teleop_mode == ArenaConfig.Arena_Head:
-            _, q = self.tf_buffer.lookup_transform(
-                "World", self.head_frame_id, rospy.Time(0),
-                rospy.Duration(0.1))
-            a = acc_from_cmd(cmd_vel, q)
+            try:
+                _, q = self.tf_buffer.lookup_transform(
+                    "World", self.head_frame_id, rospy.Time(0),
+                    rospy.Duration(0.1))
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                    tf2_ros.ExtrapolationException):
+                q = None
+            if q is not None:
+                a = acc_from_cmd(cmd_vel, q)
+            else:
+                a = [0, 0]
         elif self.teleop_mode == ArenaConfig.Arena_World:
             a = acc_from_cmd(cmd_vel, [0, 0, 0, 1])
         elif self.teleop_mode == ArenaConfig.Arena_Body:
@@ -433,8 +442,13 @@ class Controller(object):
         rospy.loginfo("Has received target")
         self.track_head = False
         # convert in world frame
-        transform = self.tf_buffer.lookup_transform(
-            "World", msg.header.frame_id, rospy.Time(0), rospy.Duration(0.1))
+        try:
+            transform = self.tf_buffer.lookup_transform(
+                "World", msg.header.frame_id, rospy.Time(0),
+                rospy.Duration(0.1))
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException):
+            self.target_position = None
         target_pose = tf2_geometry_msgs.do_transform_pose(msg, transform)
         _p = target_pose.pose.position
         _o = target_pose.pose.orientation
