@@ -1,0 +1,46 @@
+version: '2'
+services:
+  roscore:
+    network_mode: host
+    image: ros
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roscore
+  monitor:
+    image: docker_ui
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: roslaunch docker_ui monitor.launch video:=true
+    network_mode: host
+    env_file:
+      - ./ros.env
+      - ./monitor.env
+    # ports:
+    #   - 8085:8085
+    #   - 9090:9090
+    depends_on:
+      - roscore
+  driver:
+    network_mode: host
+    image: bebop
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roslaunch bebop_driver bebop_node.launch
+    depends_on:
+      - roscore
+  controller:
+    privileged: true
+    network_mode: host
+    image: fence
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roslaunch drone_arena demo.launch
+    depends_on:
+      - roscore
