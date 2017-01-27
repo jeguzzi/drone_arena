@@ -92,7 +92,7 @@ teleop:
     type: topic
     message_type: "std_msgs/Empty"
     topic_name: "start"
-    deadman_buttons: [2]
+    deadman_buttons: [0]
     axis_mappings: []
   land_home:
     type: topic

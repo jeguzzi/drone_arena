@@ -21,6 +21,7 @@ def pose(x, y, z, yaw):
 
 
 class Planner():
+
     def __init__(self):
         rospy.init_node('fence_client')
         self.client = actionlib.SimpleActionClient(
@@ -38,6 +39,7 @@ class Planner():
         self.current_target = None
         self.client.wait_for_server()
         self.running = False
+        self.landing = False
         self.next_waypoint = None
         rospy.Subscriber("start", Empty, self.start_path)
         rospy.Subscriber("stop", Empty, self.stop_path)
@@ -66,6 +68,7 @@ class Planner():
         if not finished_within_time:
             self.client.cancel_goal()
             rospy.loginfo("Timed out achieving goal")
+            self.running = False
         else:
             # We made it!
             state = self.client.get_state()
@@ -74,17 +77,30 @@ class Planner():
                 self.next_waypoint = None
             elif state == GoalStatus.PREEMPTED:
                 rospy.loginfo("Goal preempted!")
+                self.running = False
 
     def land_home(self, msg):
+        if self.landing:
+            return
+        self.landing = True
         rospy.loginfo("Go home and land")
+        self.running = False
+        self.client.cancel_all_goals()
         goal = GoToPoseGoal(target_pose=self.home)
         self.client.send_goal(goal)
         if self.client.wait_for_result(rospy.Duration(60)):
             if self.client.get_state() == GoalStatus.SUCCEEDED:
                 rospy.loginfo("ready to land")
-                self.land_pub.publish(Empty)
+                rospy.sleep(1.0)
+                self.land_pub.publish(Empty())
+            else:
+                rospy.loginfo("Failed moving to home %s",
+                              self.client.get_state())
+        self.landing = False
 
     def start_path(self, msg):
+        if self.running:
+            return
         rospy.loginfo("(re)Start a path")
         self.running = True
         if not self.loop and self.done:

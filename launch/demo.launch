@@ -4,8 +4,10 @@
     <remap from="odom" to="mocap_odom"/>
     <param name="tau" value="0.5"/>
     <param name="eta" value="1.0"/>
+    <param name="max_speed" value="1.0"/>
+    <param name="delay" value="0.1"/>
     <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 2.4], [0.5, 2.0]]</rosparam>
-    <rosparam param="home">[0, 0, 1]</rosparam>
+    <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
   </node>
   <remap from="cmd_vel" to="cmd_vel_input"/>
   <remap from="takeoff" to="takeoff_input"/>
@@ -15,7 +17,7 @@
   </include>
 
   <node name="demo" pkg='drone_arena' type='test_client.py' output="screen" ns="bebop">
-    <rosparam param="home">[0, 0, 1, 0]</rosparam>
+    <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
     <rosparam param="plan">
       - [0.5,  -2,  1.5,  -1.57]
       - [-2, -1.5,  1.5,  -3.14]
