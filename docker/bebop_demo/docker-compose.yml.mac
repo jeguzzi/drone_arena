@@ -1,0 +1,61 @@
+version: '2'
+services:
+  roscore:
+    image: ros
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env.mac
+    command: roscore
+    environment:
+      - ROS_HOSTNAME=roscore
+  monitor:
+    image: docker_ui
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: roslaunch docker_ui monitor.launch video:=true video_stream:=/bebop/image_raw
+    env_file:
+      - ./ros.env.mac
+      - ./monitor.env
+    environment:
+      - ROS_HOSTNAME=docker_ui
+    # ports:
+    #   - 8085:8085
+    #   - 9090:9090
+    depends_on:
+      - roscore
+  driver:
+    image: bebop
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env.mac
+    command: roslaunch bebop_driver bebop_node.launch
+    depends_on:
+      - roscore
+    environment:
+      - ROS_HOSTNAME=bebop
+  controller:
+    privileged: true
+    image: fence
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env.mac
+    command: roslaunch drone_arena demo.launch
+    depends_on:
+      - roscore
+    environment:
+      - ROS_HOSTNAME=controller
+  land:
+    image: bebop
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env.mac
+    command: rostopic pub --once /bebop/land std_msgs/Empty
+    depends_on:
+      - roscore
+    environment:
+      - ROS_HOSTNAME=land
