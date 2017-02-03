@@ -76,6 +76,8 @@ class Controller(object):
         self.pub_cmd = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.pub_takeoff = rospy.Publisher('takeoff', Empty, queue_size=1)
         self.pub_land = rospy.Publisher('land', Empty, queue_size=1)
+        self.land_home_pub = rospy.Publisher(
+            'land_home', Empty, queue_size=1)
         self.fence_margin = 0.5
         # self.fence = Polygon(
         #     [(-2.8, -2.8), (-2.8, 2.8), (2.8, 2.8), (2.8, -2.8)])
@@ -166,7 +168,7 @@ class Controller(object):
         r = rospy.Rate(5.0)
         feedback = GoToPoseFeedback()
         result = GoToPoseResult()
-        while(self.target_position and self.localized):
+        while(self.target_position and self.localized and not self.track_head):
             if self._as.is_preempt_requested():
                 rospy.loginfo('Preempted')
                 self._as.set_preempted()
@@ -177,12 +179,15 @@ class Controller(object):
             if near:
                 rospy.loginfo('Succeeded')
                 self._as.set_succeeded(result)
+                self.target_position = None
                 return
             # publish the feedback
             self._as.publish_feedback(feedback)
             r.sleep()
-        if not (self.target_position and self.localized):
+        if not (self.target_position and self.localized and
+                not self.track_head):
             self._as.set_preempted()
+        self.target_position = None
 
     def has_received_enable_tracking(self, msg):
         self.track_head = msg.data
@@ -323,6 +328,9 @@ class Controller(object):
     #         self.target_position = None
     #         self.pub_land.publish(Empty())
 
+    def go_home_and_land(self):
+        self.land_home_pub.publish(Empty())
+
     def go_home(self):
         if self.home:
             self.track_head = False
@@ -332,16 +340,17 @@ class Controller(object):
 
     def has_received_battery(self, msg):
         self.battery_msg = msg
-        if(msg.percent < 2):
-            # not really usefull
-            self.target_position = None
-            self.track_head = False
-            self.pub_land.publish(Empty())
+        # if(msg.percent < 2):
+        #     # not really usefull
+        #     self.target_position = None
+        #     self.track_head = False
+        #     self.pub_land.publish(Empty())
         if(msg.percent < 5):
             rospy.logwarn("battery nearly deplated")
-            self.go_home()
+            self.go_home_and_land()
 
     def has_received_land(self, msg):
+        rospy.loginfo("Controller has received landing")
         self.target_position = None
         self.track_head = False
         # self.pub_land.publish(Empty())
