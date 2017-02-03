@@ -2,7 +2,7 @@ FROM ros:latest
 MAINTAINER Jerome Guzzi "jerome@idsia.ch"
 
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --fix-missing\
    git \
    build-essential python-rosdep python-catkin-tools \
    sudo
@@ -27,4 +27,6 @@ ENTRYPOINT ["/ros_entrypoint.sh"]
 CMD ["bash"]
 
 RUN apt-get update && apt-get install -y \
-   ros-kinetic-robot-state-publisher
+   ros-kinetic-robot-state-publisher \
+   ros-kinetic-compressed-image-transport \
+   ros-kinetic-image-transport-plugins
