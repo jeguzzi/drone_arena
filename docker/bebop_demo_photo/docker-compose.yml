@@ -34,6 +34,7 @@ services:
     privileged: true
     network_mode: *nm
     image: fence:photo
+    build: .
     volumes:
       - ./logs:/root/.ros/log:rw
     env_file:
