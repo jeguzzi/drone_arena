@@ -406,7 +406,7 @@ class Controller(object):
 
     def tracked_teleop_cmd_pos(self, acc, vz, vyaw):
         # world frame
-        d = self.tracked_teleop_cmd
+        d = self.tracked_teleop_d
         a = np.array(acc[:2])
         v = a / np.linalg.norm(a) / F * self.s_max
         v = [v[0], v[1], vz]
