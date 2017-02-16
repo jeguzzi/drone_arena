@@ -104,11 +104,11 @@ teleop:
     type: topic
     message_type: "std_msgs/Empty"
     topic_name: "switch_observe"
-    deadman_buttons: [2]
+    deadman_buttons: [8]
     axis_mappings: []
   stop_observing:
     type: topic
     message_type: "std_msgs/Empty"
     topic_name: "stop_observe"
-    deadman_buttons: [8]
+    deadman_buttons: [6]
     axis_mappings: []

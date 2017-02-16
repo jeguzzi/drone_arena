@@ -6,14 +6,9 @@ from ftplib import FTP
 from io import BytesIO
 # See http://bebop-autonomy.readthedocs.io/en/latest/piloting.html
 # #take-on-board-snapshot
-import flickr_api
-from flickr_api.api import flickr
+from my_flickr_api import upload
 from geometry_msgs.msg import PoseStamped, PointStamped, Point
-from fence_client import pose
-flickr_secret_app = "Qselfie"
-flickr_key = "9aa598dd27f68aac0b2bcd928dff1427"
-flickr_secret = "2d680c98807617aa"
-flickr_api.set_keys(api_key=flickr_key, api_secret=flickr_secret)
+from test_client import pose
 
 
 def point(x, y, z):
@@ -32,17 +27,16 @@ class Photographer():
         self.observe = point(*rospy.get_param("~observe"))
         self.snapshot_pub = rospy.Publisher("snapshot", Empty,
                                             queue_size=1)
-        rospy.Subscriber('take_photo', Empty, self.take_photo)
+        rospy.Subscriber('take_photo', Empty, self.take_photo, queue_size=1)
         rospy.Subscriber('go_photo', Empty, self.go_photo)
         self.target_pub = rospy.Publisher(
             'target', PoseStamped, queue_size=1)
         self.observe_pub = rospy.Publisher(
             'observe', PointStamped, queue_size=1)
-        flickr_api.set_auth_handler('flickr_auth')
-        rospy.loginfo('init flickr %s', flickr)
+        rospy.loginfo("Will observe %s", self.observe)
         rospy.spin()
 
-    def go_photo(self):
+    def go_photo(self, msg):
         self.target_pub.publish(self.place)
         self.observe_pub.publish(self.observe)
 
@@ -54,8 +48,8 @@ class Photographer():
         rospy.loginfo('Connected')
         ftp.cwd('internal_000/Bebop_2/media')
         while True:
-            file_names = ftp.nlst()
-            rospy.loginfo("Files %s", file_names)
+            file_names = [f for f in ftp.nlst() if 'jpg' in f]
+            # rospy.loginfo("Files %s", file_names)
             if file_names:
                 for name in file_names:
                     rospy.loginfo("Try to retrieve %s", name)
@@ -75,8 +69,8 @@ class Photographer():
         rospy.loginfo("Took photos %s", len(images))
         for name, image in images:
             rospy.loginfo(
-                "Try to load %s to flickr", name)
-            s = flickr_api.upload(
+                "Try to upload %s to flickr", name)
+            s = upload(
                 photo_file=name, title="Test bebop", photo_file_data=image)
             rospy.loginfo("Uploaded %s", s)
 
