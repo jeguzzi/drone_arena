@@ -68,18 +68,6 @@ teleop:
     topic_name: flattrim
     deadman_buttons: [0, 7] # RT + X
     axis_mappings: []
-  flip:
-    type: topic
-    message_type: "std_msgs/UInt8"
-    topic_name: flip
-    deadman_buttons: [6, 7, 0] # RT + LT + X
-    axis_mappings: []
-  snapshot:
-    type: topic
-    message_type: "std_msgs/Empty"
-    topic_name: snapshot
-    deadman_buttons: [7, 4] # RT + LB
-    axis_mappings: []
   follow_on:
     type: topic
     message_type: "std_msgs/Bool"
