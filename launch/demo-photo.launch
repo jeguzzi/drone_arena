@@ -1,0 +1,7 @@
+<launch>
+  <include file="$(find drone_arena)/launch/demo.launch"/>
+  <node name="photographer" pkg='drone_arena' type='photographer.py' output="screen" ns="bebop">
+    <rosparam param="place">[0, 1.8, 1.7, 3.14]</rosparam>
+    <rosparam param="observe">[-4, 1.8, 0]</rosparam>
+  </node>
+</launch>
