@@ -88,3 +88,27 @@ teleop:
     topic_name: "land_home"
     deadman_buttons: [1]
     axis_mappings: []
+  take_photo:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "take_photo"
+    deadman_buttons: [4]
+    axis_mappings: []
+  go_photo:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "go_photo"
+    deadman_buttons: [2]
+    axis_mappings: []
+  switch_observation:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "switch_observe"
+    deadman_buttons: [8]
+    axis_mappings: []
+  stop_observing:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "stop_observe"
+    deadman_buttons: [6]
+    axis_mappings: []

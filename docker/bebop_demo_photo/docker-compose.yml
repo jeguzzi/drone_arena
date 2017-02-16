@@ -1,0 +1,53 @@
+version: '2'
+services:
+  roscore:
+    network_mode: &nm host
+    image: ros
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roscore
+  monitor:
+    image: docker_ui
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: roslaunch docker_ui monitor.launch video:=true video_stream:=/bebop/image_raw
+    network_mode: *nm
+    env_file:
+      - ./ros.env
+      - ./monitor.env
+    depends_on:
+      - roscore
+  driver:
+    network_mode: *nm
+    image: bebop
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roslaunch bebop_driver bebop_node.launch
+    depends_on:
+      - roscore
+  controller:
+    privileged: true
+    network_mode: *nm
+    image: fence:photo
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roslaunch drone_arena demo-photo.launch
+    depends_on:
+      - roscore
+  land:
+    network_mode: *nm
+    image: bebop
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: rostopic pub --once /bebop/land std_msgs/Empty
+    depends_on:
+      - roscore

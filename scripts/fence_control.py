@@ -2,7 +2,7 @@
 
 import rospy
 from std_msgs.msg import Empty, Bool
-from geometry_msgs.msg import Twist, PoseStamped
+from geometry_msgs.msg import Twist, PoseStamped, PointStamped
 from nav_msgs.msg import Odometry
 # from shapely.geometry import Polygon, Point
 from tf.transformations import quaternion_conjugate, quaternion_multiply
@@ -68,6 +68,23 @@ def clamp(xs, bss):
     return [max(min(x, bs[1]), bs[0]) for x, bs in zip(xs, bss)]
 
 
+def target_yaw_to_observe(observer_point, target_point):
+    d = np.array(target_point) - np.array(observer_point)
+    return np.arctan2(d[1], d[0])
+
+
+# full up/down = 70 degrees, i.e. from 60 = 25 + 35  to -60 = -25 - 35
+def camera_control_cmd(observer_point, target_point):
+    p1 = np.array(observer_point[:2])
+    p2 = np.array(target_point[:2])
+    d = np.linalg.norm(p1-p2)
+    delta_z = target_point[2] - observer_point[2]
+    pitch_deg = np.arctan2(delta_z, d) * 180.0 / np.pi
+    cmd = Twist()
+    cmd.angular.y = pitch_deg
+    return cmd
+
+
 class Controller(object):
     """docstring for Controller"""
     def __init__(self):
@@ -76,6 +93,8 @@ class Controller(object):
         self.pub_cmd = rospy.Publisher('cmd_vel', Twist, queue_size=1)
         self.pub_takeoff = rospy.Publisher('takeoff', Empty, queue_size=1)
         self.pub_land = rospy.Publisher('land', Empty, queue_size=1)
+        self.camera_control_pub = rospy.Publisher(
+            'camera_control', Twist, queue_size=1)
         self.land_home_pub = rospy.Publisher(
             'land_home', Empty, queue_size=1)
         self.fence_margin = 0.5
@@ -123,6 +142,11 @@ class Controller(object):
         self.battery_msg = None
         self.tracked_teleop_d = 1.0
         self.tracked_teleop = False
+
+        self.observe = False
+        self.observe_point = None
+        self.head_point = None
+
         self.updater = diagnostic_updater.Updater()
         self.updater.setHardwareID("bebop controller")
         self.updater.add("Localization", self.localization_diagnostics)
@@ -140,6 +164,14 @@ class Controller(object):
         rospy.Subscriber('states/common/CommonState/BatteryStateChanged',
                          CommonCommonStateBatteryStateChanged,
                          self.has_received_battery)
+
+        self.switch_button_enabled = True
+        rospy.Subscriber(
+            'switch_observe', Empty, self.switch_observe, queue_size=1)
+        rospy.Subscriber(
+            'stop_observe', Empty, self.stop_observe, queue_size=1)
+        rospy.Subscriber(
+            'observe', PointStamped, self.start_observe, queue_size=1)
 
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
         self.timer = rospy.Timer(rospy.Duration(0.05), self.update)
@@ -195,12 +227,14 @@ class Controller(object):
         self.track_head = msg.data
         if self.track_head:
             self.target_position = None
+            self.observe = False
             # Will preempt GoToPose action
 
     def has_received_head(self, msg):
+        _p = msg.pose.pose.position
+        self.head_point = [_p.x, _p.y, _p.z * 0.5]
         if self.track_head and self.localized:
             # rospy.loginfo("track_frame")
-            _p = msg.pose.pose.position
             _o = msg.pose.pose.orientation
             _v = msg.twist.twist.linear
             v = [_v.x, _v.y, 0]
@@ -211,11 +245,10 @@ class Controller(object):
             self.track_frame(p, q, v)
 
     def track_frame(self, position, rotation, velocity):
-        p = np.array(position)
-        d = p - np.array(self.position)
-        self.target_yaw = np.arctan2(d[1], d[0])
+        self.target_yaw = target_yaw_to_observe(self.position, position)
         f = [self.track_range, 0, 0, 0]
         f = np.array(rotate(f, rotation, inverse=True)[:3])
+        p = np.array(position)
         self.target_position = self.clamp_in_fence_pos(p + f)
         self.target_velocity = velocity
 
@@ -289,6 +322,10 @@ class Controller(object):
 
     def update_pose_control(self, target_position, target_yaw,
                             target_velocity=[0, 0, 0]):
+        if self.observe:
+            _y = self.observe_target_yaw()
+            if _y is not None:
+                target_yaw = _y
         rospy.logdebug(
             "Go to target %s %s %s", target_position, target_yaw,
             target_velocity)
@@ -312,20 +349,24 @@ class Controller(object):
         cmd_vel.linear.x = t[0]
         cmd_vel.linear.y = t[1]
         cmd_vel.linear.z = v_des[2]
+        cmd_vel.angular.z = self.target_angular_yaw(target_yaw)
+        rospy.logdebug("-> %s" % cmd_vel)
+        self.pub_cmd.publish(cmd_vel)
+
+    def target_angular_yaw(self, target_yaw):
         d_yaw = target_yaw - self.yaw
         if d_yaw > math.pi:
             d_yaw = d_yaw - 2 * math.pi
         if d_yaw < -math.pi:
             d_yaw = d_yaw + 2 * math.pi
         v_yaw = d_yaw / self.tau
-        cmd_vel.angular.z = v_yaw
-        rospy.logdebug("-> %s" % cmd_vel)
-        self.pub_cmd.publish(cmd_vel)
+        return v_yaw
 
     def update(self, evt):
         # print "*****"
         self.update_localization_state()
         self.update_hovering_cmd()
+        self.update_camera_control()
         # rospy.loginfo("update %s %s", self.target_position, self.localized)
         #
         if self.localized:
@@ -336,6 +377,8 @@ class Controller(object):
                 msg = Twist()
                 msg.linear.z = min(0, 2 * (self.max_height - self.z))
                 self.clamp_in_fence_cmd(msg)
+                if self.observe:
+                    self.update_observe(msg)
                 self.pub_cmd.publish(msg)
 
     # def go_home_and_land(self, msg):
@@ -351,6 +394,7 @@ class Controller(object):
     def go_home(self):
         if self.home:
             self.track_head = False
+            self.observe = False
             self.target_position = self.home_p
             self.target_velocity = [0, 0, 0]
             rospy.logwarn("flying home to %s" % self.home_p)
@@ -370,12 +414,14 @@ class Controller(object):
         rospy.loginfo("Controller has received landing")
         self.target_position = None
         self.track_head = False
+        self.observe = False
         # self.pub_land.publish(Empty())
 
     def has_received_takeoff(self, msg):
         if self.inside_fence:
             self.target_position = None
             self.track_head = False
+            self.observe = False
             self.pub_takeoff.publish(Empty())
         else:
             rospy.logwarn("outside fence, will not takeoff")
@@ -383,7 +429,7 @@ class Controller(object):
     def has_received_input_cmd(self, msg):
         self.target_position = None
         self.track_head = False
-        self.latest_cmd_time = msg.header.stamp
+        self.latest_cmd_time = rospy.Time.now()
         if not self.enable_fence:
             self.pub_cmd.publish(msg)
             return
@@ -391,8 +437,10 @@ class Controller(object):
             self.pub_cmd.publish(Twist())
             return
         vz = msg.linear.z
-        vyaw = msg.angular.z
         msg.linear.z = min(msg.linear.z, 2 * (self.max_height - self.z))
+        if self.observe:
+            self.update_observe(msg)
+        vyaw = msg.angular.z
         # rospy.logwarn("too high")
         if self.inside_fence:
             # TODO apply when outside too
@@ -424,7 +472,7 @@ class Controller(object):
 
     def tracked_teleop_cmd_pos(self, acc, vz, vyaw):
         # world frame
-        d = self.tracked_teleop_cmd
+        d = self.tracked_teleop_d
         a = np.array(acc[:2])
         v = a / np.linalg.norm(a) / F * self.s_max
         v = [v[0], v[1], vz]
@@ -468,6 +516,7 @@ class Controller(object):
     def has_received_target(self, msg):
         rospy.loginfo("Has received target")
         self.track_head = False
+        self.observe = False
         # convert in world frame
         try:
             transform = self.tf_buffer.lookup_transform(
@@ -514,6 +563,84 @@ class Controller(object):
         #     ("inside fence %s. acc bounds %s" %
         #      (self.inside_fence, self.acc_bounds)))
         self.localized = True
+
+    # We don't want to trigger the switch if the button is triggered
+    # in the next 1 seconds
+
+    def enable_switch_button(self, evt):
+        self.switch_button_enabled = True
+
+    def switch_observe(self, msg):
+        if not self.switch_button_enabled:
+            return
+        rospy.loginfo("Switch observe from %s", self.observe)
+        self.switch_button_enabled = False
+        rospy.Timer(
+            rospy.Duration(1), self.enable_switch_button, oneshot=True)
+        if not self.observe:
+            self.observe = "head"
+            return
+        if self.observe == "point":
+            self.observe = "head"
+            return
+        if self.observe == "head" and self.observe_point:
+            self.observe = "point"
+            return
+
+    def stop_observe(self, msg):
+        rospy.loginfo("Stop observe")
+        self.observe = False
+        self.camera_control_pub.publish(Twist())
+        pass
+
+    def start_observe(self, msg):
+        rospy.loginfo("Has received observe target")
+        try:
+            transform = self.tf_buffer.lookup_transform(
+                "World", msg.header.frame_id, rospy.Time(0),
+                rospy.Duration(0.1))
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException):
+            return
+        _p = tf2_geometry_msgs.do_transform_point(
+            msg, transform).point
+        self.observe_point = [_p.x, _p.y, _p.z]
+        self.observe = "point"
+        pass
+
+    # replace the msg.angular.z with the appropriate value to point
+    # to the target
+
+    def observe_target_yaw(self):
+        if self.observe == "point":
+            observe_point = self.observe_point
+        elif self.observe == "head":
+            observe_point = self.head_point
+        else:
+            return None
+        if observe_point:
+            return target_yaw_to_observe(self.position, observe_point)
+        return None
+
+    def update_observe(self, msg):
+        yaw = self.observe_target_yaw()
+        if yaw is not None:
+            msg.angular.z = self.target_angular_yaw(yaw)
+
+    def update_camera_control(self):
+        if not self.localized:
+            return
+        if self.observe == "point":
+            observe_point = self.observe_point
+        elif self.observe == "head":
+            observe_point = self.head_point
+        else:
+            return None
+        if observe_point:
+
+            cmd = camera_control_cmd(self.position, observe_point)
+            self.camera_control_pub.publish(cmd)
+        return None
 
 
 if __name__ == '__main__':

@@ -1,0 +1,31 @@
+<launch>
+  <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
+  <node name='fence' pkg='drone_arena' type='fence_control.py' output="screen" ns="bebop">
+    <remap from="odom" to="mocap_odom"/>
+    <param name="tau" value="0.5"/>
+    <param name="eta" value="1.0"/>
+    <param name="max_speed" value="1.0"/>
+    <param name="delay" value="0.1"/>
+    <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 2.4], [0.5, 2.0]]</rosparam>
+    <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
+  </node>
+  <remap from="cmd_vel" to="cmd_vel_input"/>
+  <remap from="takeoff" to="takeoff_input"/>
+  <!-- <remap from="land" to="land_input"/> -->
+  <include file="$(find bebop_tools)/launch/joy_teleop.launch">
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-photo.yaml" />
+  </include>
+
+  <node name="demo" pkg='drone_arena' type='test_client.py' output="screen" ns="bebop">
+    <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
+    <rosparam param="plan">
+      - [0.5,  -2,  1.5,  -1.57]
+      - [-2, -1.5,  1.5,  -3.14]
+    </rosparam>
+    <param name="loop" value="true"/>
+  </node>
+  <node name="photographer" pkg='drone_arena' type='photographer.py' output="screen" ns="bebop">
+    <rosparam param="place">[0, 1.8, 1.7, 3.14]</rosparam>
+    <rosparam param="observe">[-4, 1.8, 0.8]</rosparam>
+  </node>
+</launch>
