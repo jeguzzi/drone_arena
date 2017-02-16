@@ -34,7 +34,9 @@ services:
     privileged: true
     network_mode: *nm
     image: fence:photo
-    build: .
+    build:
+        context: ../..
+        dockerfile: docker/bebop_demo_photo/Dockerfile
     volumes:
       - ./logs:/root/.ros/log:rw
     env_file:
