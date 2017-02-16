@@ -79,6 +79,8 @@ class Controller(object):
         self.land_home_pub = rospy.Publisher(
             'land_home', Empty, queue_size=1)
         self.fence_margin = 0.5
+        self.latest_cmd_time = None
+        self.hovering_cmd = True
         # self.fence = Polygon(
         #     [(-2.8, -2.8), (-2.8, 2.8), (2.8, 2.8), (2.8, -2.8)])
         # self.max_height = 2.0
@@ -277,6 +279,14 @@ class Controller(object):
                 self.localized = False
                 self.pub_cmd.publish(Twist())
 
+    def update_hovering_cmd(self):
+        if self.latest_cmd_time:
+            delta = rospy.Time.now() - self.latest_cmd_time
+            if delta.to_sec() < 0.2:
+                self.hovering_cmd = False
+                return
+        self.hovering_cmd = True
+
     def update_pose_control(self, target_position, target_yaw,
                             target_velocity=[0, 0, 0]):
         rospy.logdebug(
@@ -315,11 +325,18 @@ class Controller(object):
     def update(self, evt):
         # print "*****"
         self.update_localization_state()
+        self.update_hovering_cmd()
         # rospy.loginfo("update %s %s", self.target_position, self.localized)
         #
-        if self.target_position is not None and self.localized:
-            self.update_pose_control(self.target_position, self.target_yaw,
-                                     self.target_velocity)
+        if self.localized:
+            if self.target_position is not None:
+                self.update_pose_control(self.target_position, self.target_yaw,
+                                         self.target_velocity)
+            elif self.hovering_cmd:
+                msg = Twist()
+                msg.linear.z = min(0, 2 * (self.max_height - self.z))
+                self.clamp_in_fence_cmd(msg)
+                self.pub_cmd.publish(msg)
 
     # def go_home_and_land(self, msg):
     #     if self.home:
@@ -366,6 +383,7 @@ class Controller(object):
     def has_received_input_cmd(self, msg):
         self.target_position = None
         self.track_head = False
+        self.latest_cmd_time = msg.header.stamp
         if not self.enable_fence:
             self.pub_cmd.publish(msg)
             return

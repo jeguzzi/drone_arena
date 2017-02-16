@@ -48,3 +48,7 @@
 
 - [x] Head tracker
   - [ ] simple separate node (at first without fence)
+
+
+## FixMe
+   - [ ] fence control when no msg are being sent, else the drone will exit the fence by hovering
