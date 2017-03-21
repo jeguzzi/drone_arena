@@ -9,7 +9,7 @@ services:
       - ./ros.env
     command: roscore
   monitor:
-    image: docker_ui
+    image: jeguzzi/df:docker-ui
     volumes:
       - ./logs:/root/.ros/log:rw
       - /var/run/docker.sock:/var/run/docker.sock
@@ -36,10 +36,10 @@ services:
   controller:
     privileged: true
     build:
-      dockerfile: docker/bebop_demo_photo/Dockerfile
+      dockerfile: docker/bebop_demo_nav/Dockerfile
       context: ../..
     network_mode: *nm
-    image: jeguzzi/drone_arena:photo
+    image: jeguzzi/drone_arena:nav
     volumes:
       - ./logs:/root/.ros/log:rw
       - ./demo-nav.launch:/root/catkin_ws/src/drone_arena/launch/main.launch:ro

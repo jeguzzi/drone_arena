@@ -3,8 +3,10 @@
   <node name='fence' pkg='drone_arena' type='fence_control.py' output="screen" ns="bebop">
     <remap from="odom" to="mocap_odom"/>
     <param name="tau" value="0.5"/>
+    <param name="rotation_tau" value="0.5"/>
     <param name="eta" value="1.0"/>
-    <param name="max_speed" value="1.0"/>
+    <param name="max_speed" value="1.5"/>
+    <param name="max_acceleration" value="1.0"/>
     <param name="delay" value="0.1"/>
     <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 2.4], [0.5, 2.0]]</rosparam>
     <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
@@ -30,10 +32,10 @@
     </rosparam>
   </node>
   <node name="photographer" pkg='drone_arena' type='photographer.py' output="screen" ns="bebop">
-    <rosparam param="place">[0, 0.8, 0.7, 2.9]</rosparam>
+    <rosparam param="place">[0, 0.8, 1.7, 2.9]</rosparam>
     <rosparam param="observe">[-4, 1.8, 0.8]</rosparam>
   </node>
   <node name='diagnostics' pkg='drone_arena' type='diagnostics.py' output="screen" ns="bebop">
   </node>
-  <node name='bag' pkg="rosbag" type="record" args='-o /bags/demo -j -a -x "(.*)/camera"'/>
+  <!-- <node name='bag' pkg="rosbag" type="record" args='-o /bags/demo -j -a -x "(.*)(camera|image)(.*)"'/> -->
 </launch>

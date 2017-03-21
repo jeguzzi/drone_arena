@@ -6,24 +6,26 @@
             <param name="type" value="HOLONOMIC"/>
             <param name="resolution" value="100"/>
             <param name="behavior" value="HL"/>
-            <param name="maximal_speed" value="2"/>
+            <param name="maximal_speed" value="1.5"/>
             <param name="maximal_angular_speed" value="1"/>
-            <param name="optimal_speed" value="1.0"/>
-            <param name="optimal_vertical_speed" value="0.1"/>
-            <param name="optimal_angular_speed" value="0.3"/>
+            <param name="optimal_speed" value="1.5"/>
+            <param name="optimal_vertical_speed" value="0.3"/>
+            <param name="optimal_angular_speed" value="0.5"/>
             <param name="tau" value="0.5"/>
-            <param name="eta" value="0.7"/>
+            <param name="eta" value="1.0"/>
             <param name="tauZ" value="0.5"/>
-            <param name="rotation_tau" value="0.5"/>
-            <param name="safety_margin" value="0.3"/>
-            <param name="horizon" value="5"/>
+            <param name="rotation_tau" value="1.5"/>
+            <param name="safety_margin" value="0.5"/>
+            <param name="horizon" value="8"/>
             <param name="radius" value="0.15"/>
             <remap from="cmd/velocity" to="des_body_vel"/>
             <remap from="odom" to="mocap_odom"/>
+            <param name="rate" value="20.0"/>
         </node>
         <node name="optitrack_obstacles" pkg="optitrack_obstacles" type="optitrack_obstacles" output="screen">
             <param name="name" value="$(arg name)"/>
             <rosparam file="$(find optitrack_obstacles)/config/bebop.yaml" command="load"/>
+            <param name="rate" value="20.0"/>
         </node>
     </group>
 </launch>
