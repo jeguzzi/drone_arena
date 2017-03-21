@@ -9,7 +9,9 @@ RUN apt-get update && apt-get install -y --fix-missing\
    sudo \
    && rm -rf /var/lib/apt/lists/*
 
+
 RUN git clone https://github.com/AutonomyLab/bebop_autonomy.git src/bebop_autonomy
+
 
 RUN apt-get update && apt-get install -y --fix-missing\
    python-rosdep
