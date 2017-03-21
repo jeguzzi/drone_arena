@@ -8,103 +8,124 @@ import bebop_msgs.msg as b_msg
 OK = diagnostic_msgs.msg.DiagnosticStatus.OK
 WARN = diagnostic_msgs.msg.DiagnosticStatus.WARN
 ERROR = diagnostic_msgs.msg.DiagnosticStatus.ERROR
+STALE = diagnostic_msgs.msg.DiagnosticStatus.STALE
 
 
 class BebopState(object):
 
-    def __init__(self, updater, name, param, topic, msg_type, f):
-        self.msgs = []
-        self.name = name
-        rospy.Subscriber('states/{topic}'.format(topic=topic), msg_type, self.has_received_msg)
-        rospy.set_param('~states/{param}'.format(param=param), True)
-        updater.add(name, self.updater(f))
+    def __init__(self, updater):
+        self.msg = None
+        rospy.Subscriber('states/{topic}'.format(topic=self.topic), self.msg_type,
+                         self.has_received_msg)
+        rospy.set_param('bebop_driver/states/{param}'.format(param=self.param), True)
+        updater.add(self.name, self.update)
 
     def has_received_msg(self, msg):
-        self.msgs.append(msg)
+        # print(self.name, msg)
+        self.msg = msg
 
-    def updater(self, f):
-        def g(stat):
-            if not self.msgs:
-                stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
-                             "No {name} status received".format(name=self.name))
-                return stat
-            msg = self.msgs[-1]
-            if msg:
-                d = (rospy.Time.now() - self.msgs.header.stamp).to_sec()
-            else:
-                d = None
-            if d is not None and d > 60:
-                stat.summary(
-                    diagnostic_msgs.msg.DiagnosticStatus.WARN,
-                    "Not updated for more than 60 seconds")
-            else:
-                stat = f(stat, self.msgs)
-                stat.add("last updated", "%.0f seconds ago" % d)
+    def update_stat(self, stat):
+        raise NameError('Not implemented')
+
+    def update(self, stat):
+        # print(self.name, self.msg)
+        if not self.msg:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.STALE,
+                         "No {name} status received".format(name=self.name))
             return stat
-        return g
+        d = (rospy.Time.now() - self.msg.header.stamp).to_sec()
+        stat = self.update_stat(stat)
+        stat.add("last updated", "%.0f seconds ago" % d)
+        return stat
 
 
-class BebopDiagnostics(object):
+def sensor_name(name):
+    return getattr(b_msg.CommonCommonStateSensorsStatesListChanged, 'sensorName_{0}'.format(name))
 
-    def __init__(self):
-        self.updater = diagnostic_updater.Updater()
-        self.updater.setHardwareID("bebop diagnostic")
-        rospy.Timer(rospy.Duration(1), self.update_diagnostics)
-        self.sensors = {}
-        _m = b_msg.Ardrone3PilotingStateFlyingStateChanged
-        self.state = {getattr(_m, 'state_{0}'.format(n), -1): (n, OK)
+
+class SensorState(BebopState):
+    name = 'Sensors'
+    param = 'enable_commonstate_sensorsstateslistchanged'
+    topic = 'common/CommonState/SensorsStatesListChanged'
+    msg_type = b_msg.CommonCommonStateSensorsStatesListChanged
+
+    def __init__(self, updater):
+        super(SensorState, self).__init__(updater)
+        self.sensors = {sensor_name(n): {'working': True, 'name': n}
+                        for n in ['IMU', 'barometer', 'ultrasound', 'GPS', 'magnetometer',
+                                  'vertical_camera']}
+
+    def has_received_msg(self, msg):
+        super(SensorState, self).has_received_msg(msg)
+        self.sensors[msg.sensorName]['working'] = msg.sensorState == 1
+
+    def update_stat(self, stat):
+        if len([s for s, v in self.sensors.items() if v == 0]) > 0:
+            stat.summary(WARN, "Not working properly")
+        else:
+            stat.summary(OK, "Ok")
+        for v in self.sensors.values():
+            stat.add(v['name'], v['working'])
+        return stat
+
+
+def state_name(name):
+    return getattr(b_msg.Ardrone3PilotingStateFlyingStateChanged, 'state_{0}'.format(name), -1)
+
+
+class AutopilotState(BebopState):
+    name = 'Autopilot state'
+    param = 'enable_pilotingstate_flyingstatechanged'
+    topic = 'ardrone3/PilotingState/FlyingStateChanged'
+    msg_type = b_msg.Ardrone3PilotingStateFlyingStateChanged
+
+    def __init__(self, *args):
+        super(AutopilotState, self).__init__(*args)
+        self.state = {state_name(n): (n, OK)
                       for n in ['landed', 'hovering', 'flying', 'landing', 'usertakeoff',
                                 'takingoff']}
-        self.state.update({getattr(_m, 'state_{0}'.format(n), -1): (n, WARN)
+        self.state.update({state_name(n): (n, WARN)
                            for n in ['emergency', 'emergency_landing']})
-        _am = b_msg.Ardrone3PilotingStateAlertStateChanged
-        self.alert = {getattr(_am, 'state_{0}'.format(n), -1): (n, ERROR)
+
+    def update_stat(self, stat):
+        s = self.msg.state
+        name, diag = self.state[s]
+        stat.summary(diag, name)
+        return stat
+
+
+def alert_name(name):
+    return getattr(b_msg.Ardrone3PilotingStateAlertStateChanged, 'state_{0}'.format(name), -1)
+
+
+class AutopilotAlert(BebopState):
+    name = 'Autopilot alert'
+    param = 'enable_pilotingstate_alertstatechanged'
+    topic = 'ardrone3/PilotingState/AlertStateChanged'
+    msg_type = b_msg.Ardrone3PilotingStateAlertStateChanged
+
+    def __init__(self, *args):
+        super(AutopilotAlert, self).__init__(*args)
+        self.alert = {alert_name(n): (n, ERROR)
                       for n in ['user', 'cut_out', 'critical_battery', 'low_battery',
                                 'too_much_angle']}
-        self.alert.update({getattr(_am, 'state_{0}'.format(n)): (n, OK) for n in ['none']})
+        self.alert.update({alert_name(n): (n, OK) for n in ['none']})
 
-        BebopState(self.updater, 'Battery',
-                   'enable_commonstate_batterystatechanged',
-                   'common/CommonState/BatteryStateChanged',
-                   b_msg.CommonCommonStateBatteryStateChanged,
-                   self.battery_diagnostics)
-        BebopState(self.updater, 'Wifi',
-                   'enable_commonstate_wifisignalchanged',
-                   'common/CommonState/WifiSignalChanged',
-                   b_msg.CommonCommonStateWifiSignalChanged,
-                   self.wifi_diagnostics)
-        BebopState(self.updater, 'Wifi',
-                   'enable_commonstate_sensorsstateslistchanged',
-                   'common/CommonState/SensorsStatesListChanged',
-                   b_msg.CommonCommonStateSensorsStatesListChanged,
-                   self.sensors_diagnostics)
-        BebopState(self.updater, 'Overheating',
-                   'enable_overheatstate_overheatchanged',
-                   'common/OverHeatState/OverHeatChanged',
-                   b_msg.CommonOverHeatStateOverHeatChanged,
-                   self.overheat)
-        BebopState(self.updater, 'Magnetometer',
-                   'enable_calibrationstate_magnetocalibrationrequiredstate',
-                   'common/CalibrationState/MagnetoCalibrationRequiredState',
-                   b_msg.CommonCalibrationStateMagnetoCalibrationRequiredState,
-                   self.mag_calibration)
-        BebopState(self.updater, 'Autopilot state',
-                   'enable_pilotingstate_flyingstatechanged',
-                   'ardrone3/PilotingState/FlyingStateChanged',
-                   b_msg.Ardrone3PilotingStateFlyingStateChanged,
-                   self.autopilot)
-        BebopState(self.updater, 'Autopilot alert',
-                   'enable_pilotingstate_alertstatechanged',
-                   'ardrone3/PilotingState/AlertStateChanged',
-                   b_msg.Ardrone3PilotingStateAlertStateChanged,
-                   self.autopilot_alert)
+    def update_stat(self, stat):
+        s = self.msg.state
+        name, diag = self.alert[s]
+        stat.summary(diag, name)
+        return stat
 
-    def update_diagnostics(self, event):
-        self.updater.update()
 
-    @staticmethod
-    def battery_diagnostics(stat, msgs):
-        battery_msg = msgs[-1]
+class BatteryState(BebopState):
+    name = 'Battery'
+    param = 'enable_commonstate_batterystatechanged'
+    topic = 'common/CommonState/BatteryStateChanged'
+    msg_type = b_msg.CommonCommonStateBatteryStateChanged
+
+    def update_stat(self, stat):
+        battery_msg = self.msg
         p = battery_msg.percent
         if p < 10:
             stat.summary(WARN, "Almost empty")
@@ -113,9 +134,40 @@ class BebopDiagnostics(object):
         stat.add("percent", p)
         return stat
 
-    @staticmethod
-    def wifi_diagnostics(stat, msgs):
-        wifi_signal_msg = msgs[-1]
+
+class MagnetormeterState(BebopState):
+    name = 'Magnetometer'
+    param = 'enable_calibrationstate_magnetocalibrationrequiredstate'
+    topic = 'common/CalibrationState/MagnetoCalibrationRequiredState'
+    msg_type = b_msg.CommonCalibrationStateMagnetoCalibrationRequiredState
+
+    def update_stat(self, stat):
+        if self.msg.required == 1:
+            stat.summary(WARN, 'Need calibration')
+        else:
+            stat.summary(OK, 'Calibration ok')
+        return stat
+
+
+class OverheatingState(BebopState):
+    name = 'Overheating'
+    param = 'enable_overheatstate_overheatchanged'
+    topic = 'common/OverHeatState/OverHeatChanged'
+    msg_type = b_msg.CommonOverHeatStateOverHeatChanged
+
+    def update_stat(self, stat):
+        stat.summary(WARN, 'Overheating')
+        return stat
+
+
+class WifiState(BebopState):
+    name = 'Wifi'
+    param = 'enable_commonstate_wifisignalchanged'
+    topic = 'common/CommonState/WifiSignalChanged'
+    msg_type = b_msg.CommonCommonStateWifiSignalChanged
+
+    def update_stat(self, stat):
+        wifi_signal_msg = self.msg
         rssi = wifi_signal_msg.rssi
         if rssi > -75:
             stat.summary(OK, "Ok")
@@ -125,47 +177,22 @@ class BebopDiagnostics(object):
             stat.summary(WARN, "Low quality")
         else:
             stat.summary(ERROR, "Quality too low")
-        stat.data('RSSI', "%d dBm" % rssi)
+        stat.add('RSSI', "%d dBm" % rssi)
         return stat
 
-    def sensors_diagnostics(self, stat, msgs):
-        for m in msgs:
-            self.sensors[m.sensorName] = m.sensorState
-        if len([s for s, v in self.sensors.items() if v == 0]) > 0:
-            stat.summary(WARN, "Not working properly")
-        else:
-            stat.summary(OK, "Ok")
-        for n in ['IMU', 'barometer', 'ultrasound', 'GPS', 'magnetometer', 'vertical_camera']:
-            i = b_msg.CommonCommonStateSensorsStatesListChanged.__getattribute__(
-                'sensorName_{n}'.format(n=n))
-            v = self.sensors.get(i, 1)
-            stat.data(n, v == 1)
-        return stat
 
-    @staticmethod
-    def overheat(stat, msgs):
-        stat.summary(WARN, 'Overheating')
-        return stat
+class BebopDiagnostics(object):
 
-    @staticmethod
-    def mag_calibration(stat, msgs):
-        if msgs[-1].required == 0:
-            stat.summary(WARN, 'Need calibration')
-        else:
-            stat.summary(OK, 'Calibration ok')
-        return stat
+    def __init__(self):
+        self.updater = diagnostic_updater.Updater()
+        self.updater.setHardwareID("bebop diagnostic")
+        clss = [AutopilotState, AutopilotAlert, SensorState, BatteryState, WifiState,
+                OverheatingState, MagnetormeterState]
+        self.bebop_states = [cls(self.updater) for cls in clss]
+        rospy.Timer(rospy.Duration(1), self.update_diagnostics)
 
-    def autopilot(self, stat, msgs):
-        state = msgs[-1].state
-        name, diag = self.state[state]
-        stat.summary(diag, name)
-        return stat
-
-    def autopilot_alert(self, stat, msgs):
-        alert = msgs[-1].state
-        name, diag = self.alert[alert]
-        stat.summary(diag, name)
-        return stat
+    def update_diagnostics(self, event):
+        self.updater.update()
 
 
 if __name__ == '__main__':
