@@ -52,13 +52,12 @@ services:
   navigation:
     network_mode: *nm
     image: jeguzzi/ros:hl_navigation
-    build: .
     volumes:
       - ./logs:/root/.ros/log:rw
-      - ./demo-nav.launch:/root/catkin_ws/src/drone_arena/launch/main.launch:ro
+      - ./navigation.launch:/root/catkin_ws/src/hl_navigation_launch/launch/bebop.launch:ro
     env_file:
       - ./ros.env
-    command: roslaunch drone_arena main.launch
+    command: roslaunch hl_navigation_launch bebop.launch
     depends_on:
       - roscore
   land:
