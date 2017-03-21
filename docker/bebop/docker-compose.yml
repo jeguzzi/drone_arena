@@ -2,23 +2,21 @@ version: '2'
 services:
   driver:
     network_mode: host
-    container_name: driver
-    image: bebop
+    image: jeguzzi/drone_arena:bebop
+    build:
+      dockerfile: Dockerfile
+      context: .
     volumes:
       - ./logs:/root/.ros/log:rw
-    environment:
-      - "ROS_MASTER_URI=http://192.168.201.2:11311"
-      - "ROS_HOSTNAME=192.168.201.4"
     command: roslaunch bebop_driver bebop_node.launch
+    env_file:
+      - ./ros.env
   teleop:
     privileged: true
     network_mode: host
-    container_name: teleop
-    image: bebop
+    image: jeguzzi/drone_arena:bebop
     volumes:
       - ./logs:/root/.ros/log:rw
-    environment:
-      - "ROS_MASTER_URI=http://192.168.201.2:11311"
-      - "ROS_HOSTNAME=192.168.201.4"
-    command: roslaunch bebop_tools joy_teleop.launch 
-
+    command: roslaunch bebop_tools joy_teleop.launch
+    env_file:
+      - ./ros.env

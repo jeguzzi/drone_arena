@@ -25,7 +25,7 @@ services:
       - roscore
   driver:
     network_mode: *nm
-    image: bebop
+    image: jeguzzi/drone_arena:bebop
     volumes:
       - ./logs:/root/.ros/log:rw
     env_file:
@@ -36,7 +36,10 @@ services:
   controller:
     privileged: true
     network_mode: *nm
-    image: fence
+    image: jeguzzi/drone_arena:fence
+    build:
+      context: ../..
+      dockerfile: docker/fence/Dockerfile
     volumes:
       - ./logs:/root/.ros/log:rw
     env_file:
@@ -46,7 +49,7 @@ services:
       - roscore
   land:
     network_mode: *nm
-    image: bebop
+    image: jeguzzi/drone_arena:bebop
     volumes:
       - ./logs:/root/.ros/log:rw
     env_file:
