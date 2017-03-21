@@ -28,22 +28,22 @@ teleop:
         target: angular.z
         scale: 1.0
         offset: 0.0
-  camera:
-    type: topic
-    message_type: "geometry_msgs/Twist"
-    topic_name: camera_control
-    deadman_buttons: [7]
-    axis_mappings:
-      -
-        axis: 5  # Left D-Pad (up/down)
-        target: angular.y
-        scale: 35.0
-        offset: 0.0
-      -
-        axis: 4  # Left D-Pad (left/right)
-        target: angular.z
-        scale: -35.0
-        offset: 0.0
+  # camera:
+  #   type: topic
+  #   message_type: "geometry_msgs/Twist"
+  #   topic_name: camera_control
+  #   deadman_buttons: [7]
+  #   axis_mappings:
+  #     -
+  #       axis: 5  # Left D-Pad (up/down)
+  #       target: angular.y
+  #       scale: 35.0
+  #       offset: 0.0
+  #     -
+  #       axis: 4  # Left D-Pad (left/right)
+  #       target: angular.z
+  #       scale: -35.0
+  #       offset: 0.0
   takeoff:
     type: topic
     message_type: "std_msgs/Empty"
@@ -105,7 +105,8 @@ teleop:
     message_type: "std_msgs/UInt8"
     topic_name: "observe"
     message_value:
-      - data: 0
+      - target: data
+        value: 0
     deadman_buttons: [8]
     axis_mappings: []
   observe_group:
@@ -113,14 +114,15 @@ teleop:
     message_type: "std_msgs/UInt8"
     topic_name: "observe"
     message_value:
-      - data: 0
+      - target: data
+        value: 1
     deadman_buttons: [9]
     axis_mappings: []
   nav_on:
     type: topic
     message_type: "std_msgs/Empty"
     topic_name: "start_nav"
-    deadman_buttons: [9]
+    deadman_buttons: [5]
     axis_mappings: []
   stop_observing:
     type: topic
