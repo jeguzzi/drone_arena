@@ -54,7 +54,7 @@ class Planner():
         self.next_waypoint = None
         self.last_input = None
         rospy.Subscriber("start_nav", Empty, button(self.start_path))
-        rospy.loginfo("init done")
+        rospy.loginfo("nav_client init done")
         while not rospy.is_shutdown():
             if self.running:
                 if not self.next_waypoint:

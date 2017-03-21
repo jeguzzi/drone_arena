@@ -40,15 +40,17 @@ class Planner():
         rospy.loginfo("home %s", self.home)
         rospy.loginfo("plan %s", self.plan)
         self.current_target = None
+        rospy.loginfo('Waiting for fence_control action server')
         self.client.wait_for_server()
+        rospy.loginfo('fence_control action server is there')
         self.running = False
         self.landing = False
         self.next_waypoint = None
         rospy.Subscriber("start", Empty, button(self.start_path))
-        rospy.Subscriber("stop", Empty, button(self.stop_path))
+        # rospy.Subscriber("stop", Empty, button(self.stop_path))
         rospy.Subscriber("land_home", Empty, button(self.land_home))
         self.land_pub = rospy.Publisher("land", Empty, queue_size=1)
-        rospy.loginfo("init done")
+        rospy.loginfo("fence client init done")
         while not rospy.is_shutdown():
             if self.running:
                 if not self.next_waypoint:
@@ -111,11 +113,11 @@ class Planner():
             self.next_waypoint = None
             self.plan = iter(self._poses)
 
-    def stop_path(self, msg):
-        if self.running:
-            if self.next_waypoint:
-                self.client.cancel_goal()
-            self.running = False
+    # def stop_path(self, msg):
+    #     if self.running:
+    #         if self.next_waypoint:
+    #             self.client.cancel_goal()
+    #         self.running = False
 
 
 if __name__ == '__main__':
