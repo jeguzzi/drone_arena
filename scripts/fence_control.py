@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import division
 import rospy
 from std_msgs.msg import Empty, Bool, UInt8
 from geometry_msgs.msg import Twist, PoseStamped, PointStamped, TwistStamped
@@ -70,6 +71,10 @@ def cmd_from_acc(acc, q):
     return rotate(t, q)[:2]
 
 
+def cmd_from_angular_speed(omega):
+    return min(max(omega / 1.75, -1), 1)
+
+
 def clamp(xs, bss):
     return [max(min(x, bs[1]), bs[0]) for x, bs in zip(xs, bss)]
 
@@ -85,7 +90,7 @@ def camera_control_cmd(observer_point, target_point):
     p2 = np.array(target_point[:2])
     d = np.linalg.norm(p1 - p2)
     delta_z = target_point[2] - observer_point[2]
-    pitch_deg = np.arctan2(delta_z, d) * 180.0 / np.pi
+    pitch_deg = math.atan2(delta_z, d) * 180.0 / math.pi
     cmd = Twist()
     cmd.angular.y = pitch_deg
     return cmd
@@ -182,7 +187,7 @@ class Controller(object):
         rospy.Subscriber(
             'switch_observe', Empty, button(self.switch_observe), queue_size=1)
         rospy.Subscriber(
-            'observe', UInt8, button(self.observe), queue_size=1)
+            'observe', UInt8, button(self.set_observe_from_msg), queue_size=1)
         rospy.Subscriber(
             'stop_observe', Empty, button(self.stop_observe), queue_size=1)
         rospy.Subscriber(
@@ -191,10 +196,12 @@ class Controller(object):
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
         self.timer = rospy.Timer(rospy.Duration(0.05), self.update)
 
+        rospy.loginfo('Will start SimpleActionServer fence_control')
         self._as = actionlib.SimpleActionServer(
             'fence_control', GoToPoseAction, execute_cb=self.execute_cb,
             auto_start=False)
         self._as.start()
+        rospy.loginfo('Started SimpleActionServer fence_control')
         rospy.spin()
 
     def is_near(self, position, yaw):
@@ -306,6 +313,7 @@ class Controller(object):
     def callback(self, config, level):
         self.eta = config['eta']
         self.tau = config['tau']
+        self.rotation_tau = config['rotation_tau']
         self.delay = config['delay']
         a = config['max_acceleration']
         self.max_acc_bounds = ((-a, a), (-a, a))
@@ -366,23 +374,27 @@ class Controller(object):
         self.has_received_vel_in_world_frame(des_vel, des_omega)
 
     def update_desired_velocity(self, v_des, w_des):
-        v_des = np.array(v_des)
+        vz_des = v_des[2]
+        v_des = np.array(v_des[:2])
         s_des = np.linalg.norm(v_des)
         if s_des > self.s_max:
             v_des = v_des / s_des * self.s_max
             # TODO velocita' diverse per xy e z
-        a_des = (v_des - np.array(self.velocity)) / self.tau
+        a_des = (v_des - np.array(self.velocity[:2])) / self.tau
+        a = clamp(a_des, self.max_acc_bounds)
+        if self.enable_fence:
+            a = clamp(a, self.acc_bounds)
         # a = clamp(a, self.max_acc_bounds)
         # if self.enable_fence:
         #   a = clamp(a, self.acc_bounds)
-        a = clamp(a_des[:2], self.acc_bounds)
+        # a = clamp(a_des, self.acc_bounds)
         t = cmd_from_acc(a, self.q)
         rospy.logdebug("v_des %s, a_des %s, t %s" % (v_des, a_des, t))
         cmd_vel = Twist()
         cmd_vel.linear.x = t[0]
         cmd_vel.linear.y = t[1]
-        cmd_vel.linear.z = v_des[2]
-        cmd_vel.angular.z = w_des
+        cmd_vel.linear.z = vz_des
+        cmd_vel.angular.z = cmd_from_angular_speed(w_des)
         rospy.logdebug("-> %s" % cmd_vel)
         self.pub_cmd.publish(cmd_vel)
 
@@ -408,7 +420,7 @@ class Controller(object):
             d_yaw = d_yaw - 2 * math.pi
         if d_yaw < -math.pi:
             d_yaw = d_yaw + 2 * math.pi
-        v_yaw = d_yaw / self.tau
+        v_yaw = d_yaw / self.rotation_tau
         return v_yaw
 
     def update(self, evt):
@@ -483,7 +495,7 @@ class Controller(object):
         return self._follow_vel_cmd
 
     @follow_vel_cmd.setter
-    def set_follow_vel_cmd(self, value):
+    def follow_vel_cmd(self, value):
         if value != self._follow_vel_cmd:
             self._follow_vel_cmd = value
             if not value:
@@ -629,29 +641,17 @@ class Controller(object):
         #      (self.inside_fence, self.acc_bounds)))
         self.localized = True
 
-    # We don't want to trigger the switch if the button is triggered
-    # in the next 1 seconds
-
-    def enable_switch_button(self, evt):
-        self.switch_button_enabled = True
-
-    def observe(self, msg):
+    def set_observe_from_msg(self, msg):
+        rospy.loginfo('BANANANA')
         if msg.data == 0:
             rospy.loginfo("Observe head")
             self.observe = "head"
-            return
         if msg.data == 1:
             rospy.loginfo("Observe point")
             self.observe = "point"
-            return
 
     def switch_observe(self, msg):
-        if not self.switch_button_enabled:
-            return
         rospy.loginfo("Switch observe from %s", self.observe)
-        self.switch_button_enabled = False
-        rospy.Timer(
-            rospy.Duration(1), self.enable_switch_button, oneshot=True)
         if not self.observe:
             self.observe = "head"
             return
@@ -686,36 +686,34 @@ class Controller(object):
     # replace the msg.angular.z with the appropriate value to point
     # to the target
 
-    def observe_target_yaw(self):
+    def observe_target(self):
         if self.observe == "point":
-            observe_point = self.observe_point
+            return self.observe_point
         elif self.observe == "head":
-            observe_point = self.head_point
+            return self.head_point
         else:
             return None
-        if observe_point:
+
+    def observe_target_yaw(self):
+        observe_point = self.observe_target()
+        if observe_point is not None:
             return target_yaw_to_observe(self.position, observe_point)
         return None
 
     def update_observe(self, msg):
         yaw = self.observe_target_yaw()
         if yaw is not None:
-            msg.angular.z = self.target_angular_yaw(yaw)
+            wz = cmd_from_angular_speed(self.target_angular_yaw(yaw))
+            msg.angular.z = wz
 
     def update_camera_control(self):
         if not self.localized:
             return
-        if self.observe == "point":
-            observe_point = self.observe_point
-        elif self.observe == "head":
-            observe_point = self.head_point
-        else:
-            return None
-        if observe_point:
-
+        observe_point = self.observe_target()
+        if observe_point is not None:
             cmd = camera_control_cmd(self.position, observe_point)
             self.camera_control_pub.publish(cmd)
-        return None
+            #  rospy.loginfo(cmd.angular)
 
 
 if __name__ == '__main__':
