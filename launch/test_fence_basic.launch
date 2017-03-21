@@ -13,5 +13,6 @@
   <include file="$(find bebop_tools)/launch/joy_teleop.launch">
     <arg name="teleop_config" default="$(find drone_arena)/config/log710.yaml" />
   </include>
-
+  <node name='diagnostics' pkg='drone_arena' type='diagnostics.py' output="screen" ns="bebop">
+  </node>
 </launch>
