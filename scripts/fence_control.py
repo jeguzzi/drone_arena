@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-from std_msgs.msg import Empty, Bool
-from geometry_msgs.msg import Twist, PoseStamped, PointStamped
+from std_msgs.msg import Empty, Bool, UInt8
+from geometry_msgs.msg import Twist, PoseStamped, PointStamped, TwistStamped
 from nav_msgs.msg import Odometry
 # from shapely.geometry import Polygon, Point
 from tf.transformations import quaternion_conjugate, quaternion_multiply
@@ -22,6 +22,12 @@ import diagnostic_msgs
 import actionlib
 from drone_arena.msg import GoToPoseFeedback, GoToPoseResult, GoToPoseAction
 
+# from diagnostics import BebopDiagnostics
+
+from drone_arena.temporized import Temporized
+
+button = Temporized(1)
+
 
 F = 2.83
 
@@ -32,8 +38,8 @@ def is_stop(cmd_vel):
     return np.allclose(a, np.array([0] * 6))
 
 
-# rotate from world to body frame (with quaternion q)
 def rotate(v, q, inverse=False):
+    '''rotate vector v from world to body frame (with quaternion q)'''
     cq = quaternion_conjugate(q)
     if inverse:
         z = quaternion_multiply(q, v)
@@ -77,7 +83,7 @@ def target_yaw_to_observe(observer_point, target_point):
 def camera_control_cmd(observer_point, target_point):
     p1 = np.array(observer_point[:2])
     p2 = np.array(target_point[:2])
-    d = np.linalg.norm(p1-p2)
+    d = np.linalg.norm(p1 - p2)
     delta_z = target_point[2] - observer_point[2]
     pitch_deg = np.arctan2(delta_z, d) * 180.0 / np.pi
     cmd = Twist()
@@ -91,6 +97,7 @@ class Controller(object):
         super(Controller, self).__init__()
         rospy.init_node('fence_control', anonymous=True)
         self.pub_cmd = rospy.Publisher('cmd_vel', Twist, queue_size=1)
+        self.stop_pub = rospy.Publisher('stop', Empty, queue_size=1)
         self.pub_takeoff = rospy.Publisher('takeoff', Empty, queue_size=1)
         self.pub_land = rospy.Publisher('land', Empty, queue_size=1)
         self.camera_control_pub = rospy.Publisher(
@@ -136,10 +143,12 @@ class Controller(object):
         self.localized = False
         self.last_localization = None
 
+        self._follow_vel_cmd = False
+
         self.track_head = False
         self.track_range = 1.5
 
-        self.battery_msg = None
+        # self.battery_msg = None
         self.tracked_teleop_d = 1.0
         self.tracked_teleop = False
 
@@ -150,28 +159,34 @@ class Controller(object):
         self.updater = diagnostic_updater.Updater()
         self.updater.setHardwareID("bebop controller")
         self.updater.add("Localization", self.localization_diagnostics)
-        self.updater.add("Battery", self.battery_diagnostics)
+        # self.updater.add("Battery", self.battery_diagnostics)
+
+        # self.diagnostics = BebopDiagnostics()
 
         rospy.Subscriber('cmd_vel_input', Twist, self.has_received_input_cmd)
-        rospy.Subscriber('takeoff_input', Empty, self.has_received_takeoff)
-        rospy.Subscriber('land', Empty, self.has_received_land)
+        rospy.Subscriber('takeoff_input', Empty, button(self.has_received_takeoff))
+        rospy.Subscriber('land', Empty, button(self.has_received_land))
         rospy.Subscriber('odom', Odometry, self.has_received_odometry)
         rospy.Subscriber('target', PoseStamped, self.has_received_target)
+        rospy.Subscriber('des_body_vel', Twist, self.has_received_desired_body_vel)
+        rospy.Subscriber('des_vel', TwistStamped, self.has_received_desired_vel)
+
         rospy.Subscriber('enable_tracking', Bool,
-                         self.has_received_enable_tracking)
+                         button(self.has_received_enable_tracking))
         rospy.Subscriber('/head/mocap_odom', Odometry,
                          self.has_received_head)
         rospy.Subscriber('states/common/CommonState/BatteryStateChanged',
                          CommonCommonStateBatteryStateChanged,
                          self.has_received_battery)
 
-        self.switch_button_enabled = True
         rospy.Subscriber(
-            'switch_observe', Empty, self.switch_observe, queue_size=1)
+            'switch_observe', Empty, button(self.switch_observe), queue_size=1)
         rospy.Subscriber(
-            'stop_observe', Empty, self.stop_observe, queue_size=1)
+            'observe', UInt8, button(self.observe), queue_size=1)
         rospy.Subscriber(
-            'observe', PointStamped, self.start_observe, queue_size=1)
+            'stop_observe', Empty, button(self.stop_observe), queue_size=1)
+        rospy.Subscriber(
+            'observe_point', PointStamped, self.start_observe, queue_size=1)
 
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
         self.timer = rospy.Timer(rospy.Duration(0.05), self.update)
@@ -228,6 +243,7 @@ class Controller(object):
         if self.track_head:
             self.target_position = None
             self.observe = False
+            self.follow_vel_cmd = False
             # Will preempt GoToPose action
 
     def has_received_head(self, msg):
@@ -252,25 +268,25 @@ class Controller(object):
         self.target_position = self.clamp_in_fence_pos(p + f)
         self.target_velocity = velocity
 
-    def battery_diagnostics(self, stat):
-        if not self.battery_msg:
-            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
-                         "No battery status received")
-        else:
-            d = (rospy.Time.now() - self.battery_msg.header.stamp).to_sec()
-            p = self.battery_msg.percent
-            if d > 60:
-                stat.summary(
-                    diagnostic_msgs.msg.DiagnosticStatus.WARN, "Not updated")
-            elif p < 10:
-                stat.summary(
-                    diagnostic_msgs.msg.DiagnosticStatus.WARN, "Almost empty")
-            else:
-                stat.summary(
-                    diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
-            stat.add("percent", p)
-            stat.add("last updated", "%.0f seconds ago" % d)
-        return stat
+    # def battery_diagnostics(self, stat):
+    #     if not self.battery_msg:
+    #         stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
+    #                      "No battery status received")
+    #     else:
+    #         d = (rospy.Time.now() - self.battery_msg.header.stamp).to_sec()
+    #         p = self.battery_msg.percent
+    #         if d > 60:
+    #             stat.summary(
+    #                 diagnostic_msgs.msg.DiagnosticStatus.WARN, "Not updated")
+    #         elif p < 10:
+    #             stat.summary(
+    #                 diagnostic_msgs.msg.DiagnosticStatus.WARN, "Almost empty")
+    #         else:
+    #             stat.summary(
+    #                 diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
+    #         stat.add("percent", p)
+    #         stat.add("last updated", "%.0f seconds ago" % d)
+    #     return stat
 
     def localization_diagnostics(self, stat):
         if self.localized:
@@ -320,20 +336,37 @@ class Controller(object):
                 return
         self.hovering_cmd = True
 
-    def update_pose_control(self, target_position, target_yaw,
-                            target_velocity=[0, 0, 0]):
-        if self.observe:
-            _y = self.observe_target_yaw()
-            if _y is not None:
-                target_yaw = _y
-        rospy.logdebug(
-            "Go to target %s %s %s", target_position, target_yaw,
-            target_velocity)
-        rospy.logdebug(
-            "From %s %s %s" % (self.position, self.yaw, self.velocity))
-        v_des = ((np.array(target_position) - np.array(self.position) -
-                  np.array(self.velocity) * self.delay) /
-                 self.eta + np.array(target_velocity))
+    def has_received_vel_in_world_frame(self, des_vel, des_omega):
+        # The same as if a cmd would have been received
+        self.target_position = None
+        self.track_head = False
+        self.follow_vel_cmd = True
+        self.latest_cmd_time = rospy.Time.now()
+        self.update_desired_velocity(des_vel, des_omega)
+
+    def has_received_desired_body_vel(self, msg):
+        # convert in world frame
+        vel = [msg.linear.x, msg.linear.y, msg.linear.z, 0]
+        omega = [msg.angular.x, msg.angular.y, msg.angular.z, 0]
+        des_vel = rotate(vel, self.q, inverse=True)[:3]
+        des_omega = rotate(omega, self.q, inverse=True)[2]
+        self.has_received_vel_in_world_frame(des_vel, des_omega)
+
+    def has_received_desired_vel(self, msg):
+        # convert in world frame
+        try:
+            transform = self.tf_buffer.lookup_transform(
+                "World", msg.header.frame_id, rospy.Time(0),
+                rospy.Duration(0.1))
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException):
+            return
+        des_vel = tf2_geometry_msgs.do_transform_vector3(msg.twist.linear, transform)
+        des_omega = tf2_geometry_msgs.do_transform_vector3(msg.twist.angular, transform)[2]
+        self.has_received_vel_in_world_frame(des_vel, des_omega)
+
+    def update_desired_velocity(self, v_des, w_des):
+        v_des = np.array(v_des)
         s_des = np.linalg.norm(v_des)
         if s_des > self.s_max:
             v_des = v_des / s_des * self.s_max
@@ -349,9 +382,25 @@ class Controller(object):
         cmd_vel.linear.x = t[0]
         cmd_vel.linear.y = t[1]
         cmd_vel.linear.z = v_des[2]
-        cmd_vel.angular.z = self.target_angular_yaw(target_yaw)
+        cmd_vel.angular.z = w_des
         rospy.logdebug("-> %s" % cmd_vel)
         self.pub_cmd.publish(cmd_vel)
+
+    def update_pose_control(self, target_position, target_yaw,
+                            target_velocity=[0, 0, 0]):
+        if self.observe:
+            _y = self.observe_target_yaw()
+            if _y is not None:
+                target_yaw = _y
+        rospy.logdebug(
+            "Go to target %s %s %s", target_position, target_yaw,
+            target_velocity)
+        rospy.logdebug(
+            "From %s %s %s" % (self.position, self.yaw, self.velocity))
+        v_des = ((np.array(target_position) - np.array(self.position) -
+                  np.array(self.velocity) * self.delay) /
+                 self.eta + np.array(target_velocity))
+        self.update_desired_velocity(v_des, self.target_angular_yaw(target_yaw))
 
     def target_angular_yaw(self, target_yaw):
         d_yaw = target_yaw - self.yaw
@@ -397,10 +446,11 @@ class Controller(object):
             self.observe = False
             self.target_position = self.home_p
             self.target_velocity = [0, 0, 0]
+            self.follow_vel_cmd = False
             rospy.logwarn("flying home to %s" % self.home_p)
 
     def has_received_battery(self, msg):
-        self.battery_msg = msg
+        # self.battery_msg = msg
         # if(msg.percent < 2):
         #     # not really usefull
         #     self.target_position = None
@@ -415,6 +465,7 @@ class Controller(object):
         self.target_position = None
         self.track_head = False
         self.observe = False
+        self.follow_vel_cmd = False
         # self.pub_land.publish(Empty())
 
     def has_received_takeoff(self, msg):
@@ -422,11 +473,24 @@ class Controller(object):
             self.target_position = None
             self.track_head = False
             self.observe = False
+            self.follow_vel_cmd = False
             self.pub_takeoff.publish(Empty())
         else:
             rospy.logwarn("outside fence, will not takeoff")
 
+    @property
+    def follow_vel_cmd(self):
+        return self._follow_vel_cmd
+
+    @follow_vel_cmd.setter
+    def set_follow_vel_cmd(self, value):
+        if value != self._follow_vel_cmd:
+            self._follow_vel_cmd = value
+            if not value:
+                self.stop_pub.publish()
+
     def has_received_input_cmd(self, msg):
+        self.follow_vel_cmd = False
         self.target_position = None
         self.track_head = False
         self.latest_cmd_time = rospy.Time.now()
@@ -517,6 +581,7 @@ class Controller(object):
         rospy.loginfo("Has received target")
         self.track_head = False
         self.observe = False
+        self.follow_vel_cmd = False
         # convert in world frame
         try:
             transform = self.tf_buffer.lookup_transform(
@@ -569,6 +634,16 @@ class Controller(object):
 
     def enable_switch_button(self, evt):
         self.switch_button_enabled = True
+
+    def observe(self, msg):
+        if msg.data == 0:
+            rospy.loginfo("Observe head")
+            self.observe = "head"
+            return
+        if msg.data == 1:
+            rospy.loginfo("Observe point")
+            self.observe = "point"
+            return
 
     def switch_observe(self, msg):
         if not self.switch_button_enabled:
