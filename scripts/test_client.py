@@ -9,6 +9,10 @@ from itertools import cycle
 from actionlib_msgs.msg import GoalStatus
 from std_msgs.msg import Empty
 
+from drone_arena.temporized import Temporized
+
+button = Temporized(1)
+
 
 def pose(x, y, z, yaw):
     q = quaternion_from_euler(0, 0, yaw)
@@ -24,8 +28,7 @@ class Planner():
 
     def __init__(self):
         rospy.init_node('fence_client')
-        self.client = actionlib.SimpleActionClient(
-            'fence_control', GoToPoseAction)
+        self.client = actionlib.SimpleActionClient('fence_control', GoToPoseAction)
         self.home = pose(*rospy.get_param("~home", (0, 0, 1, 0)))
         self._poses = [pose(*x) for x in rospy.get_param("~plan", [])]
         self.loop = rospy.get_param("~loop", False)
@@ -41,9 +44,9 @@ class Planner():
         self.running = False
         self.landing = False
         self.next_waypoint = None
-        rospy.Subscriber("start", Empty, self.start_path)
-        rospy.Subscriber("stop", Empty, self.stop_path)
-        rospy.Subscriber("land_home", Empty, self.land_home)
+        rospy.Subscriber("start", Empty, button(self.start_path))
+        rospy.Subscriber("stop", Empty, button(self.stop_path))
+        rospy.Subscriber("land_home", Empty, button(self.land_home))
         self.land_pub = rospy.Publisher("land", Empty, queue_size=1)
         rospy.loginfo("init done")
         while not rospy.is_shutdown():
@@ -119,4 +122,4 @@ if __name__ == '__main__':
     try:
         Planner()
     except rospy.ROSInterruptException:
-        print "Program interrupted"
+        print("Program interrupted")

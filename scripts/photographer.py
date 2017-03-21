@@ -6,9 +6,13 @@ from ftplib import FTP
 from io import BytesIO
 # See http://bebop-autonomy.readthedocs.io/en/latest/piloting.html
 # #take-on-board-snapshot
-from my_flickr_api import upload
+from drone_arena.my_flickr_api import upload
 from geometry_msgs.msg import PoseStamped, PointStamped, Point
 from test_client import pose
+
+from drone_arena.temporized import Temporized
+
+button = Temporized(1)
 
 
 def point(x, y, z):
@@ -25,14 +29,13 @@ class Photographer():
         rospy.init_node('photographer')
         self.place = pose(*rospy.get_param("~place"))
         self.observe = point(*rospy.get_param("~observe"))
-        self.snapshot_pub = rospy.Publisher("snapshot", Empty,
-                                            queue_size=1)
-        rospy.Subscriber('take_photo', Empty, self.take_photo, queue_size=1)
-        rospy.Subscriber('go_photo', Empty, self.go_photo)
+        self.snapshot_pub = rospy.Publisher("snapshot", Empty, queue_size=1)
+        rospy.Subscriber('take_photo', Empty, button(self.take_photo), queue_size=1)
+        rospy.Subscriber('go_photo', Empty, button(self.go_photo))
         self.target_pub = rospy.Publisher(
             'target', PoseStamped, queue_size=1)
         self.observe_pub = rospy.Publisher(
-            'observe', PointStamped, queue_size=1)
+            'observe_point', PointStamped, queue_size=1)
         rospy.loginfo("Will observe %s", self.observe)
         rospy.spin()
 
@@ -79,4 +82,4 @@ if __name__ == '__main__':
     try:
         Photographer()
     except rospy.ROSInterruptException:
-        print "Program interrupted"
+        print("Program interrupted")
