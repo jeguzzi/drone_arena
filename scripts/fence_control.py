@@ -2,8 +2,8 @@
 
 from __future__ import division
 import rospy
-from std_msgs.msg import Empty, Bool, UInt8
-from geometry_msgs.msg import Twist, PoseStamped, PointStamped, TwistStamped
+from std_msgs.msg import Empty, Bool, UInt8, Header
+from geometry_msgs.msg import Twist, PoseStamped, PointStamped, TwistStamped, Vector3Stamped
 from nav_msgs.msg import Odometry
 # from shapely.geometry import Polygon, Point
 from tf.transformations import quaternion_conjugate, quaternion_multiply
@@ -31,6 +31,16 @@ button = Temporized(1)
 
 
 F = 2.83
+
+
+def twist_in_frame(transform, twist_s, frame_id):
+    h = Header(frame_id=frame_id, stamp=twist_s.header.stamp)
+    vs_l = Vector3Stamped(header=h, vector=twist_s.twist.linear)
+    vs_a = Vector3Stamped(header=h, vector=twist_s.twist.angular)
+    msg = TwistStamped(header=h)
+    msg.twist.linear = tf2_geometry_msgs.do_transform_vector3(vs_l, transform).vector
+    msg.twist.angular = tf2_geometry_msgs.do_transform_vector3(vs_a, transform).vector
+    return msg
 
 
 def is_stop(cmd_vel):
@@ -105,6 +115,7 @@ class Controller(object):
         self.stop_pub = rospy.Publisher('stop', Empty, queue_size=1)
         self.pub_takeoff = rospy.Publisher('takeoff', Empty, queue_size=1)
         self.pub_land = rospy.Publisher('land', Empty, queue_size=1)
+        self.control_camera = rospy.get_param('control_camera', False)
         self.camera_control_pub = rospy.Publisher(
             'camera_control', Twist, queue_size=1)
         self.land_home_pub = rospy.Publisher(
@@ -343,6 +354,7 @@ class Controller(object):
                 self.hovering_cmd = False
                 return
         self.hovering_cmd = True
+        self._follow_vel_cmd = False
 
     def has_received_vel_in_world_frame(self, des_vel, des_omega):
         # The same as if a cmd would have been received
@@ -368,9 +380,14 @@ class Controller(object):
                 rospy.Duration(0.1))
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
                 tf2_ros.ExtrapolationException):
+            rospy.logerr('Cound not tranform %s to frame World', msg)
             return
-        des_vel = tf2_geometry_msgs.do_transform_vector3(msg.twist.linear, transform)
-        des_omega = tf2_geometry_msgs.do_transform_vector3(msg.twist.angular, transform)[2]
+        twist_s = twist_in_frame(transform, msg, 'World')
+        v = twist_s.twist.linear
+        des_vel = [v.x, v.y, v.z]
+        des_omega = twist_s.twist.angular.z
+        # des_vel = tf2_geometry_msgs.do_transform_vector3(msg.twist.linear, transform)
+        # des_omega = tf2_geometry_msgs.do_transform_vector3(msg.twist.angular, transform)[2]
         self.has_received_vel_in_world_frame(des_vel, des_omega)
 
     def update_desired_velocity(self, v_des, w_des):
@@ -427,7 +444,8 @@ class Controller(object):
         # print "*****"
         self.update_localization_state()
         self.update_hovering_cmd()
-        self.update_camera_control()
+        if self.control_camera:
+            self.update_camera_control()
         # rospy.loginfo("update %s %s", self.target_position, self.localized)
         #
         if self.localized:
@@ -642,7 +660,7 @@ class Controller(object):
         self.localized = True
 
     def set_observe_from_msg(self, msg):
-        rospy.loginfo('BANANANA')
+        # rospy.loginfo('BANANANA')
         if msg.data == 0:
             rospy.loginfo("Observe head")
             self.observe = "head"
