@@ -1,0 +1,24 @@
+<launch>
+  <arg name="pose" default="pose"/>
+  <arg name="continuous" default="false"/>
+  <arg name="enable_position" default="true"/>
+  <arg name="enable_sensors" default="false"/>
+  <arg name="rate" default="5.0"/>
+  <arg name="debug" default="false"/>
+  <arg name="id" default="0x6075"/>
+  <node output="screen" pkg="pozyx_ros_driver" name="pozyx" type="pozyx.py" clear_params="true" required="true">
+    <rosparam command="load" file="$(find pozyx_ros_driver)/launch/main.yaml"/>
+    <param name="remote_id" value="$(arg id)"/>
+    <param name="rate" value="$(arg rate)"/>
+    <param name="enable_position" value="$(arg enable_position)"/>
+    <param name="enable_sensors" value="$(arg enable_sensors)"/>
+    <param name="position_stddev" value="0.5"/>
+    <param name="linear_acceleration_stddev" value="0.1"/>
+    <param name="angular_velocity_stddev" value="0.005"/>
+    <param name="magnetic_field_stddev" value="0.000002"/>
+    <param name="orientation_stddev" value="0.001"/>
+    <param name="debug" value="$(arg debug)"/>
+    <param name="continuous" value="$(arg continuous)"/>
+    <remap from="pose" to="$(arg pose)"/>
+  </node>
+</launch>

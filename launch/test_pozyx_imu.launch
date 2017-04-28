@@ -1,0 +1,50 @@
+<launch>
+   <!-- <include file="$(find bebop_description)/launch/description.launch"/> -->
+   <!-- <param name="robot_description" command="$(find xacro)/xacro $(find bebop_description)/urdf/bebop_base.urdf.xacro" /> -->
+   <group ns="bebop">
+      <node pkg="tf2_ros" type="static_transform_publisher" name="map2world" args="5.367 4.67 0 1.5708 0 0 map World" />
+      <node pkg="tf2_ros" type="static_transform_publisher" name="utm2map" args="493696.082822 5097005.38856 0 0 0 0.805928282249 -0.592013178799 utm map" />
+      <node name="odom2imu" pkg="drone_arena" type="imu.py" output="screen" clear_params="true">
+         <param name='angle_std_dev' value="0.1"/>
+      </node>
+      <node name="odom_cov" pkg="drone_arena" type="odom_z.py" output="screen" clear_params="true">
+         <param name='z' value="0.05"/>
+         <param name='speed' value="0.02"/>
+         <remap from='input_odom' to='odom'/>
+         <remap from='output_odom' to='vo_odom'/>
+      </node>
+
+        <!-- this file is included by bebop_driver launch files by default in their own namespaces -->
+
+        <!-- <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" /> -->
+
+      <node name="ekf_map" pkg="robot_localization" type="ukf_localization_node" output="screen" clear_params="true">
+         <param name="frequency" value="5.0"/>
+         <param name="sensor_timeout" value="0.5"/>
+         <!-- <param name="two_d_mode" value="true"/> -->
+         <param name="map_frame" value="World"/>
+         <param name="odom_frame" value="odom"/>
+         <param name="base_link_frame" value="base_link"/>
+         <param name="world_frame" value="World"/>
+         <param name="odom0" value="vo_odom"/>
+         <rosparam param="odom0_config">
+            [false, false, true, false, false, false, true, true, true, false, false, false, false, false, false]
+         </rosparam>
+         <param name="imu0" value="imu"/>
+         <rosparam param="imu0_config">
+            [false, false, false, true, true, true, false, false, false, false, false, false, false, false, false]
+         </rosparam>
+         <param name="pose0" value="/pose_cov"/>
+         <rosparam param="pose0_config">
+            [true, true, false, false, false, false, false, false, false, false, false, false, false, false, false]
+         </rosparam>
+         <param name="publish_tf" value="true"/>
+         <param name="print_diagnostics" value="true"/>
+         <remap from="odometry/filtered" to="mocap_odom"/>
+         <!-- <param name='use_control' value='true'/>
+         <rosparam param="control_config">
+            [true, true, true, false, false, true]
+         </rosparam> -->
+      </node>
+   </group>
+</launch>

@@ -1,0 +1,96 @@
+# Logitech F710 wireless controller
+# Deadman (enable) button: Right Trigger
+# D<>X button (located on the back panel) must be set to D
+teleop:
+  piloting:
+    type: topic
+    message_type: "geometry_msgs/Twist"
+    topic_name: cmd_vel
+    deadman_buttons: [7]
+    axis_mappings:
+      -
+        axis: 3  # Right thumb stick (up/down)
+        target: linear.x
+        scale: 1.0
+        offset: 0.0
+      -
+        axis: 2  # Right thumb stick (left/right)
+        target: linear.y
+        scale: 1.0
+        offset: 0.0
+      -
+        axis: 1  # Left thumb stick (up/down)
+        target: linear.z
+        scale: 1.0
+        offset: 0.0
+      -
+        axis: 0  # Left thumb stick (left/right)
+        target: angular.z
+        scale: 1.0
+        offset: 0.0
+  camera:
+    type: topic
+    message_type: "geometry_msgs/Twist"
+    topic_name: camera_control
+    deadman_buttons: [7]
+    axis_mappings:
+      -
+        axis: 5  # Left D-Pad (up/down)
+        target: angular.y
+        scale: 35.0
+        offset: 0.0
+      -
+        axis: 4  # Left D-Pad (left/right)
+        target: angular.z
+        scale: -35.0
+        offset: 0.0
+  takeoff:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: takeoff
+    deadman_buttons: [3, 7]  # RT + Y
+    axis_mappings: []
+  land:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: land
+    deadman_buttons: [1, 7]  # RT + A
+    axis_mappings: []
+  emergency:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: reset
+    deadman_buttons: [2, 7] # RT + B
+    axis_mappings: []
+  flattrim:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: flattrim
+    deadman_buttons: [0, 7] # RT + X
+    axis_mappings: []
+  follow_on:
+    type: topic
+    message_type: "std_msgs/Bool"
+    topic_name: "enable_tracking"
+    message_value:
+      - target: data
+        value: true
+    deadman_buttons: [3]
+  plan_on:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "start"
+    deadman_buttons: [0]
+    axis_mappings: []
+  plan_off:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "stop"
+    deadman_buttons: [2]
+    axis_mappings: []
+  land_home:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "land_home"
+    deadman_buttons: [1]
+    axis_mappings: []
