@@ -676,9 +676,13 @@ class Controller(object):
                     in zip(position[:2], self.pos_bounds[:2])])
 
     def has_received_odometry(self, msg):
-        self.last_localization = msg.header.stamp
+
         # Transform pose to World and twist to world
-        msg = odometry_in_frame(self.tf_buffer, msg, self.frame_id, self.frame_id)
+        odom = odometry_in_frame(self.tf_buffer, msg, self.frame_id, self.frame_id)
+        if not odom:
+            return
+        msg = odom
+        self.last_localization = msg.header.stamp
         _p = msg.pose.pose.position
         self.z = _p.z
         _v = msg.twist.twist.linear
