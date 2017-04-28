@@ -36,10 +36,10 @@ services:
   controller:
     privileged: true
     build:
-      dockerfile: docker/bebop_demo_nav/Dockerfile
+      dockerfile: docker/bebop_demo_pozyx/Dockerfile
       context: ../..
     network_mode: *nm
-    image: jeguzzi/drone_arena:nav
+    image: jeguzzi/drone_arena:pozyx
     volumes:
       - ./logs:/root/.ros/log:rw
       - ./demo-pozyx.launch:/root/catkin_ws/src/drone_arena/launch/main.launch:ro
