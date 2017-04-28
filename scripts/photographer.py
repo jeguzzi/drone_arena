@@ -9,7 +9,7 @@ from io import BytesIO
 from drone_arena.my_flickr_api import upload
 from geometry_msgs.msg import PoseStamped, PointStamped, Point
 from test_client import pose
-
+import threading
 from drone_arena.temporized import Temporized
 
 button = Temporized(1)
@@ -52,7 +52,7 @@ class Photographer():
         ftp.cwd('internal_000/Bebop_2/media')
         while True:
             file_names = [f for f in ftp.nlst() if 'jpg' in f]
-            # rospy.loginfo("Files %s", file_names)
+            rospy.loginfo("Files %s", file_names)
             if file_names:
                 for name in file_names:
                     rospy.loginfo("Try to retrieve %s", name)
@@ -71,11 +71,11 @@ class Photographer():
         images = self.retrieve_photos()
         rospy.loginfo("Took photos %s", len(images))
         for name, image in images:
-            rospy.loginfo(
-                "Try to upload %s to flickr", name)
-            s = upload(
-                photo_file=name, title="Test bebop", photo_file_data=image)
-            rospy.loginfo("Uploaded %s", s)
+            def f():
+                rospy.loginfo("Try to upload %s to flickr", name)
+                s = upload(photo_file=name, title="Test bebop", photo_file_data=image)
+                rospy.loginfo("Uploaded %s", s)
+            threading.Thread(target=f).start()
 
 
 if __name__ == '__main__':
