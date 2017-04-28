@@ -33,13 +33,58 @@ button = Temporized(1)
 F = 2.83
 
 
-def twist_in_frame(transform, twist_s, frame_id):
+def get_transform(tf_buffer, from_frame, to_frame):
+    try:
+        return tf_buffer.lookup_transform(
+            from_frame, to_frame, rospy.Time(0), rospy.Duration(0.1)
+        )
+    except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+            tf2_ros.ExtrapolationException) as e:
+        rospy.logerr(e)
+        return None
+
+
+def point_in_frame(tf_buffer, point_s, frame_id):
+    t = get_transform(tf_buffer, frame_id, point_s.header.frame_id)
+    if not t:
+        return None
+    return tf2_geometry_msgs.do_transform_point(point_s, t)
+
+
+def pose_in_frame(tf_buffer, pose_s, frame_id):
+    t = get_transform(tf_buffer, frame_id, pose_s.header.frame_id)
+    if not t:
+        return None
+    return tf2_geometry_msgs.do_transform_pose(pose_s, t)
+
+
+def twist_in_frame(tf_buffer, twist_s, frame_id):
+    transform = get_transform(tf_buffer, frame_id, twist_s.header.frame_id)
+    if not transform:
+        return None
     h = Header(frame_id=frame_id, stamp=twist_s.header.stamp)
     vs_l = Vector3Stamped(header=h, vector=twist_s.twist.linear)
     vs_a = Vector3Stamped(header=h, vector=twist_s.twist.angular)
     msg = TwistStamped(header=h)
     msg.twist.linear = tf2_geometry_msgs.do_transform_vector3(vs_l, transform).vector
     msg.twist.angular = tf2_geometry_msgs.do_transform_vector3(vs_a, transform).vector
+    return msg
+
+
+def odometry_in_frame(tf_buffer, odom, frame_id, child_frame_id):
+    # ignoring covariances
+    transform_pose = get_transform(tf_buffer, frame_id, odom.header.frame_id)
+    transform_twist = get_transform(tf_buffer, child_frame_id, odom.child_frame_id)
+    if not (transform_pose and transform_twist):
+        return None
+    h = Header(frame_id=frame_id, stamp=odom.header.stamp)
+    msg = Odometry(header=h, child_frame_id=child_frame_id)
+    vs_l = Vector3Stamped(header=h, vector=odom.twist.twist.linear)
+    vs_a = Vector3Stamped(header=h, vector=odom.twist.twist.angular)
+    pose_s = PoseStamped(header=h, pose=odom.pose.pose)
+    msg.twist.twist.linear = tf2_geometry_msgs.do_transform_vector3(vs_l, transform_twist).vector
+    msg.twist.twist.angular = tf2_geometry_msgs.do_transform_vector3(vs_a, transform_twist).vector
+    msg.pose.pose = tf2_geometry_msgs.do_transform_pose(pose_s, transform_pose).pose
     return msg
 
 
@@ -121,6 +166,8 @@ class Controller(object):
         self.land_home_pub = rospy.Publisher(
             'land_home', Empty, queue_size=1)
         self.fence_margin = 0.5
+        self.s_max = 0.5
+        self.omega_max = 0.5
         self.latest_cmd_time = None
         self.hovering_cmd = True
         # self.fence = Polygon(
@@ -131,13 +178,18 @@ class Controller(object):
         # self.x_min, self.x_max = (-2, 2)
         # self.y_min, self.y_max = (-2, 2)
         # self.pos_bounds = ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0))
+
+        self.frame_id = rospy.get_param('~frame_id', 'World')
+        self.localization_timeout = rospy.get_param('~localization_timeout', 1)
+        self.control_timeout = rospy.get_param('~control_timeout', 0.2)
+
         self.pos_bounds = rospy.get_param(
             "~pos_bounds",
             ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0)))
         _home = rospy.get_param("~home", (0, 0, 1))
         self.home_p = _home
         self.home = PoseStamped()
-        self.home.header.frame_id = 'World'
+        self.home.header.frame_id = self.frame_id
         self.home.pose.position.x = _home[0]
         self.home.pose.position.y = _home[1]
         self.home.pose.position.z = _home[2]
@@ -153,7 +205,6 @@ class Controller(object):
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
         self.target_position = None
         self.target_yaw = 0.0
-        # self.s_max = 1.5
         self.target_velocity = [0, 0, 0]
         self.srv = Server(ArenaConfig, self.callback)
         self.localized = False
@@ -329,11 +380,14 @@ class Controller(object):
         a = config['max_acceleration']
         self.max_acc_bounds = ((-a, a), (-a, a))
         self.s_max = config['max_speed']
+        self.omega_max = config['max_angular_speed']
         self.enable_fence = config['enable_fence']
         self.tracked_teleop = config['tracked_teleop']
         self.tracked_teleop_d = config['tracked_teleop_d']
         self.teleop_mode = config['teleop_mode']
         self.track_range = config['track_distance']
+        self.localization_timeout = config['localization_timeout']
+        self.control_timeout = config['control_timeout']
 
         # print config['teleop_mode']
         # print dir(ArenaConfig)
@@ -342,7 +396,7 @@ class Controller(object):
 
     def update_localization_state(self):
         if self.localized:
-            if (rospy.Time.now() - self.last_localization).to_sec() > 1:
+            if (rospy.Time.now() - self.last_localization).to_sec() > self.localization_timeout:
                 rospy.logwarn("No more localized")
                 self.localized = False
                 self.pub_cmd.publish(Twist())
@@ -350,7 +404,7 @@ class Controller(object):
     def update_hovering_cmd(self):
         if self.latest_cmd_time:
             delta = rospy.Time.now() - self.latest_cmd_time
-            if delta.to_sec() < 0.2:
+            if delta.to_sec() < self.control_timeout:
                 self.hovering_cmd = False
                 return
         self.hovering_cmd = True
@@ -374,15 +428,7 @@ class Controller(object):
 
     def has_received_desired_vel(self, msg):
         # convert in world frame
-        try:
-            transform = self.tf_buffer.lookup_transform(
-                "World", msg.header.frame_id, rospy.Time(0),
-                rospy.Duration(0.1))
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
-                tf2_ros.ExtrapolationException):
-            rospy.logerr('Cound not tranform %s to frame World', msg)
-            return
-        twist_s = twist_in_frame(transform, msg, 'World')
+        twist_s = twist_in_frame(self.tf_buffer, msg, self.frame_id)
         v = twist_s.twist.linear
         des_vel = [v.x, v.y, v.z]
         des_omega = twist_s.twist.angular.z
@@ -438,6 +484,8 @@ class Controller(object):
         if d_yaw < -math.pi:
             d_yaw = d_yaw + 2 * math.pi
         v_yaw = d_yaw / self.rotation_tau
+        if abs(v_yaw) > self.omega_max:
+            v_yaw = v_yaw / abs(v_yaw) * self.omega_max
         return v_yaw
 
     def update(self, evt):
@@ -577,12 +625,10 @@ class Controller(object):
     def clamp_in_fence_cmd(self, cmd_vel):
         rospy.logdebug("clamp %s" % cmd_vel)
         if self.teleop_mode == ArenaConfig.Arena_Head:
-            try:
-                _, q = self.tf_buffer.lookup_transform(
-                    "World", self.head_frame_id, rospy.Time(0),
-                    rospy.Duration(0.1))
-            except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
-                    tf2_ros.ExtrapolationException):
+            transform = get_transform(self.tf_buffer, self.frame_id, self.head_frame_id)
+            if transform:
+                q = transform[1]
+            else:
                 q = None
             if q is not None:
                 a = acc_from_cmd(cmd_vel, q)
@@ -613,14 +659,10 @@ class Controller(object):
         self.observe = False
         self.follow_vel_cmd = False
         # convert in world frame
-        try:
-            transform = self.tf_buffer.lookup_transform(
-                "World", msg.header.frame_id, rospy.Time(0),
-                rospy.Duration(0.1))
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
-                tf2_ros.ExtrapolationException):
-            self.target_position = None
-        target_pose = tf2_geometry_msgs.do_transform_pose(msg, transform)
+        target_pose = pose_in_frame(self.tf_buffer, msg, self.frame_id)
+        if not target_pose:
+            rospy.logwarn("has_received_target: Cannot transform pose %s to %s", msg, self.frame_id)
+            return
         _p = target_pose.pose.position
         _o = target_pose.pose.orientation
         self.target_position = self.clamp_in_fence_pos([_p.x, _p.y, _p.z])
@@ -635,6 +677,8 @@ class Controller(object):
 
     def has_received_odometry(self, msg):
         self.last_localization = msg.header.stamp
+        # Transform pose to World and twist to world
+        msg = odometry_in_frame(self.tf_buffer, msg, self.frame_id, self.frame_id)
         _p = msg.pose.pose.position
         self.z = _p.z
         _v = msg.twist.twist.linear
@@ -688,15 +732,10 @@ class Controller(object):
 
     def start_observe(self, msg):
         rospy.loginfo("Has received observe target")
-        try:
-            transform = self.tf_buffer.lookup_transform(
-                "World", msg.header.frame_id, rospy.Time(0),
-                rospy.Duration(0.1))
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
-                tf2_ros.ExtrapolationException):
+        point_s = point_in_frame(self.tf_buffer, msg, self.frame_id)
+        if not point_s:
             return
-        _p = tf2_geometry_msgs.do_transform_point(
-            msg, transform).point
+        _p = point_s.point
         self.observe_point = [_p.x, _p.y, _p.z]
         self.observe = "point"
         pass

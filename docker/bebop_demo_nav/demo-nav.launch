@@ -8,7 +8,8 @@
     <param name="max_speed" value="1.5"/>
     <param name="max_acceleration" value="1.0"/>
     <param name="delay" value="0.1"/>
-    <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 2.4], [0.5, 2.0]]</rosparam>
+    <param name="control_camera" value="false"/>
+    <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 1.8], [0.5, 2.0]]</rosparam>
     <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
   </node>
   <remap from="cmd_vel" to="cmd_vel_input"/>
