@@ -1,7 +1,7 @@
 <launch>
-  <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
+  <!-- <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/> -->
   <node name='fence' pkg='drone_arena' type='fence_control.py' output="screen" ns="bebop">
-    <remap from="odom" to="mocap_odom_safe"/>
+    <remap from="odom" to="mocap_odom"/>
     <param name="tau" value="0.75"/>
     <param name="rotation_tau" value="0.75"/>
     <param name="eta" value="1.0"/>
@@ -37,16 +37,15 @@
   <node pkg="tf2_ros" type="static_transform_publisher" name="map2world" args="5.367 4.67 0 1.5708 0 0 map World" />
   <node pkg="tf2_ros" type="static_transform_publisher" name="utm2map" args="493696.082822 5097005.38856 0 0 0 0.805928282249 -0.592013178799 utm map" />
   <group ns="bebop">
-     <node name='safe_odom' pkg='drone_arena' type='safety_odom.py' output="screen">
-         <remap from="out" to="mocap_odom_safe"/>
+     <node name='safe_pose' pkg='drone_arena' type='safety_pose.py' output="screen">
+         <remap from="out" to="safe_pose_cov"/>
          <param name="timeout" value="0.5"/>
          <rosparam param="in">
            -
-              source: /pose_cov
-              topic: mocap_odom_pozyx
+              topic: /pose_cov
            -
-              source: /optitrack/bebop
-              topic: mocap_odom
+              topic: /optitrack/bebop
+              cov: [1e-6, 0, 0, 0, 0, 0, 0, 1e-6, 0, 0, 0, 0, 0, 0, 1e-6, 0, 0, 0, 0, 0, 0, 1e-4, 0 ,0, 0, 0, 0, 0, 1e-4, 0, 0, 0, 0, 0, 0, 1e-4]
          </rosparam>
      </node>
      <node name="odom2imu" pkg="drone_arena" type="imu.py" output="screen" clear_params="true">
@@ -76,13 +75,13 @@
         <rosparam param="imu0_config">
            [false, false, false, true, true, true, false, false, false, false, false, false, false, false, false]
         </rosparam>
-        <param name="pose0" value="/pose_cov"/>
+        <param name="pose0" value="safe_pose_cov"/>
         <rosparam param="pose0_config">
            [true, true, false, false, false, false, false, false, false, false, false, false, false, false, false]
         </rosparam>
         <param name="publish_tf" value="true"/>
         <param name="print_diagnostics" value="true"/>
-        <remap from="odometry/filtered" to="mocap_odom_pozyx"/>
+        <remap from="odometry/filtered" to="mocap_odom"/>
         <!-- <param name='use_control' value='true'/>
         <rosparam param="control_config">
            [true, true, true, false, false, true]
