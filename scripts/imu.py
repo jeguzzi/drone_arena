@@ -50,8 +50,8 @@ class IMU(object):
         self._std_dev = value
 
     def reconfigure(self, config, level):
-        self.angle_std_dev = config['std_dev']
-        self.angle_bias = config['bias']
+        self.angle_std_dev = config['angle_std_dev']
+        self.angle_bias = config['angle_bias']
         return config
 
 

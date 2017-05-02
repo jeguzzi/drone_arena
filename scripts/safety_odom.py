@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import rospy
-from navigation_msgs.msg import Odometry
+from nav_msgs.msg import Odometry
 from dynamic_reconfigure.server import Server
 from drone_arena.cfg import SafeOdomConfig
 import diagnostic_updater
@@ -21,7 +21,7 @@ class SafetyOdom(object):
         self.updater = diagnostic_updater.Updater()
         self.updater.setHardwareID("odom sources")
         self.topics = []
-        for i, data in enumerate(self.get_param('~in', [])):
+        for i, data in enumerate(rospy.get_param('~in', [])):
             topic = data['topic']
             source = data.get('source', topic)
             self.last_msg.append(rospy.Time.now())
@@ -36,6 +36,7 @@ class SafetyOdom(object):
     def got_source(self, i):
         def f(msg):
             self.last_msg[i] = rospy.Time.now()
+        return f
 
     def update_diagnostics(self, event):
         self.updater.update()
@@ -63,6 +64,7 @@ class SafetyOdom(object):
             else:
                 stat.summary(OK, "")
             return stat
+        return f
 
     def got_odometry_from(self, index):
         def f(msg):
@@ -77,6 +79,7 @@ class SafetyOdom(object):
                         self.active_index = index
             if index == self.active_index:
                 self.pub.publish(self.imu_msg)
+        return f
 
     def reconfigure(self, config, level):
         self.active = config['active']

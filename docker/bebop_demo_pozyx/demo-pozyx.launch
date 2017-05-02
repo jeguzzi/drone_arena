@@ -38,8 +38,8 @@
   <node pkg="tf2_ros" type="static_transform_publisher" name="utm2map" args="493696.082822 5097005.38856 0 0 0 0.805928282249 -0.592013178799 utm map" />
   <group ns="bebop">
      <node name='safe_odom' pkg='drone_arena' type='safety_odom.py' output="screen" ns="bebop">
-         <rosparam from="out" to="mocap_odom_safe"/>
-         <rosparam from="timeout" to="0.5"/>
+         <remap from="out" to="mocap_odom_safe"/>
+         <param name="timeout" value="0.5"/>
          <rosparam param="in">
            -
               source: /pose_cov
