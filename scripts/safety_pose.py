@@ -42,7 +42,7 @@ class SafetyPose(object):
     def active_diagnostics(self, stat):
         index = self.active_index
         topic = self.topics[index]
-        dt = (self.last_msg[index] - rospy.Time.now()).to_sec()
+        dt = (rospy.Time.now() - self.last_msg[index]).to_sec()
         if dt > self.timeout:
             stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR,
                          "Active source {0} not alive".format(topic))
@@ -56,7 +56,7 @@ class SafetyPose(object):
         WARN = diagnostic_msgs.msg.DiagnosticStatus.WARN
 
         def f(stat):
-            dt = (self.last_msg[index] - rospy.Time.now()).to_sec()
+            dt = (rospy.Time.now() - self.last_msg[index]).to_sec()
             if dt > self.timeout:
                 stat.summary(WARN, "Last updated {0:.0f} seconds ago".format(dt))
             else:
@@ -71,7 +71,7 @@ class SafetyPose(object):
                 if index <= self.active_index:
                     self.active_index = index
                 else:
-                    dt = (self.last_msg[self.active_index] - rospy.Time.now()).to_sec()
+                    dt = (rospy.Time.now() - self.last_msg[self.active_index]).to_sec()
                     if dt > self.timeout:
                         rospy.logwarn('Switch to pose source {0} from {1}'.format(
                             self.topics[index], self.topics[self.active_index]))
@@ -81,7 +81,7 @@ class SafetyPose(object):
                     pose_c = PoseWithCovarianceStamped()
                     pose_c.header = msg.header
                     pose_c.pose.pose = msg.pose
-                    pose_c.covariance = cov
+                    pose_c.pose.covariance = cov
                 else:
                     pose_c = msg
                 self.pub.publish(pose_c)
