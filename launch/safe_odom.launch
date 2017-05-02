@@ -1,0 +1,14 @@
+<launch>
+  <node name='safe_odom' pkg='drone_arena' type='safety_odom.py' output="screen" ns="bebop">
+    <rosparam from="out" to="mocap_odom"/>
+    <rosparam from="timeout" to="0.5"/>
+    <rosparam param="in">
+      -
+         source: /pose_cov
+         topic: mocap_odom_pozyx
+      -
+         source: /optitrack/bebop
+         topic: mocap_odom
+    </rosparam>
+  </node>
+</launch>

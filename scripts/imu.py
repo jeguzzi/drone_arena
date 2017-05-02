@@ -7,7 +7,7 @@ from bebop_msgs.msg import Ardrone3PilotingStateAttitudeChanged
 from tf.transformations import quaternion_from_euler
 import math
 from dynamic_reconfigure.server import Server
-from drone_arena.cfg import IMUConfig
+from drone_arena.cfg import ImuConfig
 
 
 class IMU(object):
@@ -20,8 +20,8 @@ class IMU(object):
         self.imu_msg.linear_acceleration_covariance[0] = -1
         self._std_dev = None
         self.angle_std_dev = rospy.get_param('angle_std_dev', 0.01)
-        self.angle_bias = rospy.get_param('bias', 0.0)
-        self.srv = Server(IMUConfig, self.reconfigure)
+        self.angle_bias = rospy.get_param('angle_bias', 0.0)
+        self.srv = Server(ImuConfig, self.reconfigure)
         self.pub = rospy.Publisher('imu', Imu, queue_size=1)
         rospy.Subscriber('states/ardrone3/PilotingState/AttitudeChanged',
                          Ardrone3PilotingStateAttitudeChanged, self.has_received_attitude)
