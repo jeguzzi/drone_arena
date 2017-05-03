@@ -92,6 +92,8 @@ generate_messages(
 # Generate dynamic reconfigure parameters in the 'cfg' folder
 generate_dynamic_reconfigure_options(
   cfg/Config.cfg
+  cfg/IMUConfig.cfg
+  cfg/SafeOdomConfig.cfg
 )
 
 ###################################

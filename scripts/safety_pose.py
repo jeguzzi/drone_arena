@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import rospy
+from std_msgs.msg import Bool
 from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
 from dynamic_reconfigure.server import Server
 from drone_arena.cfg import SafeOdomConfig
@@ -13,11 +14,12 @@ class SafetyPose(object):
     def __init__(self):
         rospy.init_node('safety_pose')
         self.last_msg = []
+        self.localization_pub = rospy.Publisher(
+            'localization_active', Bool, queue_size=1, latch=True)
         self.pub = rospy.Publisher('out', PoseWithCovarianceStamped, queue_size=1)
         self.active = rospy.get_param('~active', True)
         self.timeout = rospy.get_param('~timeout', 1.0)
         self.active_index = 0
-        self.srv = Server(SafeOdomConfig, self.reconfigure)
         self.updater = diagnostic_updater.Updater()
         self.updater.setHardwareID("pose sources")
         self.topics = []
@@ -34,7 +36,16 @@ class SafetyPose(object):
             self.updater.add(topic, self.diagnostics(i))
         self.updater.add('active source', self.active_diagnostics)
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
+        rospy.Timer(rospy.Duration(self.timeout), self.update_localization)
+        self.srv = Server(SafeOdomConfig, self.reconfigure)
         rospy.spin()
+
+    def update_localization(self, event):
+        dt = (rospy.Time.now() - self.last_msg[self.active_index]).to_sec()
+        if dt > 2.0 * self.timeout:
+            self.localization_pub.publish(False)
+        else:
+            self.localization_pub.publish(True)
 
     def update_diagnostics(self, event):
         self.updater.update()
@@ -84,6 +95,8 @@ class SafetyPose(object):
                     pose_c.pose.covariance = cov
                 else:
                     pose_c = msg
+                # Solve issue with not synchronized publishers
+                pose_c.header.stamp = rospy.Time.now()
                 self.pub.publish(pose_c)
         return f
 

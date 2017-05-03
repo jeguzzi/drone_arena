@@ -165,6 +165,8 @@ class Controller(object):
             'camera_control', Twist, queue_size=1)
         self.land_home_pub = rospy.Publisher(
             'land_home', Empty, queue_size=1)
+        self.pos_tol = rospy.get_param('position_tol', 0.1)
+        self.angle_tol = rospy.get_param('angle_tol', 0.2)
         self.fence_margin = 0.5
         self.s_max = 0.5
         self.omega_max = 0.5
@@ -208,6 +210,7 @@ class Controller(object):
         self.target_velocity = [0, 0, 0]
         self.srv = Server(ArenaConfig, self.callback)
         self.localized = False
+        self.localization_active = True
         self.last_localization = None
 
         self._follow_vel_cmd = False
@@ -246,6 +249,8 @@ class Controller(object):
                          CommonCommonStateBatteryStateChanged,
                          self.has_received_battery)
 
+        rospy.Subscriber('localization_active', Bool, self.has_received_localization_active)
+
         rospy.Subscriber(
             'switch_observe', Empty, button(self.switch_observe), queue_size=1)
         rospy.Subscriber(
@@ -266,6 +271,9 @@ class Controller(object):
         rospy.loginfo('Started SimpleActionServer fence_control')
         rospy.spin()
 
+    def has_received_localization_active(self, msg):
+        self.localization_active = msg.data
+
     def is_near(self, position, yaw):
         d_p = np.linalg.norm(np.array(position) - np.array(self.position))
         d_y = yaw - self.yaw
@@ -273,7 +281,7 @@ class Controller(object):
             d_y = d_y - 2 * math.pi
         if d_y < - math.pi:
             d_y = d_y + 2 * math.pi
-        return (d_p < 0.1 and d_y < 0.2, d_p, d_y)
+        return (d_p < self.pos_tol and abs(d_y) < self.angle_tol, d_p, d_y)
 
     def execute_cb(self, goal):
         rospy.loginfo('Executing action Go To Pose %s' % goal.target_pose)
@@ -388,6 +396,8 @@ class Controller(object):
         self.track_range = config['track_distance']
         self.localization_timeout = config['localization_timeout']
         self.control_timeout = config['control_timeout']
+        self.pos_tol = config['position_tol']
+        self.angle_tol = config['angle_tol']
 
         # print config['teleop_mode']
         # print dir(ArenaConfig)
@@ -676,6 +686,9 @@ class Controller(object):
                     in zip(position[:2], self.pos_bounds[:2])])
 
     def has_received_odometry(self, msg):
+
+        if not self.localization_active:
+            return
 
         # Transform pose to World and twist to world
         odom = odometry_in_frame(self.tf_buffer, msg, self.frame_id, self.frame_id)
