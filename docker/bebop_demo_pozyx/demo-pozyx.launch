@@ -4,8 +4,10 @@
     <remap from="odom" to="mocap_odom"/>
     <param name="tau" value="0.75"/>
     <param name="rotation_tau" value="0.75"/>
-    <param name="eta" value="1.0"/>
+    <param name="eta" value="1.5"/>
     <param name="max_speed" value="0.5"/>
+    <param name="position_tol" value="0.3"/>
+    <param name="angle_tol" value="0.3"/>
     <param name="max_angular_speed" value="0.5"/>
     <param name="max_acceleration" value="1.5"/>
     <param name="delay" value="0.1"/>
@@ -25,8 +27,8 @@
     <rosparam param="plan">
       - [0,  -2,  1,  -1.57]
       - [-2, 0,  1.5,  -3.14]
-      - [0, 1,  1,  1.57]
-      - [2, 0,  0.5,  0]
+      - [0, 1,  1.0,  1.57]
+      - [2, 0,  0.75,  0]
     </rosparam>
     <param name="loop" value="true"/>
   </node>
@@ -40,12 +42,14 @@
      <node name='safe_pose' pkg='drone_arena' type='safety_pose.py' output="screen">
          <remap from="out" to="safe_pose_cov"/>
          <param name="timeout" value="0.5"/>
+	 <param name="active" value="true"/>
+	 <param name="active_index" value="0"/>
          <rosparam param="in">
            -
               topic: /pose_cov
            -
               topic: /optitrack/bebop
-              cov: [1e-6, 0, 0, 0, 0, 0, 0, 1e-6, 0, 0, 0, 0, 0, 0, 1e-6, 0, 0, 0, 0, 0, 0, 1e-4, 0 ,0, 0, 0, 0, 0, 1e-4, 0, 0, 0, 0, 0, 0, 1e-4]
+              cov: [0.0000001, 0, 0, 0, 0, 0, 0, 0.0000001, 0, 0, 0, 0, 0, 0, 0.00001, 0, 0, 0, 0, 0, 0, 0.0001, 0 ,0, 0, 0, 0, 0, 0.0001, 0, 0, 0, 0, 0, 0, 0.0001]
          </rosparam>
      </node>
      <node name="odom2imu" pkg="drone_arena" type="imu.py" output="screen" clear_params="true">
@@ -60,7 +64,7 @@
      </node>
 
      <node name="ekf_map" pkg="robot_localization" type="ukf_localization_node" output="screen" clear_params="true">
-        <param name="frequency" value="5.0"/>
+        <param name="frequency" value="20.0"/>
         <param name="sensor_timeout" value="0.5"/>
         <!-- <param name="two_d_mode" value="true"/> -->
         <param name="map_frame" value="World"/>
@@ -86,6 +90,10 @@
         <rosparam param="control_config">
            [true, true, true, false, false, true]
         </rosparam> -->
+     </node>
+
+     <node name="mavros_state_pub" pkg="drone_arena" type="mavros_state.py" output="screen">
+
      </node>
   </group>
 
