@@ -20,7 +20,7 @@
   <remap from="takeoff" to="takeoff_input"/>
   <!-- <remap from="land" to="land_input"/> -->
   <include file="$(find bebop_tools)/launch/joy_teleop.launch">
-    <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-nav.yaml" />
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-pozyx.yaml" />
   </include>
   <node name="path_planner" pkg='drone_arena' type='test_client.py' output="screen" ns="bebop">
     <rosparam param="home">[1.2, -1.2, 1, 1.57]</rosparam>
