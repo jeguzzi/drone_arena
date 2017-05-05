@@ -42,6 +42,7 @@ services:
     image: jeguzzi/drone_arena:pozyx
     volumes:
       - ./logs:/root/.ros/log:rw
+      - ./log710-demo-pozyx.yaml:/root/catkin_ws/src/drone_arena/config/log710-demo-pozyx.yaml:ro
       - ./demo-pozyx.launch:/root/catkin_ws/src/drone_arena/launch/main.launch:ro
       - ./bags:/bags:rw
     env_file:

@@ -4,7 +4,7 @@ import rospy
 import bebop_msgs.msg as b_msg
 from mavros_msgs.msg import State
 
-from diagnostic import state_name
+from diagnostics import state_name
 
 
 class BebopMavRosState(object):
@@ -19,23 +19,26 @@ class BebopMavRosState(object):
         rospy.Subscriber('states/ardrone3/PilotingState/FlyingStateChanged',
                          b_msg.Ardrone3PilotingStateFlyingStateChanged,
                          self.has_received_state)
+        self.mavros_msg = State()
+        self.mavros_msg.connected = True
+        self.mavros_msg.armed = True
+        rospy.Timer(rospy.Duration(1), self.publish_mavros_state)
         rospy.spin()
+
+    def publish_mavros_state(self, evt):
+        self.mavros_pub.publish(self.mavros_msg)
 
     def has_received_state(self, msg):
         s = self.state[msg.state]
-        mavros_msg = State()
-        mavros_msg.header = msg.header
-        mavros_msg.connected = True
-        mavros_msg.armed = True
-        mavros_msg.guided = s in ['flying']
-        mavros_msg.mode = s
+        self.mavros_msg.header = msg.header
+        self.mavros_msg.guided = s in ['flying']
+        self.mavros_msg.mode = s
         if s in ['landed']:
-            mavros_msg.system_status = 3  # MAV_STATE_STANDBY
+            self.mavros_msg.system_status = 3  # MAV_STATE_STANDBY
         if s in ['hovering', 'flying', 'landing', 'usertakeoff', 'takingoff']:
-            mavros_msg.system_status = 4  # MAV_STATE_ACTIVE
+            self.mavros_msg.system_status = 4  # MAV_STATE_ACTIVE
         elif s in ['emergency', 'emergency_landing']:
-            mavros_msg.system_status = 6  # MAV_STATE_EMERGENCY
-        self.mavros_pub.publish(mavros_msg)
+            self.mavros_msg.system_status = 6  # MAV_STATE_EMERGENCY
 
 
 if __name__ == '__main__':
