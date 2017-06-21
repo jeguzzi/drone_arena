@@ -2,7 +2,7 @@
 
 from __future__ import division
 import rospy
-from std_msgs.msg import Empty, Bool, UInt8, Header
+from std_msgs.msg import Empty, Bool, UInt8, Header, String
 from geometry_msgs.msg import Twist, PoseStamped, PointStamped, TwistStamped, Vector3Stamped
 from nav_msgs.msg import Odometry
 # from shapely.geometry import Polygon, Point
@@ -161,6 +161,7 @@ class Controller(object):
         self.pub_takeoff = rospy.Publisher('takeoff', Empty, queue_size=1)
         self.pub_land = rospy.Publisher('land', Empty, queue_size=1)
         self.control_camera = rospy.get_param('control_camera', False)
+        self.localization_pub = rospy.Publisher('location', String, queue_size=1, latch=True)
         self.camera_control_pub = rospy.Publisher(
             'camera_control', Twist, queue_size=1)
         self.land_home_pub = rospy.Publisher(
@@ -212,7 +213,7 @@ class Controller(object):
         self.localized = False
         self.localization_active = True
         self.last_localization = None
-
+        self.publish_location()
         self._follow_vel_cmd = False
 
         self.track_head = False
@@ -367,8 +368,10 @@ class Controller(object):
 
     def localization_diagnostics(self, stat):
         if self.localized:
-            stat.summary(
-                diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
+            if self.inside_fence:
+                stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
+            else:
+                stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN, "Outside fence")
         else:
             stat.summary(
                 diagnostic_msgs.msg.DiagnosticStatus.ERROR, "Not localized")
@@ -404,11 +407,20 @@ class Controller(object):
 
         return config
 
+    def publish_location(self):
+        if not self.localized:
+            self.localization_pub.publish('')
+        elif not self.inside_fence:
+            self.localization_pub.publish('out')
+        else:
+            self.localization_pub.publish('in')
+
     def update_localization_state(self):
         if self.localized:
             if (rospy.Time.now() - self.last_localization).to_sec() > self.localization_timeout:
                 rospy.logwarn("No more localized")
                 self.localized = False
+                self.publish_location()
                 self.pub_cmd.publish(Twist())
 
     def update_hovering_cmd(self):
@@ -719,6 +731,8 @@ class Controller(object):
         #     ("inside fence %s. acc bounds %s" %
         #      (self.inside_fence, self.acc_bounds)))
         self.localized = True
+
+        self.publish_location()
 
     def set_observe_from_msg(self, msg):
         # rospy.loginfo('BANANANA')

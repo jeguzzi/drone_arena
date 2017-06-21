@@ -7,6 +7,10 @@ from dynamic_reconfigure.server import Server
 from drone_arena.cfg import SafeOdomConfig
 import diagnostic_updater
 import diagnostic_msgs
+import utm
+from sensor_msgs.msg import NavSatFix
+
+topic_type = {'pose': PoseStamped, 'fix': NavSatFix}
 
 
 class SafetyPose(object):
@@ -26,13 +30,15 @@ class SafetyPose(object):
         for i, data in enumerate(rospy.get_param('~in', [])):
             topic = data['topic']
             covariance = data.get('cov', None)
-            if covariance is None:
-                _type = PoseWithCovarianceStamped
-            else:
-                _type = PoseStamped
+            _type = topic_type.get(data.get('type', None), None)
+            if _type is None:
+                if covariance is None:
+                    _type = PoseWithCovarianceStamped
+                else:
+                    _type = PoseStamped
             self.last_msg.append(rospy.Time.now())
             self.topics.append(topic)
-            rospy.Subscriber(topic, _type, self.got_pose_from(i, cov=covariance))
+            rospy.Subscriber(topic, _type, self.got_pose_from(_type, i, cov=covariance))
             self.updater.add(topic, self.diagnostics(i))
         self.updater.add('active source', self.active_diagnostics)
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
@@ -75,8 +81,11 @@ class SafetyPose(object):
             return stat
         return f
 
-    def got_pose_from(self, index, cov=None):
+    def got_pose_from(self, _type, index, cov=None):
         def f(msg):
+            if _type == NavSatFix and msg.status.status < 0:
+                # No fix
+                return
             self.last_msg[index] = rospy.Time.now()
             if self.active:
                 if index <= self.active_index:
@@ -88,13 +97,31 @@ class SafetyPose(object):
                             self.topics[index], self.topics[self.active_index]))
                         self.active_index = index
             if index == self.active_index:
-                if cov is not None:
+                if _type == PoseWithCovarianceStamped:
+                    pose_c = msg
+                elif _type == PoseStamped:
                     pose_c = PoseWithCovarianceStamped()
                     pose_c.header = msg.header
                     pose_c.pose.pose = msg.pose
                     pose_c.pose.covariance = cov
+                elif _type == NavSatFix:
+                    pose_c = PoseWithCovarianceStamped()
+                    pose_c.header.frame_id = 'utm'
+                    x, y, _, _ = utm.from_latlon(msg.latitude, msg.longitude)
+                    z = msg.altitude
+                    position = pose_c.pose.pose.position
+                    position.x = x
+                    position.y = y
+                    position.z = z
+                    if cov is None:
+                        gps_cov = msg.position_covariance
+                    else:
+                        gps_cov = cov
+                    for i in range(3):
+                        for j in range(3):
+                            pose_c.pose.covariance[6*i + j] = gps_cov[3*i + j]
                 else:
-                    pose_c = msg
+                    return
                 # Solve issue with not synchronized publishers
                 pose_c.header.stamp = rospy.Time.now()
                 self.pub.publish(pose_c)
