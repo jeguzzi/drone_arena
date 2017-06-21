@@ -1,0 +1,106 @@
+<launch>
+  <!-- <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/> -->
+  <node name='fence' pkg='drone_arena' type='fence_control.py' output="screen" ns="bebop">
+    <remap from="odom" to="mocap_odom"/>
+    <param name="tau" value="0.75"/>
+    <param name="rotation_tau" value="0.75"/>
+    <param name="eta" value="1.5"/>
+    <param name="max_speed" value="0.5"/>
+    <param name="position_tol" value="0.3"/>
+    <param name="angle_tol" value="0.3"/>
+    <param name="max_angular_speed" value="0.5"/>
+    <param name="max_acceleration" value="1.5"/>
+    <param name="delay" value="0.1"/>
+    <param name="control_camera" value="false"/>
+    <param name='frame_id' value="World"/>
+    <rosparam param="pos_bounds">[[2, 50], [2, 22], [0.5, 5.0]]</rosparam>
+    <rosparam param="home">[4, 4, 1, 0]</rosparam>
+  </node>
+  <remap from="cmd_vel" to="cmd_vel_input"/>
+  <remap from="takeoff" to="takeoff_input"/>
+  <!-- <remap from="land" to="land_input"/> -->
+  <include file="$(find bebop_tools)/launch/joy_teleop.launch">
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-pozyx.yaml" />
+  </include>
+  <node name="path_planner" pkg='drone_arena' type='test_client.py' output="screen" ns="bebop">
+    <rosparam param="home">[4, 4, 1, 3.14]</rosparam>
+    <rosparam param="plan">
+      - [4,  4,  1,  3.14]
+      - [4, 14,  1.5,  1.57]
+      - [14, 14,  1.0,  0]
+      - [14, 4,  0.75,  -1.57]
+    </rosparam>
+    <param name="loop" value="true"/>
+  </node>
+  <node name='diagnostics' pkg='drone_arena' type='diagnostics.py' output="screen" ns="bebop">
+  </node>
+  <node name='bag' pkg="rosbag" type="record" args='-o /bags/demo -j -a -x "(.*)(camera|image)(.*)"'/>
+
+  <node pkg="tf2_ros" type="static_transform_publisher" name="map2world" args="0 0 0 5.0562 0 0 map World" />
+  <group ns="bebop">
+     <node name='safe_pose' pkg='drone_arena' type='safety_pose.py' output="screen">
+         <remap from="out" to="safe_pose_cov"/>
+         <param name="timeout" value="2.0"/>
+	 <param name="active" value="true"/>
+	 <param name="active_index" value="0"/>
+         <rosparam param="in">
+           -
+              topic: /pose_cov
+           -
+              topic: /bebop/fix
+              type: fix
+              cov: [1, 0, 0, 0, 1, 0, 0, 0, 4]
+         </rosparam>
+     </node>
+     <node name="odom2imu" pkg="drone_arena" type="imu.py" output="screen" clear_params="true">
+        <param name='angle_std_dev' value="0.1"/>
+        <param name='angle_bias' value="-1.3"/>
+     </node>
+     <node name="odom_cov" pkg="drone_arena" type="odom_z.py" output="screen" clear_params="true">
+        <param name='z' value="0.05"/>
+        <param name='speed' value="0.02"/>
+        <remap from='input_odom' to='odom'/>
+        <remap from='output_odom' to='vo_odom'/>
+     </node>
+
+     <node name="ekf_map" pkg="robot_localization" type="ukf_localization_node" output="screen" clear_params="true">
+        <param name="frequency" value="20.0"/>
+        <param name="sensor_timeout" value="0.5"/>
+        <!-- <param name="two_d_mode" value="true"/> -->
+        <param name="map_frame" value="World"/>
+        <param name="odom_frame" value="odom"/>
+        <param name="base_link_frame" value="base_link"/>
+        <param name="world_frame" value="World"/>
+        <param name="odom0" value="vo_odom"/>
+        <rosparam param="odom0_config">
+           [false, false, true, false, false, false, true, true, true, false, false, false, false, false, false]
+        </rosparam>
+        <param name="imu0" value="imu"/>
+        <rosparam param="imu0_config">
+           [false, false, false, true, true, true, false, false, false, false, false, false, false, false, false]
+        </rosparam>
+        <param name="pose0" value="safe_pose_cov"/>
+        <rosparam param="pose0_config">
+           [true, true, false, false, false, false, false, false, false, false, false, false, false, false, false]
+        </rosparam>
+        <param name="publish_tf" value="true"/>
+        <param name="print_diagnostics" value="true"/>
+        <remap from="odometry/filtered" to="mocap_odom"/>
+        <!-- <param name='use_control' value='true'/>
+        <rosparam param="control_config">
+           [true, true, true, false, false, true]
+        </rosparam> -->
+     </node>
+
+     <node name="mavros_state_pub" pkg="drone_arena" type="mavros_state.py" output="screen">
+
+     </node>
+
+     <node name='led' pkg='drone_arena' type='led.py' output="screen">
+        <param name='max_intensity' value="60"/>
+        <param name='leds' value="8"/>
+    </node>
+
+  </group>
+
+</launch>

@@ -38,5 +38,9 @@
   </node>
   <node name='diagnostics' pkg='drone_arena' type='diagnostics.py' output="screen" ns="bebop">
   </node>
+  <node name='led' pkg='drone_arena' type='led.py' output="screen" ns="bebop">
+     <param name='max_intensity' value="60"/>
+     <param name='leds' value="8"/>
+ </node>
   <!-- <node name='bag' pkg="rosbag" type="record" args='-o /bags/demo -j -a -x "(.*)(camera|image)(.*)"'/> -->
 </launch>
