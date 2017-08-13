@@ -1,0 +1,44 @@
+-
+   key: KEY_0
+   commands:
+      - waypoint:
+         frame_id: World
+         point: [0, 0, 1.5]
+         tol: 0.5
+-
+   key: KEY_1
+   commands:
+      - waypoint:
+         frame_id: World
+         point: [1, 0, 1]
+         tol: 0.5
+      - sleep:
+         duration: 2
+      - waypoint:
+         frame_id: World
+         point: [-1, 0, 1]
+         tol: 0.5
+-
+   key: KEY_2
+   commands:
+      - path:
+         frame_id: World
+         curve: [[-1, -1], [-1, 1], [1, 1], [1, -1], [-1, -1]]
+         tol: 0.5
+         altitude: 1
+-
+   key: KEY_3
+   commands:
+      - loop:
+         name: 'circle'
+         frame_id: World
+         center: [0, 0, 1]
+         radius: 2
+-
+   key: KEY_4
+   commands:
+      - loop:
+         name: 'square'
+         frame_id: World
+         center: [0, 0, 1]
+         radius: 2

@@ -1,0 +1,27 @@
+<launch>
+   <arg name="ns" default="bebop"/>
+   <group ns="$(arg ns)">
+      <node pkg="mav_control" type="single_bebop_node.py" name="path_follower" output="screen" clear_params="true">
+         <param name="frame_id" value="World"/>
+         <param name="delta" value="0.8"/>
+         <param name="distance" value="1.2"/>
+         <param name="max_rate" value="6.0"/>
+         <param name="min_distance" value="0.5"/>
+         <param name="odom" value="mocap_odom"/>
+         <param name="max_speed" value="1"/>
+         <param name="track_s" value="false"/>
+         <param name="control_order" value="1"/>
+         <param name="speed" value="0.3"/>
+         <param name="angular_speed" value="0.3"/>
+         <param name="tau" value="1"/>
+         <param name='flat' value="false"/>
+         <remap from="target_twist" to="des_vel"/>
+         <remap from="target_pose" to="target"/>
+      </node>
+      <node pkg="mav_control" type="test_bebop.py" name="path_controller" output="screen">
+         <remap from="odom" to="mocap_odom"/>
+         <rosparam param='tests' command="load" file="$(find mav_control)/config/paths.yml"/>
+      </node>
+      <!-- <node pkg="keyboard" type="keyboard" name="keyboard"/> -->
+   </group>
+</launch>
