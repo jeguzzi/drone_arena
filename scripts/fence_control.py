@@ -219,6 +219,10 @@ class Controller(object):
         self.track_head = False
         self.track_range = 1.5
 
+        self.track_vertical_head = rospy.get_param('~track_vertical_head', False)
+        self.head_altitude_difference = rospy.get_param('~head_altitude_difference', -0.2)
+        self.head_altitude = rospy.get_param('~head_altitude', 1.5)
+
         # self.battery_msg = None
         self.tracked_teleop_d = 1.0
         self.tracked_teleop = False
@@ -332,7 +336,10 @@ class Controller(object):
             _o = msg.pose.pose.orientation
             _v = msg.twist.twist.linear
             v = [_v.x, _v.y, 0]
-            p = [_p.x, _p.y, 1.5]
+            if self.track_vertical_head:
+                p = [_p.x, _p.y, _p.z + self.head_altitude_difference]
+            else:
+                p = [_p.x, _p.y, self.head_altitude]
             q = [_o.x, _o.y, _o.z, _o.w]
             _, _, yaw = euler_from_quaternion(q)
             q = quaternion_from_euler(0, 0, yaw)
@@ -401,6 +408,10 @@ class Controller(object):
         self.control_timeout = config['control_timeout']
         self.pos_tol = config['position_tol']
         self.angle_tol = config['angle_tol']
+
+        self.track_vertical_head = config['track_vertical_head']
+        self.head_altitude_difference = config['head_altitude_difference']
+        self.head_altitude = config['head_altitude']
 
         # print config['teleop_mode']
         # print dir(ArenaConfig)
