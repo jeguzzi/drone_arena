@@ -1,0 +1,61 @@
+[roslaunch][INFO] 2017-08-14 09:05:05,517: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 09:05:05,525: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 09:05:05,525: roslaunch starting with args ['roscore', '--core']
+[roslaunch][INFO] 2017-08-14 09:05:05,526: roslaunch env is {'LANG': 'C.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9d05d94-80cf-11e7-815b-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/opt/ros/kinetic/lib/python2.7/dist-packages', 'ROS_IP': '192.168.201.4', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'PWD': '/', 'ROS_MASTER_URI': 'http://192.168.201.36:11311', 'LC_ALL': 'C.UTF-8', 'PKG_CONFIG_PATH': '/opt/ros/kinetic/lib/pkgconfig', 'ROS_PACKAGE_PATH': '/opt/ros/kinetic/share', 'CMAKE_PREFIX_PATH': '/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 09:05:05,526: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 09:05:05,527: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 09:05:05,528: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 09:05:05,618: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2017-08-14 09:05:05,618: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 09:05:05,619: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 09:05:05,620: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 09:05:05,620: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 09:05:05,620: starting roslaunch XML-RPC server
+[xmlrpc][INFO] 2017-08-14 09:05:05,621: XML-RPC server binding to 0.0.0.0:0
+[roslaunch.server][INFO] 2017-08-14 09:05:05,621: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 09:05:05,622: Started XML-RPC server [http://192.168.201.4:43147/]
+[xmlrpc][INFO] 2017-08-14 09:05:05,623: xml rpc node: starting XML-RPC server
+[roslaunch.pmon][INFO] 2017-08-14 09:05:10,701: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, started daemon 140456669210368)>
+[roslaunch.pmon][INFO] 2017-08-14 09:05:10,751: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140456669210368)>
+[roslaunch.pmon][INFO] 2017-08-14 09:05:10,752: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140456669210368)>: remaining procs are []
+[roslaunch.pmon][INFO] 2017-08-14 09:05:10,756: ProcessMonitor exit: cleaning up data structures and signals
+[roslaunch.pmon][INFO] 2017-08-14 09:05:10,756: ProcessMonitor exit: pmon has shutdown
+[roslaunch][ERROR] 2017-08-14 09:05:10,757: Unable to contact my own server at [http://192.168.201.4:43147/].
+This usually means that the network is not configured properly.
+
+A common cause is that the machine cannot ping itself.  Please check
+for errors by running:
+
+	ping 192.168.201.4
+
+For more tips, please see
+
+	http://www.ros.org/wiki/ROS/NetworkSetup
+
+[roslaunch][ERROR] 2017-08-14 09:05:10,757: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2017-08-14 09:05:10,764: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/__init__.py", line 307, in main
+    p.start()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 268, in start
+    self._start_infrastructure()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 226, in _start_infrastructure
+    self._start_server()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 177, in _start_server
+    self.server.start()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/server.py", line 405, in start
+    """%(self.uri, p.hostname))
+RLException: Unable to contact my own server at [http://192.168.201.4:43147/].
+This usually means that the network is not configured properly.
+
+A common cause is that the machine cannot ping itself.  Please check
+for errors by running:
+
+	ping 192.168.201.4
+
+For more tips, please see
+
+	http://www.ros.org/wiki/ROS/NetworkSetup
+
+
+[rospy.core][INFO] 2017-08-14 09:05:10,765: signal_shutdown [atexit]

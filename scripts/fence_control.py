@@ -1,31 +1,32 @@
 #!/usr/bin/env python
 
 from __future__ import division
-import rospy
-from std_msgs.msg import Empty, Bool, UInt8, Header, String
-from geometry_msgs.msg import Twist, PoseStamped, PointStamped, TwistStamped, Vector3Stamped
-from nav_msgs.msg import Odometry
-# from shapely.geometry import Polygon, Point
-from tf.transformations import quaternion_conjugate, quaternion_multiply
-from tf.transformations import euler_from_quaternion, quaternion_from_euler
-import tf2_ros
-import tf2_geometry_msgs
-import numpy as np
+
 import math
-from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
 
-from dynamic_reconfigure.server import Server
-from drone_arena.cfg import ArenaConfig
-
-import diagnostic_updater
-import diagnostic_msgs
+import numpy as np
 
 import actionlib
-from drone_arena.msg import GoToPoseFeedback, GoToPoseResult, GoToPoseAction
+import diagnostic_msgs
+import diagnostic_updater
+import rospy
+import tf2_geometry_msgs
+import tf2_ros
+from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
+from drone_arena.cfg import ArenaConfig
+from drone_arena.msg import GoToPoseAction, GoToPoseFeedback, GoToPoseResult
+from drone_arena.temporized import Temporized
+from dynamic_reconfigure.server import Server
+from geometry_msgs.msg import (PointStamped, PoseStamped, Twist, TwistStamped,
+                               Vector3Stamped)
+from nav_msgs.msg import Odometry
+from std_msgs.msg import Bool, Empty, Header, String, UInt8
+# from shapely.geometry import Polygon, Point
+from tf.transformations import (euler_from_quaternion, quaternion_conjugate,
+                                quaternion_from_euler, quaternion_multiply)
 
 # from diagnostics import BebopDiagnostics
 
-from drone_arena.temporized import Temporized
 
 button = Temporized(1)
 
@@ -449,6 +450,8 @@ class Controller(object):
         self.track_head = False
         self.follow_vel_cmd = True
         self.latest_cmd_time = rospy.Time.now()
+        if not self.localized:
+            return
         self.update_desired_velocity(des_vel, des_omega)
 
     def has_received_desired_body_vel(self, msg):
@@ -694,7 +697,8 @@ class Controller(object):
         # convert in world frame
         target_pose = pose_in_frame(self.tf_buffer, msg, self.frame_id)
         if not target_pose:
-            rospy.logwarn("has_received_target: Cannot transform pose %s to %s", msg, self.frame_id)
+            rospy.logwarn("has_received_target: Cannot transform pose %s to %s",
+                          msg, self.frame_id)
             return
         _p = target_pose.pose.position
         _o = target_pose.pose.orientation
@@ -807,6 +811,7 @@ class Controller(object):
 
     def update_camera_control(self):
         if not self.localized:
+            self.pub_cmd.publish(Twist())
             return
         observe_point = self.observe_target()
         if observe_point is not None:

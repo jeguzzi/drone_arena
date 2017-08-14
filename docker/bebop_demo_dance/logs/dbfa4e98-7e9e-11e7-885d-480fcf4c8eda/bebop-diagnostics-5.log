@@ -1,0 +1,156 @@
+[rospy.client][INFO] 2017-08-14 09:05:54,916: init_node, name[/bebop/diagnostics], pid[81]
+[xmlrpc][INFO] 2017-08-14 09:05:54,917: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 09:05:54,918: Started XML-RPC server [http://192.168.201.36:45142/]
+[rospy.init][INFO] 2017-08-14 09:05:54,918: ROS Slave URI: [http://192.168.201.36:45142/]
+[rospy.impl.masterslave][INFO] 2017-08-14 09:05:54,919: _ready: http://192.168.201.36:45142/
+[xmlrpc][INFO] 2017-08-14 09:05:54,920: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2017-08-14 09:05:54,921: Registering with master node http://192.168.201.4:11311
+[rospy.init][INFO] 2017-08-14 09:05:55,020: registered with master
+[rospy.rosout][INFO] 2017-08-14 09:05:55,021: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 09:05:55,025: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 09:05:55,028: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 09:05:55,341: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2017-08-14 09:06:24,692: topic[/diagnostics] adding connection to [/rqt_gui_py_node_12527], count 0
+[rospy.core][INFO] 2017-08-14 09:07:46,154: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2017-08-14 09:07:46,192: topic[/diagnostics] removing connection to /rqt_gui_py_node_12527
+[rospy.internal][INFO] 2017-08-14 09:07:46,193: topic[/rosout] removing connection to /rosout
+[rospy.impl.masterslave][INFO] 2017-08-14 09:07:46,193: signal-2
+[rospy.client][INFO] 2017-08-14 09:08:10,632: init_node, name[/bebop/diagnostics], pid[81]
+[xmlrpc][INFO] 2017-08-14 09:08:10,633: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 09:08:10,634: Started XML-RPC server [http://192.168.201.36:45470/]
+[rospy.impl.masterslave][INFO] 2017-08-14 09:08:10,637: _ready: http://192.168.201.36:45470/
+[rospy.registration][INFO] 2017-08-14 09:08:10,639: Registering with master node http://192.168.201.4:11311
+[xmlrpc][INFO] 2017-08-14 09:08:10,640: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2017-08-14 09:08:10,635: ROS Slave URI: [http://192.168.201.36:45470/]
+[rospy.init][INFO] 2017-08-14 09:08:10,653: registered with master
+[rospy.rosout][INFO] 2017-08-14 09:08:10,656: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 09:08:10,659: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 09:08:10,667: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 09:08:10,714: topic[/bebop/states/common/CommonState/SensorsStatesListChanged] adding connection to [http://192.168.201.36:42302/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,716: topic[/bebop/states/ardrone3/PilotingState/FlyingStateChanged] adding connection to [http://192.168.201.36:42302/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,716: topic[/bebop/states/ardrone3/PilotingState/AlertStateChanged] adding connection to [http://192.168.201.36:42302/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,722: topic[/bebop/states/common/CommonState/BatteryStateChanged] adding connection to [http://192.168.201.36:42302/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,734: topic[/bebop/states/common/CommonState/WifiSignalChanged] adding connection to [http://192.168.201.36:42302/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,743: topic[/bebop/states/common/OverHeatState/OverHeatChanged] adding connection to [http://192.168.201.36:42302/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,745: topic[/bebop/states/common/CalibrationState/MagnetoCalibrationRequiredState] adding connection to [http://192.168.201.36:42302/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,760: topic[/diagnostics] adding connection to [/rqt_gui_py_node_12527], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,828: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][WARNING] 2017-08-14 09:08:16,496: Unknown error initiating TCP/IP socket to 192.168.201.36:60699 (http://192.168.201.36:42302/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:08:16,497: Unknown error initiating TCP/IP socket to 192.168.201.36:60699 (http://192.168.201.36:42302/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:08:16,497: Unknown error initiating TCP/IP socket to 192.168.201.36:60699 (http://192.168.201.36:42302/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:08:16,497: Unknown error initiating TCP/IP socket to 192.168.201.36:60699 (http://192.168.201.36:42302/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:08:16,497: Unknown error initiating TCP/IP socket to 192.168.201.36:60699 (http://192.168.201.36:42302/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:08:16,498: Unknown error initiating TCP/IP socket to 192.168.201.36:60699 (http://192.168.201.36:42302/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:08:16,498: Unknown error initiating TCP/IP socket to 192.168.201.36:60699 (http://192.168.201.36:42302/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2017-08-14 09:08:16,498: topic[/bebop/states/ardrone3/PilotingState/AlertStateChanged] removing connection to http://192.168.201.36:42302/
+[rospy.internal][INFO] 2017-08-14 09:08:16,498: topic[/bebop/states/ardrone3/PilotingState/FlyingStateChanged] removing connection to http://192.168.201.36:42302/
+[rospy.internal][INFO] 2017-08-14 09:08:16,499: topic[/bebop/states/common/CommonState/SensorsStatesListChanged] removing connection to http://192.168.201.36:42302/
+[rospy.internal][INFO] 2017-08-14 09:08:16,499: topic[/bebop/states/common/OverHeatState/OverHeatChanged] removing connection to http://192.168.201.36:42302/
+[rospy.internal][INFO] 2017-08-14 09:08:16,499: topic[/bebop/states/common/CommonState/WifiSignalChanged] removing connection to http://192.168.201.36:42302/
+[rospy.internal][INFO] 2017-08-14 09:08:16,499: topic[/bebop/states/common/CommonState/BatteryStateChanged] removing connection to http://192.168.201.36:42302/
+[rospy.internal][INFO] 2017-08-14 09:08:16,500: topic[/bebop/states/common/CalibrationState/MagnetoCalibrationRequiredState] removing connection to http://192.168.201.36:42302/
+[rospy.internal][INFO] 2017-08-14 09:09:06,490: topic[/bebop/states/ardrone3/PilotingState/AlertStateChanged] adding connection to [http://192.168.201.36:36960/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,491: topic[/bebop/states/ardrone3/PilotingState/FlyingStateChanged] adding connection to [http://192.168.201.36:36960/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,656: topic[/bebop/states/common/CalibrationState/MagnetoCalibrationRequiredState] adding connection to [http://192.168.201.36:36960/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,657: topic[/bebop/states/common/CommonState/SensorsStatesListChanged] adding connection to [http://192.168.201.36:36960/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,658: topic[/bebop/states/common/OverHeatState/OverHeatChanged] adding connection to [http://192.168.201.36:36960/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,659: topic[/bebop/states/common/CommonState/WifiSignalChanged] adding connection to [http://192.168.201.36:36960/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,660: topic[/bebop/states/common/CommonState/BatteryStateChanged] adding connection to [http://192.168.201.36:36960/], count 0
+[rospy.internal][WARNING] 2017-08-14 09:09:12,769: Unknown error initiating TCP/IP socket to 192.168.201.36:34842 (http://192.168.201.36:36960/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2017-08-14 09:09:12,770: topic[/bebop/states/ardrone3/PilotingState/AlertStateChanged] removing connection to http://192.168.201.36:36960/
+[rospy.internal][WARNING] 2017-08-14 09:09:12,770: Unknown error initiating TCP/IP socket to 192.168.201.36:34842 (http://192.168.201.36:36960/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:09:12,770: Unknown error initiating TCP/IP socket to 192.168.201.36:34842 (http://192.168.201.36:36960/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:09:12,771: Unknown error initiating TCP/IP socket to 192.168.201.36:34842 (http://192.168.201.36:36960/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:09:12,771: Unknown error initiating TCP/IP socket to 192.168.201.36:34842 (http://192.168.201.36:36960/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:09:12,771: Unknown error initiating TCP/IP socket to 192.168.201.36:34842 (http://192.168.201.36:36960/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][WARNING] 2017-08-14 09:09:12,771: Unknown error initiating TCP/IP socket to 192.168.201.36:34842 (http://192.168.201.36:36960/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 555, in connect
+    self.socket.connect((dest_addr, dest_port))
+  File "/usr/lib/python2.7/socket.py", line 228, in meth
+    return getattr(self._sock,name)(*args)
+error: [Errno 111] Connection refused
+
+[rospy.internal][INFO] 2017-08-14 09:09:12,772: topic[/bebop/states/common/CommonState/BatteryStateChanged] removing connection to http://192.168.201.36:36960/
+[rospy.internal][INFO] 2017-08-14 09:09:12,772: topic[/bebop/states/common/CommonState/WifiSignalChanged] removing connection to http://192.168.201.36:36960/
+[rospy.internal][INFO] 2017-08-14 09:09:12,772: topic[/bebop/states/common/CommonState/SensorsStatesListChanged] removing connection to http://192.168.201.36:36960/
+[rospy.internal][INFO] 2017-08-14 09:09:12,773: topic[/bebop/states/common/CalibrationState/MagnetoCalibrationRequiredState] removing connection to http://192.168.201.36:36960/
+[rospy.internal][INFO] 2017-08-14 09:09:12,773: topic[/bebop/states/common/OverHeatState/OverHeatChanged] removing connection to http://192.168.201.36:36960/
+[rospy.internal][INFO] 2017-08-14 09:09:12,773: topic[/bebop/states/ardrone3/PilotingState/FlyingStateChanged] removing connection to http://192.168.201.36:36960/

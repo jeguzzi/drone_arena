@@ -1,0 +1,999 @@
+[roslaunch][INFO] 2017-08-14 08:36:38,590: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:36:38,596: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:36:38,597: roslaunch starting with args ['roscore', '--core']
+[roslaunch][INFO] 2017-08-14 08:36:38,598: roslaunch env is {'LANG': 'C.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'PWD': '/', 'ROS_MASTER_URI': 'http://localhost:11311', 'LC_ALL': 'C.UTF-8', 'PKG_CONFIG_PATH': '/opt/ros/kinetic/lib/pkgconfig', 'ROS_PACKAGE_PATH': '/opt/ros/kinetic/share', 'CMAKE_PREFIX_PATH': '/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:36:38,598: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:36:38,599: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:36:38,599: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:36:38,688: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:38,689: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:36:38,689: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:36:38,690: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:36:38,690: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:36:38,691: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:36:38,691: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:36:38,692: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:36:38,692: Started XML-RPC server [http://ubuntu:36685/]
+[xmlrpc][INFO] 2017-08-14 08:36:38,693: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:36:38,704: started roslaunch server http://ubuntu:36685/
+[roslaunch.parent][INFO] 2017-08-14 08:36:38,705: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:36:38,706: master.is_running[http://ubuntu:11311/]
+[roslaunch][ERROR] 2017-08-14 08:36:38,707: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+[roslaunch][ERROR] 2017-08-14 08:36:38,708: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2017-08-14 08:36:38,709: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/__init__.py", line 307, in main
+    p.start()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 279, in start
+    self.runner.launch()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 654, in launch
+    self._setup()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 630, in _setup
+    self._launch_master()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 391, in _launch_master
+    raise RLException("roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"%(m.uri))
+RLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+
+[rospy.core][INFO] 2017-08-14 08:36:38,709: signal_shutdown [atexit]
+[roslaunch][INFO] 2017-08-14 08:36:39,072: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:36:39,078: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:36:39,078: roslaunch starting with args ['/opt/ros/kinetic/bin/roslaunch', 'drone_arena', 'main.launch']
+[roslaunch][INFO] 2017-08-14 08:36:39,078: roslaunch env is {'LANG': 'en_US.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PWD': '/root/catkin_ws', 'ROS_MASTER_URI': 'http://localhost:11311', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:36:39,079: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:36:39,079: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:36:39,079: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:36:39,158: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.config][INFO] 2017-08-14 08:36:39,159: loading config file /root/catkin_ws/src/drone_arena/launch/main.launch
+[roslaunch][INFO] 2017-08-14 08:36:39,184: Added node of type [optitrack2odom/optitrack2odom] in namespace [/]
+[roslaunch][INFO] 2017-08-14 08:36:39,187: Added node of type [drone_arena/fence_control.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:36:39,225: Added node of type [joy/joy_node] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:36:39,225: Added node of type [joy_teleop/joy_teleop.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:36:39,226: Added node of type [drone_arena/diagnostics.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:36:39,226: Added node of type [drone_arena/led.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:36:39,227: ... selected machine [] for node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:36:39,227: ... selected machine [] for node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:36:39,227: ... selected machine [] for node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:36:39,228: ... selected machine [] for node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:36:39,228: ... selected machine [] for node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:36:39,228: ... selected machine [] for node of type [drone_arena/led.py]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,230: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,230: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,231: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:36:39,231: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:36:39,231: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:36:39,232: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:36:39,232: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:36:39,232: Started XML-RPC server [http://ubuntu:40568/]
+[xmlrpc][INFO] 2017-08-14 08:36:39,233: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:36:39,244: started roslaunch server http://ubuntu:40568/
+[roslaunch.parent][INFO] 2017-08-14 08:36:39,244: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:36:39,245: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,247: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,248: ROS_MASTER_URI=http://localhost:11311
+[roslaunch][INFO] 2017-08-14 08:36:39,251: setting /roslaunch/uris/host_ubuntu__40568' to http://ubuntu:40568/
+[roslaunch][INFO] 2017-08-14 08:36:39,254: load_parameters starting ...
+[roslaunch][INFO] 2017-08-14 08:36:39,266: ... load_parameters complete
+[roslaunch][INFO] 2017-08-14 08:36:39,266: launch_nodes: launching local nodes ...
+[roslaunch][INFO] 2017-08-14 08:36:39,267: ... preparing to launch node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:36:39,267: create_node_process: package[optitrack2odom] type[optitrack2odom] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,268: process[filtered_optitrack-1]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:36:39,301: process[filtered_optitrack-1]: args[[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack']]
+[roslaunch][INFO] 2017-08-14 08:36:39,302: ... created process [filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,302: ProcessMonitor.register[filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,303: ProcessMonitor.register[filtered_optitrack-1] complete
+[roslaunch][INFO] 2017-08-14 08:36:39,303: ... registered process [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:36:39,304: process[filtered_optitrack-1]: starting os process
+[roslaunch][INFO] 2017-08-14 08:36:39,304: process[filtered_optitrack-1]: start w/ args [[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/filtered_optitrack-1.log']]
+[roslaunch][INFO] 2017-08-14 08:36:39,304: process[filtered_optitrack-1]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:36:39,384: process[filtered_optitrack-1]: started with pid [66]
+[roslaunch][INFO] 2017-08-14 08:36:39,384: ... successfully launched [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:36:39,385: ... preparing to launch node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:36:39,385: create_node_process: package[drone_arena] type[fence_control.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,386: process[bebop/fence-2]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:36:39,394: process[bebop/fence-2]: args[[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence']]
+[roslaunch][INFO] 2017-08-14 08:36:39,395: ... created process [bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,395: ProcessMonitor.register[bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,395: ProcessMonitor.register[bebop/fence-2] complete
+[roslaunch][INFO] 2017-08-14 08:36:39,396: ... registered process [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:36:39,396: process[bebop/fence-2]: starting os process
+[roslaunch][INFO] 2017-08-14 08:36:39,397: process[bebop/fence-2]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-fence-2.log']]
+[roslaunch][INFO] 2017-08-14 08:36:39,397: process[bebop/fence-2]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:36:39,484: process[bebop/fence-2]: started with pid [67]
+[roslaunch][INFO] 2017-08-14 08:36:39,484: ... successfully launched [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:36:39,485: ... preparing to launch node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:36:39,486: create_node_process: package[joy] type[joy_node] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,487: process[bebop/joy_node-3]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:36:39,489: process[bebop/joy_node-3]: args[[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node']]
+[roslaunch][INFO] 2017-08-14 08:36:39,489: ... created process [bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,490: ProcessMonitor.register[bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,490: ProcessMonitor.register[bebop/joy_node-3] complete
+[roslaunch][INFO] 2017-08-14 08:36:39,490: ... registered process [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:36:39,491: process[bebop/joy_node-3]: starting os process
+[roslaunch][INFO] 2017-08-14 08:36:39,492: process[bebop/joy_node-3]: start w/ args [[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_node-3.log']]
+[roslaunch][INFO] 2017-08-14 08:36:39,492: process[bebop/joy_node-3]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:36:39,584: process[bebop/joy_node-3]: started with pid [73]
+[roslaunch][INFO] 2017-08-14 08:36:39,585: ... successfully launched [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:36:39,585: ... preparing to launch node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:36:39,586: create_node_process: package[joy_teleop] type[joy_teleop.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,587: process[bebop/joy_teleop-4]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:36:39,590: process[bebop/joy_teleop-4]: args[[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop']]
+[roslaunch][INFO] 2017-08-14 08:36:39,591: ... created process [bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,592: ProcessMonitor.register[bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,593: ProcessMonitor.register[bebop/joy_teleop-4] complete
+[roslaunch][INFO] 2017-08-14 08:36:39,595: ... registered process [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:36:39,595: process[bebop/joy_teleop-4]: starting os process
+[roslaunch][INFO] 2017-08-14 08:36:39,596: process[bebop/joy_teleop-4]: start w/ args [[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_teleop-4.log']]
+[roslaunch][INFO] 2017-08-14 08:36:39,597: process[bebop/joy_teleop-4]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:36:39,692: process[bebop/joy_teleop-4]: started with pid [74]
+[roslaunch][INFO] 2017-08-14 08:36:39,693: ... successfully launched [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:36:39,693: ... preparing to launch node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:36:39,694: create_node_process: package[drone_arena] type[diagnostics.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,694: process[bebop/diagnostics-5]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:36:39,706: process[bebop/diagnostics-5]: args[[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics']]
+[roslaunch][INFO] 2017-08-14 08:36:39,707: ... created process [bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,707: ProcessMonitor.register[bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,708: ProcessMonitor.register[bebop/diagnostics-5] complete
+[roslaunch][INFO] 2017-08-14 08:36:39,708: ... registered process [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:36:39,709: process[bebop/diagnostics-5]: starting os process
+[roslaunch][INFO] 2017-08-14 08:36:39,709: process[bebop/diagnostics-5]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-diagnostics-5.log']]
+[roslaunch][INFO] 2017-08-14 08:36:39,709: process[bebop/diagnostics-5]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:36:39,803: process[bebop/diagnostics-5]: started with pid [81]
+[roslaunch][INFO] 2017-08-14 08:36:39,804: ... successfully launched [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:36:39,804: ... preparing to launch node of type [drone_arena/led.py]
+[roslaunch][INFO] 2017-08-14 08:36:39,805: create_node_process: package[drone_arena] type[led.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:36:39,805: process[bebop/led-6]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:36:39,816: process[bebop/led-6]: args[[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led']]
+[roslaunch][INFO] 2017-08-14 08:36:39,823: ... created process [bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,824: ProcessMonitor.register[bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,825: ProcessMonitor.register[bebop/led-6] complete
+[roslaunch][INFO] 2017-08-14 08:36:39,825: ... registered process [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:36:39,826: process[bebop/led-6]: starting os process
+[roslaunch][INFO] 2017-08-14 08:36:39,828: process[bebop/led-6]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log']]
+[roslaunch][INFO] 2017-08-14 08:36:39,828: process[bebop/led-6]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:36:39,932: process[bebop/led-6]: started with pid [82]
+[roslaunch][INFO] 2017-08-14 08:36:39,933: ... successfully launched [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:36:39,933: ... launch_nodes complete
+[roslaunch.pmon][INFO] 2017-08-14 08:36:39,933: registrations completed <ProcessMonitor(ProcessMonitor-1, started daemon 140337945478912)>
+[roslaunch.parent][INFO] 2017-08-14 08:36:39,934: ... roslaunch parent running, waiting for process exit
+[roslaunch][INFO] 2017-08-14 08:36:39,934: spin
+[roslaunch][ERROR] 2017-08-14 08:36:40,843: [bebop/led-6] process has died [pid 82, exit code 1, cmd /root/catkin_ws/src/drone_arena/scripts/led.py cmd_vel:=cmd_vel_input takeoff:=takeoff_input __name:=led __log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log].
+log file: /root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6*.log
+[roslaunch.pmon][INFO] 2017-08-14 08:36:40,843: ProcessMonitor.unregister[bebop/led-6] starting
+[roslaunch.pmon][INFO] 2017-08-14 08:36:40,844: ProcessMonitor.unregister[bebop/led-6] complete
+[roslaunch.pmon][INFO] 2017-08-14 08:36:40,980: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, started daemon 140337945478912)>
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,045: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140337945478912)>
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,046: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140337945478912)>: remaining procs are [<roslaunch.nodeprocess.LocalProcess object at 0x7fa2f98f7c10>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa2f98f7290>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa2f9884850>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa2f9884c50>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa2f9884ad0>]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,046: ProcessMonitor exit: killing bebop/diagnostics-5
+[roslaunch][INFO] 2017-08-14 08:36:41,047: [bebop/diagnostics-5] killing on exit
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,047: ProcessMonitor exit: killing bebop/joy_teleop-4
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,048: ProcessMonitor exit: killing bebop/joy_node-3
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,048: ProcessMonitor exit: killing bebop/fence-2
+[roslaunch][INFO] 2017-08-14 08:36:41,049: process[bebop/diagnostics-5]: killing os process with pid[81] pgid[81]
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,049: ProcessMonitor exit: killing filtered_optitrack-1
+[roslaunch][INFO] 2017-08-14 08:36:41,049: [bebop/joy_teleop-4] killing on exit
+[roslaunch][INFO] 2017-08-14 08:36:41,050: [bebop/joy_node-3] killing on exit
+[roslaunch][INFO] 2017-08-14 08:36:41,051: [bebop/fence-2] killing on exit
+[roslaunch][INFO] 2017-08-14 08:36:41,051: [bebop/diagnostics-5] sending SIGINT to pgid [81]
+[roslaunch][INFO] 2017-08-14 08:36:41,051: [filtered_optitrack-1] killing on exit
+[roslaunch][INFO] 2017-08-14 08:36:41,053: process[filtered_optitrack-1]: killing os process with pid[66] pgid[66]
+[roslaunch][INFO] 2017-08-14 08:36:41,052: process[bebop/joy_node-3]: killing os process with pid[73] pgid[73]
+[roslaunch][INFO] 2017-08-14 08:36:41,052: process[bebop/fence-2]: killing os process with pid[67] pgid[67]
+[roslaunch][INFO] 2017-08-14 08:36:41,053: [bebop/diagnostics-5] sent SIGINT to pgid [81]
+[roslaunch][INFO] 2017-08-14 08:36:41,052: process[bebop/joy_teleop-4]: killing os process with pid[74] pgid[74]
+[roslaunch][INFO] 2017-08-14 08:36:41,054: [filtered_optitrack-1] sending SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:36:41,054: [bebop/joy_node-3] sending SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:36:41,054: [bebop/fence-2] sending SIGINT to pgid [67]
+[roslaunch][INFO] 2017-08-14 08:36:41,055: [bebop/joy_teleop-4] sending SIGINT to pgid [74]
+[roslaunch][INFO] 2017-08-14 08:36:41,056: [filtered_optitrack-1] sent SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:36:41,056: [bebop/joy_node-3] sent SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:36:41,057: [bebop/fence-2] sent SIGINT to pgid [67]
+[roslaunch][INFO] 2017-08-14 08:36:41,057: [bebop/joy_teleop-4] sent SIGINT to pgid [74]
+[roslaunch][INFO] 2017-08-14 08:36:41,256: process[bebop/diagnostics-5]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:36:41,258: process[filtered_optitrack-1]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:36:41,259: process[bebop/fence-2]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:36:41,359: process[bebop/joy_node-3]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:36:41,761: process[bebop/joy_teleop-4]: SIGINT killed with return value 0
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,762: ProcessMonitor exit: cleaning up data structures and signals
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,763: ProcessMonitor exit: pmon has shutdown
+[roslaunch][INFO] 2017-08-14 08:36:41,800: process monitor is done spinning, initiating full shutdown
+[roslaunch][INFO] 2017-08-14 08:36:41,801: runner.stop()
+[roslaunch][INFO] 2017-08-14 08:36:41,801: shutting down processing monitor...
+[roslaunch][INFO] 2017-08-14 08:36:41,802: shutting down processing monitor <ProcessMonitor(ProcessMonitor-1, stopped daemon 140337945478912)>
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,802: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, stopped daemon 140337945478912)>
+[roslaunch][INFO] 2017-08-14 08:36:41,802: ... shutting down processing monitor complete
+[roslaunch][INFO] 2017-08-14 08:36:41,803: done
+[roslaunch.pmon][INFO] 2017-08-14 08:36:41,803: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, stopped daemon 140337945478912)>
+[rospy.core][INFO] 2017-08-14 08:36:41,804: signal_shutdown [atexit]
+[roslaunch][INFO] 2017-08-14 08:37:05,107: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:37:05,113: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:37:05,113: roslaunch starting with args ['roscore', '--core']
+[roslaunch][INFO] 2017-08-14 08:37:05,113: roslaunch env is {'LANG': 'C.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'PWD': '/', 'ROS_MASTER_URI': 'http://localhost:11311', 'LC_ALL': 'C.UTF-8', 'PKG_CONFIG_PATH': '/opt/ros/kinetic/lib/pkgconfig', 'ROS_PACKAGE_PATH': '/opt/ros/kinetic/share', 'CMAKE_PREFIX_PATH': '/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:37:05,114: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:37:05,114: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:37:05,115: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:37:05,177: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,177: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,178: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,178: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:37:05,179: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:05,179: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:05,179: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:37:05,180: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:37:05,181: Started XML-RPC server [http://ubuntu:45509/]
+[xmlrpc][INFO] 2017-08-14 08:37:05,181: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:37:05,192: started roslaunch server http://ubuntu:45509/
+[roslaunch.parent][INFO] 2017-08-14 08:37:05,192: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:37:05,193: master.is_running[http://ubuntu:11311/]
+[roslaunch][ERROR] 2017-08-14 08:37:05,194: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+[roslaunch][ERROR] 2017-08-14 08:37:05,195: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2017-08-14 08:37:05,196: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/__init__.py", line 307, in main
+    p.start()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 279, in start
+    self.runner.launch()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 654, in launch
+    self._setup()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 630, in _setup
+    self._launch_master()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 391, in _launch_master
+    raise RLException("roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"%(m.uri))
+RLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+
+[rospy.core][INFO] 2017-08-14 08:37:05,196: signal_shutdown [atexit]
+[roslaunch][INFO] 2017-08-14 08:37:05,402: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:37:05,406: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:37:05,407: roslaunch starting with args ['/opt/ros/kinetic/bin/roslaunch', 'drone_arena', 'main.launch']
+[roslaunch][INFO] 2017-08-14 08:37:05,407: roslaunch env is {'LANG': 'en_US.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PWD': '/root/catkin_ws', 'ROS_MASTER_URI': 'http://localhost:11311', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:37:05,407: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:37:05,408: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:37:05,408: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:37:05,487: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.config][INFO] 2017-08-14 08:37:05,487: loading config file /root/catkin_ws/src/drone_arena/launch/main.launch
+[roslaunch][INFO] 2017-08-14 08:37:05,511: Added node of type [optitrack2odom/optitrack2odom] in namespace [/]
+[roslaunch][INFO] 2017-08-14 08:37:05,515: Added node of type [drone_arena/fence_control.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:05,554: Added node of type [joy/joy_node] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:05,555: Added node of type [joy_teleop/joy_teleop.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:05,555: Added node of type [drone_arena/diagnostics.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:05,556: Added node of type [drone_arena/led.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:05,556: ... selected machine [] for node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:37:05,557: ... selected machine [] for node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:37:05,557: ... selected machine [] for node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:37:05,557: ... selected machine [] for node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:37:05,558: ... selected machine [] for node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:37:05,558: ... selected machine [] for node of type [drone_arena/led.py]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,560: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,560: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,561: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:37:05,561: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:05,561: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:05,562: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:37:05,562: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:37:05,562: Started XML-RPC server [http://ubuntu:45171/]
+[xmlrpc][INFO] 2017-08-14 08:37:05,563: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:37:05,574: started roslaunch server http://ubuntu:45171/
+[roslaunch.parent][INFO] 2017-08-14 08:37:05,574: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:37:05,575: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:05,577: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:05,578: ROS_MASTER_URI=http://localhost:11311
+[roslaunch][INFO] 2017-08-14 08:37:05,581: setting /roslaunch/uris/host_ubuntu__45171' to http://ubuntu:45171/
+[roslaunch][INFO] 2017-08-14 08:37:05,583: load_parameters starting ...
+[roslaunch][INFO] 2017-08-14 08:37:05,596: ... load_parameters complete
+[roslaunch][INFO] 2017-08-14 08:37:05,596: launch_nodes: launching local nodes ...
+[roslaunch][INFO] 2017-08-14 08:37:05,597: ... preparing to launch node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:37:05,597: create_node_process: package[optitrack2odom] type[optitrack2odom] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:05,598: process[filtered_optitrack-1]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:05,627: process[filtered_optitrack-1]: args[[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack']]
+[roslaunch][INFO] 2017-08-14 08:37:05,628: ... created process [filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,628: ProcessMonitor.register[filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,629: ProcessMonitor.register[filtered_optitrack-1] complete
+[roslaunch][INFO] 2017-08-14 08:37:05,629: ... registered process [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:37:05,629: process[filtered_optitrack-1]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:05,630: process[filtered_optitrack-1]: start w/ args [[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/filtered_optitrack-1.log']]
+[roslaunch][INFO] 2017-08-14 08:37:05,630: process[filtered_optitrack-1]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:05,706: process[filtered_optitrack-1]: started with pid [65]
+[roslaunch][INFO] 2017-08-14 08:37:05,707: ... successfully launched [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:37:05,707: ... preparing to launch node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:37:05,708: create_node_process: package[drone_arena] type[fence_control.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:05,708: process[bebop/fence-2]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:05,719: process[bebop/fence-2]: args[[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence']]
+[roslaunch][INFO] 2017-08-14 08:37:05,719: ... created process [bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,720: ProcessMonitor.register[bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,720: ProcessMonitor.register[bebop/fence-2] complete
+[roslaunch][INFO] 2017-08-14 08:37:05,720: ... registered process [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:37:05,721: process[bebop/fence-2]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:05,721: process[bebop/fence-2]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-fence-2.log']]
+[roslaunch][INFO] 2017-08-14 08:37:05,722: process[bebop/fence-2]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:05,799: process[bebop/fence-2]: started with pid [66]
+[roslaunch][INFO] 2017-08-14 08:37:05,800: ... successfully launched [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:37:05,800: ... preparing to launch node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:37:05,801: create_node_process: package[joy] type[joy_node] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:05,801: process[bebop/joy_node-3]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:05,803: process[bebop/joy_node-3]: args[[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node']]
+[roslaunch][INFO] 2017-08-14 08:37:05,803: ... created process [bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,804: ProcessMonitor.register[bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,804: ProcessMonitor.register[bebop/joy_node-3] complete
+[roslaunch][INFO] 2017-08-14 08:37:05,805: ... registered process [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:37:05,805: process[bebop/joy_node-3]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:05,806: process[bebop/joy_node-3]: start w/ args [[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_node-3.log']]
+[roslaunch][INFO] 2017-08-14 08:37:05,806: process[bebop/joy_node-3]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:05,902: process[bebop/joy_node-3]: started with pid [72]
+[roslaunch][INFO] 2017-08-14 08:37:05,902: ... successfully launched [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:37:05,903: ... preparing to launch node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:37:05,903: create_node_process: package[joy_teleop] type[joy_teleop.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:05,903: process[bebop/joy_teleop-4]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:05,906: process[bebop/joy_teleop-4]: args[[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop']]
+[roslaunch][INFO] 2017-08-14 08:37:05,907: ... created process [bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,908: ProcessMonitor.register[bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:05,908: ProcessMonitor.register[bebop/joy_teleop-4] complete
+[roslaunch][INFO] 2017-08-14 08:37:05,909: ... registered process [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:37:05,909: process[bebop/joy_teleop-4]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:05,911: process[bebop/joy_teleop-4]: start w/ args [[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_teleop-4.log']]
+[roslaunch][INFO] 2017-08-14 08:37:05,913: process[bebop/joy_teleop-4]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:06,004: process[bebop/joy_teleop-4]: started with pid [77]
+[roslaunch][INFO] 2017-08-14 08:37:06,004: ... successfully launched [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:37:06,005: ... preparing to launch node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:37:06,005: create_node_process: package[drone_arena] type[diagnostics.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:06,006: process[bebop/diagnostics-5]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:06,016: process[bebop/diagnostics-5]: args[[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics']]
+[roslaunch][INFO] 2017-08-14 08:37:06,017: ... created process [bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:06,017: ProcessMonitor.register[bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:06,017: ProcessMonitor.register[bebop/diagnostics-5] complete
+[roslaunch][INFO] 2017-08-14 08:37:06,018: ... registered process [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:37:06,018: process[bebop/diagnostics-5]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:06,019: process[bebop/diagnostics-5]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-diagnostics-5.log']]
+[roslaunch][INFO] 2017-08-14 08:37:06,019: process[bebop/diagnostics-5]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:06,101: process[bebop/diagnostics-5]: started with pid [80]
+[roslaunch][INFO] 2017-08-14 08:37:06,101: ... successfully launched [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:37:06,101: ... preparing to launch node of type [drone_arena/led.py]
+[roslaunch][INFO] 2017-08-14 08:37:06,102: create_node_process: package[drone_arena] type[led.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:06,102: process[bebop/led-6]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:06,113: process[bebop/led-6]: args[[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led']]
+[roslaunch][INFO] 2017-08-14 08:37:06,113: ... created process [bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:06,113: ProcessMonitor.register[bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:06,114: ProcessMonitor.register[bebop/led-6] complete
+[roslaunch][INFO] 2017-08-14 08:37:06,114: ... registered process [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:37:06,115: process[bebop/led-6]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:06,115: process[bebop/led-6]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log']]
+[roslaunch][INFO] 2017-08-14 08:37:06,115: process[bebop/led-6]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:06,214: process[bebop/led-6]: started with pid [81]
+[roslaunch][INFO] 2017-08-14 08:37:06,214: ... successfully launched [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:37:06,215: ... launch_nodes complete
+[roslaunch.pmon][INFO] 2017-08-14 08:37:06,215: registrations completed <ProcessMonitor(ProcessMonitor-1, started daemon 139890727900928)>
+[roslaunch.parent][INFO] 2017-08-14 08:37:06,215: ... roslaunch parent running, waiting for process exit
+[roslaunch][INFO] 2017-08-14 08:37:06,215: spin
+[roslaunch][ERROR] 2017-08-14 08:37:06,871: [bebop/led-6] process has died [pid 81, exit code 1, cmd /root/catkin_ws/src/drone_arena/scripts/led.py cmd_vel:=cmd_vel_input takeoff:=takeoff_input __name:=led __log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log].
+log file: /root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6*.log
+[roslaunch.pmon][INFO] 2017-08-14 08:37:06,872: ProcessMonitor.unregister[bebop/led-6] starting
+[roslaunch.pmon][INFO] 2017-08-14 08:37:06,872: ProcessMonitor.unregister[bebop/led-6] complete
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,070: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, started daemon 139890727900928)>
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,117: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 139890727900928)>
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,118: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 139890727900928)>: remaining procs are [<roslaunch.nodeprocess.LocalProcess object at 0x7f3ad950cc10>, <roslaunch.nodeprocess.LocalProcess object at 0x7f3ad950c290>, <roslaunch.nodeprocess.LocalProcess object at 0x7f3ad9499850>, <roslaunch.nodeprocess.LocalProcess object at 0x7f3ad9499c50>, <roslaunch.nodeprocess.LocalProcess object at 0x7f3ad9499ad0>]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,119: ProcessMonitor exit: killing bebop/diagnostics-5
+[roslaunch][INFO] 2017-08-14 08:37:13,120: [bebop/diagnostics-5] killing on exit
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,119: ProcessMonitor exit: killing bebop/joy_teleop-4
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,120: ProcessMonitor exit: killing bebop/joy_node-3
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,121: ProcessMonitor exit: killing bebop/fence-2
+[roslaunch][INFO] 2017-08-14 08:37:13,121: process[bebop/diagnostics-5]: killing os process with pid[80] pgid[80]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:13,122: ProcessMonitor exit: killing filtered_optitrack-1
+[roslaunch][INFO] 2017-08-14 08:37:13,123: [bebop/joy_teleop-4] killing on exit
+[roslaunch][INFO] 2017-08-14 08:37:13,124: [bebop/joy_node-3] killing on exit
+[roslaunch][INFO] 2017-08-14 08:37:13,125: [bebop/fence-2] killing on exit
+[roslaunch][INFO] 2017-08-14 08:37:13,125: [bebop/diagnostics-5] sending SIGINT to pgid [80]
+[roslaunch][INFO] 2017-08-14 08:37:13,126: [filtered_optitrack-1] killing on exit
+[roslaunch][INFO] 2017-08-14 08:37:13,126: process[bebop/joy_teleop-4]: killing os process with pid[77] pgid[77]
+[roslaunch][INFO] 2017-08-14 08:37:13,127: process[bebop/joy_node-3]: killing os process with pid[72] pgid[72]
+[roslaunch][INFO] 2017-08-14 08:37:13,127: process[bebop/fence-2]: killing os process with pid[66] pgid[66]
+[roslaunch][INFO] 2017-08-14 08:37:13,127: [bebop/diagnostics-5] sent SIGINT to pgid [80]
+[roslaunch][INFO] 2017-08-14 08:37:13,128: process[filtered_optitrack-1]: killing os process with pid[65] pgid[65]
+[roslaunch][INFO] 2017-08-14 08:37:13,128: [bebop/joy_teleop-4] sending SIGINT to pgid [77]
+[roslaunch][INFO] 2017-08-14 08:37:13,128: [bebop/joy_node-3] sending SIGINT to pgid [72]
+[roslaunch][INFO] 2017-08-14 08:37:13,129: [bebop/fence-2] sending SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:37:13,129: [filtered_optitrack-1] sending SIGINT to pgid [65]
+[roslaunch][INFO] 2017-08-14 08:37:13,130: [bebop/joy_teleop-4] sent SIGINT to pgid [77]
+[roslaunch][INFO] 2017-08-14 08:37:13,130: [bebop/joy_node-3] sent SIGINT to pgid [72]
+[roslaunch][INFO] 2017-08-14 08:37:13,131: [bebop/fence-2] sent SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:37:13,131: [filtered_optitrack-1] sent SIGINT to pgid [65]
+[roslaunch][INFO] 2017-08-14 08:37:13,232: process[bebop/joy_node-3]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:37:13,330: process[bebop/diagnostics-5]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:37:13,332: process[bebop/joy_teleop-4]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:37:13,333: process[filtered_optitrack-1]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:37:44,362: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:37:44,369: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:37:44,369: roslaunch starting with args ['roscore', '--core']
+[roslaunch][INFO] 2017-08-14 08:37:44,369: roslaunch env is {'LANG': 'C.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'PWD': '/', 'ROS_MASTER_URI': 'http://localhost:11311', 'LC_ALL': 'C.UTF-8', 'PKG_CONFIG_PATH': '/opt/ros/kinetic/lib/pkgconfig', 'ROS_PACKAGE_PATH': '/opt/ros/kinetic/share', 'CMAKE_PREFIX_PATH': '/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:37:44,370: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:37:44,370: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:37:44,370: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:37:44,437: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,438: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,438: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,439: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:37:44,439: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:44,440: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:44,440: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:37:44,441: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:37:44,442: Started XML-RPC server [http://ubuntu:39116/]
+[xmlrpc][INFO] 2017-08-14 08:37:44,442: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:37:44,453: started roslaunch server http://ubuntu:39116/
+[roslaunch.parent][INFO] 2017-08-14 08:37:44,453: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:37:44,454: master.is_running[http://ubuntu:11311/]
+[roslaunch][ERROR] 2017-08-14 08:37:44,455: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+[roslaunch][ERROR] 2017-08-14 08:37:44,455: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2017-08-14 08:37:44,456: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/__init__.py", line 307, in main
+    p.start()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 279, in start
+    self.runner.launch()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 654, in launch
+    self._setup()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 630, in _setup
+    self._launch_master()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 391, in _launch_master
+    raise RLException("roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"%(m.uri))
+RLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+
+[rospy.core][INFO] 2017-08-14 08:37:44,456: signal_shutdown [atexit]
+[roslaunch][INFO] 2017-08-14 08:37:44,680: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:37:44,686: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:37:44,686: roslaunch starting with args ['/opt/ros/kinetic/bin/roslaunch', 'drone_arena', 'main.launch']
+[roslaunch][INFO] 2017-08-14 08:37:44,686: roslaunch env is {'LANG': 'en_US.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PWD': '/root/catkin_ws', 'ROS_MASTER_URI': 'http://localhost:11311', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:37:44,687: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:37:44,687: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:37:44,688: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:37:44,768: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.config][INFO] 2017-08-14 08:37:44,768: loading config file /root/catkin_ws/src/drone_arena/launch/main.launch
+[roslaunch][INFO] 2017-08-14 08:37:44,795: Added node of type [optitrack2odom/optitrack2odom] in namespace [/]
+[roslaunch][INFO] 2017-08-14 08:37:44,799: Added node of type [drone_arena/fence_control.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:44,838: Added node of type [joy/joy_node] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:44,839: Added node of type [joy_teleop/joy_teleop.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:44,839: Added node of type [drone_arena/diagnostics.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:44,840: Added node of type [drone_arena/led.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:37:44,840: ... selected machine [] for node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:37:44,841: ... selected machine [] for node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:37:44,841: ... selected machine [] for node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:37:44,841: ... selected machine [] for node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:37:44,842: ... selected machine [] for node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:37:44,842: ... selected machine [] for node of type [drone_arena/led.py]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,844: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,844: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,845: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:37:44,845: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:44,846: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:37:44,846: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:37:44,846: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:37:44,847: Started XML-RPC server [http://ubuntu:41453/]
+[xmlrpc][INFO] 2017-08-14 08:37:44,847: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:37:44,858: started roslaunch server http://ubuntu:41453/
+[roslaunch.parent][INFO] 2017-08-14 08:37:44,859: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:37:44,860: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:44,862: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:44,863: ROS_MASTER_URI=http://localhost:11311
+[roslaunch][INFO] 2017-08-14 08:37:44,867: setting /roslaunch/uris/host_ubuntu__41453' to http://ubuntu:41453/
+[roslaunch][INFO] 2017-08-14 08:37:44,870: load_parameters starting ...
+[roslaunch][INFO] 2017-08-14 08:37:44,883: ... load_parameters complete
+[roslaunch][INFO] 2017-08-14 08:37:44,883: launch_nodes: launching local nodes ...
+[roslaunch][INFO] 2017-08-14 08:37:44,884: ... preparing to launch node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:37:44,884: create_node_process: package[optitrack2odom] type[optitrack2odom] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:44,885: process[filtered_optitrack-1]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:44,918: process[filtered_optitrack-1]: args[[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack']]
+[roslaunch][INFO] 2017-08-14 08:37:44,919: ... created process [filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,919: ProcessMonitor.register[filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:44,920: ProcessMonitor.register[filtered_optitrack-1] complete
+[roslaunch][INFO] 2017-08-14 08:37:44,920: ... registered process [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:37:44,920: process[filtered_optitrack-1]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:44,921: process[filtered_optitrack-1]: start w/ args [[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/filtered_optitrack-1.log']]
+[roslaunch][INFO] 2017-08-14 08:37:44,921: process[filtered_optitrack-1]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:44,996: process[filtered_optitrack-1]: started with pid [65]
+[roslaunch][INFO] 2017-08-14 08:37:44,997: ... successfully launched [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:37:44,997: ... preparing to launch node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:37:44,998: create_node_process: package[drone_arena] type[fence_control.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:44,998: process[bebop/fence-2]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:45,006: process[bebop/fence-2]: args[[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence']]
+[roslaunch][INFO] 2017-08-14 08:37:45,006: ... created process [bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,007: ProcessMonitor.register[bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,007: ProcessMonitor.register[bebop/fence-2] complete
+[roslaunch][INFO] 2017-08-14 08:37:45,009: ... registered process [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:37:45,009: process[bebop/fence-2]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:45,010: process[bebop/fence-2]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-fence-2.log']]
+[roslaunch][INFO] 2017-08-14 08:37:45,011: process[bebop/fence-2]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:45,087: process[bebop/fence-2]: started with pid [69]
+[roslaunch][INFO] 2017-08-14 08:37:45,088: ... successfully launched [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:37:45,088: ... preparing to launch node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:37:45,089: create_node_process: package[joy] type[joy_node] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:45,089: process[bebop/joy_node-3]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:45,091: process[bebop/joy_node-3]: args[[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node']]
+[roslaunch][INFO] 2017-08-14 08:37:45,091: ... created process [bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,091: ProcessMonitor.register[bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,092: ProcessMonitor.register[bebop/joy_node-3] complete
+[roslaunch][INFO] 2017-08-14 08:37:45,092: ... registered process [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:37:45,093: process[bebop/joy_node-3]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:45,093: process[bebop/joy_node-3]: start w/ args [[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_node-3.log']]
+[roslaunch][INFO] 2017-08-14 08:37:45,094: process[bebop/joy_node-3]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:45,173: process[bebop/joy_node-3]: started with pid [72]
+[roslaunch][INFO] 2017-08-14 08:37:45,173: ... successfully launched [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:37:45,174: ... preparing to launch node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:37:45,174: create_node_process: package[joy_teleop] type[joy_teleop.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:45,174: process[bebop/joy_teleop-4]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:45,176: process[bebop/joy_teleop-4]: args[[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop']]
+[roslaunch][INFO] 2017-08-14 08:37:45,176: ... created process [bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,177: ProcessMonitor.register[bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,177: ProcessMonitor.register[bebop/joy_teleop-4] complete
+[roslaunch][INFO] 2017-08-14 08:37:45,177: ... registered process [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:37:45,178: process[bebop/joy_teleop-4]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:45,178: process[bebop/joy_teleop-4]: start w/ args [[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_teleop-4.log']]
+[roslaunch][INFO] 2017-08-14 08:37:45,179: process[bebop/joy_teleop-4]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:45,273: process[bebop/joy_teleop-4]: started with pid [73]
+[roslaunch][INFO] 2017-08-14 08:37:45,274: ... successfully launched [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:37:45,274: ... preparing to launch node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:37:45,275: create_node_process: package[drone_arena] type[diagnostics.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:45,275: process[bebop/diagnostics-5]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:45,286: process[bebop/diagnostics-5]: args[[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics']]
+[roslaunch][INFO] 2017-08-14 08:37:45,287: ... created process [bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,287: ProcessMonitor.register[bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,288: ProcessMonitor.register[bebop/diagnostics-5] complete
+[roslaunch][INFO] 2017-08-14 08:37:45,288: ... registered process [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:37:45,289: process[bebop/diagnostics-5]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:45,289: process[bebop/diagnostics-5]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-diagnostics-5.log']]
+[roslaunch][INFO] 2017-08-14 08:37:45,290: process[bebop/diagnostics-5]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:45,367: process[bebop/diagnostics-5]: started with pid [80]
+[roslaunch][INFO] 2017-08-14 08:37:45,368: ... successfully launched [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:37:45,369: ... preparing to launch node of type [drone_arena/led.py]
+[roslaunch][INFO] 2017-08-14 08:37:45,371: create_node_process: package[drone_arena] type[led.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:37:45,371: process[bebop/led-6]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:37:45,390: process[bebop/led-6]: args[[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led']]
+[roslaunch][INFO] 2017-08-14 08:37:45,391: ... created process [bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,391: ProcessMonitor.register[bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,392: ProcessMonitor.register[bebop/led-6] complete
+[roslaunch][INFO] 2017-08-14 08:37:45,392: ... registered process [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:37:45,393: process[bebop/led-6]: starting os process
+[roslaunch][INFO] 2017-08-14 08:37:45,393: process[bebop/led-6]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log']]
+[roslaunch][INFO] 2017-08-14 08:37:45,394: process[bebop/led-6]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:37:45,486: process[bebop/led-6]: started with pid [82]
+[roslaunch][INFO] 2017-08-14 08:37:45,486: ... successfully launched [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:37:45,487: ... launch_nodes complete
+[roslaunch.pmon][INFO] 2017-08-14 08:37:45,487: registrations completed <ProcessMonitor(ProcessMonitor-1, started daemon 140604537784064)>
+[roslaunch.parent][INFO] 2017-08-14 08:37:45,487: ... roslaunch parent running, waiting for process exit
+[roslaunch][INFO] 2017-08-14 08:37:45,488: spin
+[roslaunch][ERROR] 2017-08-14 08:37:46,149: [bebop/led-6] process has died [pid 82, exit code 1, cmd /root/catkin_ws/src/drone_arena/scripts/led.py cmd_vel:=cmd_vel_input takeoff:=takeoff_input __name:=led __log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log].
+log file: /root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6*.log
+[roslaunch.pmon][INFO] 2017-08-14 08:37:46,150: ProcessMonitor.unregister[bebop/led-6] starting
+[roslaunch.pmon][INFO] 2017-08-14 08:37:46,150: ProcessMonitor.unregister[bebop/led-6] complete
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,089: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, started daemon 140604537784064)>
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,112: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140604537784064)>
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,113: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140604537784064)>: remaining procs are [<roslaunch.nodeprocess.LocalProcess object at 0x7fe10bb33c10>, <roslaunch.nodeprocess.LocalProcess object at 0x7fe10bb33290>, <roslaunch.nodeprocess.LocalProcess object at 0x7fe10bac0850>, <roslaunch.nodeprocess.LocalProcess object at 0x7fe10bac0c50>, <roslaunch.nodeprocess.LocalProcess object at 0x7fe10bac0ad0>]
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,114: ProcessMonitor exit: killing bebop/diagnostics-5
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,115: ProcessMonitor exit: killing bebop/joy_teleop-4
+[roslaunch][INFO] 2017-08-14 08:38:09,115: [bebop/diagnostics-5] killing on exit
+[roslaunch][INFO] 2017-08-14 08:38:09,118: process[bebop/diagnostics-5]: killing os process with pid[80] pgid[80]
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,116: ProcessMonitor exit: killing bebop/joy_node-3
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,117: ProcessMonitor exit: killing bebop/fence-2
+[roslaunch.pmon][INFO] 2017-08-14 08:38:09,118: ProcessMonitor exit: killing filtered_optitrack-1
+[roslaunch][INFO] 2017-08-14 08:38:09,116: [bebop/joy_teleop-4] killing on exit
+[roslaunch][INFO] 2017-08-14 08:38:09,119: [bebop/diagnostics-5] sending SIGINT to pgid [80]
+[roslaunch][INFO] 2017-08-14 08:38:09,119: [bebop/joy_node-3] killing on exit
+[roslaunch][INFO] 2017-08-14 08:38:09,120: [bebop/fence-2] killing on exit
+[roslaunch][INFO] 2017-08-14 08:38:09,120: [filtered_optitrack-1] killing on exit
+[roslaunch][INFO] 2017-08-14 08:38:09,121: process[bebop/joy_teleop-4]: killing os process with pid[73] pgid[73]
+[roslaunch][INFO] 2017-08-14 08:38:09,121: [bebop/diagnostics-5] sent SIGINT to pgid [80]
+[roslaunch][INFO] 2017-08-14 08:38:09,122: process[bebop/joy_node-3]: killing os process with pid[72] pgid[72]
+[roslaunch][INFO] 2017-08-14 08:38:09,122: process[bebop/fence-2]: killing os process with pid[69] pgid[69]
+[roslaunch][INFO] 2017-08-14 08:38:09,123: process[filtered_optitrack-1]: killing os process with pid[65] pgid[65]
+[roslaunch][INFO] 2017-08-14 08:38:09,123: [bebop/joy_teleop-4] sending SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:38:09,123: [bebop/joy_node-3] sending SIGINT to pgid [72]
+[roslaunch][INFO] 2017-08-14 08:38:09,125: [bebop/joy_node-3] sent SIGINT to pgid [72]
+[roslaunch][INFO] 2017-08-14 08:38:09,124: [filtered_optitrack-1] sending SIGINT to pgid [65]
+[roslaunch][INFO] 2017-08-14 08:38:09,124: [bebop/joy_teleop-4] sent SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:38:09,124: [bebop/fence-2] sending SIGINT to pgid [69]
+[roslaunch][INFO] 2017-08-14 08:38:09,125: [filtered_optitrack-1] sent SIGINT to pgid [65]
+[roslaunch][INFO] 2017-08-14 08:38:09,126: [bebop/fence-2] sent SIGINT to pgid [69]
+[roslaunch][INFO] 2017-08-14 08:40:55,870: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:40:55,878: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:40:55,878: roslaunch starting with args ['roscore', '--core']
+[roslaunch][INFO] 2017-08-14 08:40:55,878: roslaunch env is {'LANG': 'C.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'PWD': '/', 'ROS_MASTER_URI': 'http://localhost:11311', 'LC_ALL': 'C.UTF-8', 'PKG_CONFIG_PATH': '/opt/ros/kinetic/lib/pkgconfig', 'ROS_PACKAGE_PATH': '/opt/ros/kinetic/share', 'CMAKE_PREFIX_PATH': '/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:40:55,878: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:40:55,879: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:40:55,879: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:40:55,942: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:55,943: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:40:55,943: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:40:55,944: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:40:55,944: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:40:55,945: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:40:55,945: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:40:55,945: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:40:55,946: Started XML-RPC server [http://ubuntu:40081/]
+[xmlrpc][INFO] 2017-08-14 08:40:55,947: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:40:55,957: started roslaunch server http://ubuntu:40081/
+[roslaunch.parent][INFO] 2017-08-14 08:40:55,958: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:40:55,958: master.is_running[http://ubuntu:11311/]
+[roslaunch][ERROR] 2017-08-14 08:40:55,960: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+[roslaunch][ERROR] 2017-08-14 08:40:55,960: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2017-08-14 08:40:55,961: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/__init__.py", line 307, in main
+    p.start()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 279, in start
+    self.runner.launch()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 654, in launch
+    self._setup()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 630, in _setup
+    self._launch_master()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 391, in _launch_master
+    raise RLException("roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"%(m.uri))
+RLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+
+[rospy.core][INFO] 2017-08-14 08:40:55,962: signal_shutdown [atexit]
+[roslaunch][INFO] 2017-08-14 08:40:56,227: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:40:56,232: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:40:56,232: roslaunch starting with args ['/opt/ros/kinetic/bin/roslaunch', 'drone_arena', 'main.launch']
+[roslaunch][INFO] 2017-08-14 08:40:56,232: roslaunch env is {'LANG': 'en_US.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PWD': '/root/catkin_ws', 'ROS_MASTER_URI': 'http://localhost:11311', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:40:56,233: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:40:56,233: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:40:56,233: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:40:56,315: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.config][INFO] 2017-08-14 08:40:56,315: loading config file /root/catkin_ws/src/drone_arena/launch/main.launch
+[roslaunch][INFO] 2017-08-14 08:40:56,340: Added node of type [optitrack2odom/optitrack2odom] in namespace [/]
+[roslaunch][INFO] 2017-08-14 08:40:56,344: Added node of type [drone_arena/fence_control.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:40:56,382: Added node of type [joy/joy_node] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:40:56,383: Added node of type [joy_teleop/joy_teleop.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:40:56,384: Added node of type [drone_arena/diagnostics.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:40:56,384: Added node of type [drone_arena/led.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:40:56,385: ... selected machine [] for node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:40:56,385: ... selected machine [] for node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:40:56,385: ... selected machine [] for node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:40:56,386: ... selected machine [] for node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:40:56,386: ... selected machine [] for node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:40:56,386: ... selected machine [] for node of type [drone_arena/led.py]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,388: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,389: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,389: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:40:56,390: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:40:56,390: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:40:56,390: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:40:56,391: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:40:56,391: Started XML-RPC server [http://ubuntu:35119/]
+[xmlrpc][INFO] 2017-08-14 08:40:56,392: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:40:56,403: started roslaunch server http://ubuntu:35119/
+[roslaunch.parent][INFO] 2017-08-14 08:40:56,403: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:40:56,404: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,406: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,407: ROS_MASTER_URI=http://localhost:11311
+[roslaunch][INFO] 2017-08-14 08:40:56,410: setting /roslaunch/uris/host_ubuntu__35119' to http://ubuntu:35119/
+[roslaunch][INFO] 2017-08-14 08:40:56,413: load_parameters starting ...
+[roslaunch][INFO] 2017-08-14 08:40:56,428: ... load_parameters complete
+[roslaunch][INFO] 2017-08-14 08:40:56,429: launch_nodes: launching local nodes ...
+[roslaunch][INFO] 2017-08-14 08:40:56,429: ... preparing to launch node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:40:56,430: create_node_process: package[optitrack2odom] type[optitrack2odom] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,430: process[filtered_optitrack-1]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:40:56,460: process[filtered_optitrack-1]: args[[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack']]
+[roslaunch][INFO] 2017-08-14 08:40:56,461: ... created process [filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,461: ProcessMonitor.register[filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,461: ProcessMonitor.register[filtered_optitrack-1] complete
+[roslaunch][INFO] 2017-08-14 08:40:56,462: ... registered process [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:40:56,462: process[filtered_optitrack-1]: starting os process
+[roslaunch][INFO] 2017-08-14 08:40:56,463: process[filtered_optitrack-1]: start w/ args [[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/filtered_optitrack-1.log']]
+[roslaunch][INFO] 2017-08-14 08:40:56,463: process[filtered_optitrack-1]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:40:56,542: process[filtered_optitrack-1]: started with pid [66]
+[roslaunch][INFO] 2017-08-14 08:40:56,543: ... successfully launched [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:40:56,543: ... preparing to launch node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:40:56,544: create_node_process: package[drone_arena] type[fence_control.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,544: process[bebop/fence-2]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:40:56,554: process[bebop/fence-2]: args[[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence']]
+[roslaunch][INFO] 2017-08-14 08:40:56,554: ... created process [bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,555: ProcessMonitor.register[bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,556: ProcessMonitor.register[bebop/fence-2] complete
+[roslaunch][INFO] 2017-08-14 08:40:56,557: ... registered process [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:40:56,558: process[bebop/fence-2]: starting os process
+[roslaunch][INFO] 2017-08-14 08:40:56,559: process[bebop/fence-2]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-fence-2.log']]
+[roslaunch][INFO] 2017-08-14 08:40:56,559: process[bebop/fence-2]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:40:56,638: process[bebop/fence-2]: started with pid [71]
+[roslaunch][INFO] 2017-08-14 08:40:56,639: ... successfully launched [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:40:56,639: ... preparing to launch node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:40:56,639: create_node_process: package[joy] type[joy_node] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,640: process[bebop/joy_node-3]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:40:56,641: process[bebop/joy_node-3]: args[[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node']]
+[roslaunch][INFO] 2017-08-14 08:40:56,642: ... created process [bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,642: ProcessMonitor.register[bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,643: ProcessMonitor.register[bebop/joy_node-3] complete
+[roslaunch][INFO] 2017-08-14 08:40:56,643: ... registered process [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:40:56,643: process[bebop/joy_node-3]: starting os process
+[roslaunch][INFO] 2017-08-14 08:40:56,644: process[bebop/joy_node-3]: start w/ args [[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_node-3.log']]
+[roslaunch][INFO] 2017-08-14 08:40:56,645: process[bebop/joy_node-3]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:40:56,727: process[bebop/joy_node-3]: started with pid [73]
+[roslaunch][INFO] 2017-08-14 08:40:56,728: ... successfully launched [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:40:56,728: ... preparing to launch node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:40:56,728: create_node_process: package[joy_teleop] type[joy_teleop.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,729: process[bebop/joy_teleop-4]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:40:56,731: process[bebop/joy_teleop-4]: args[[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop']]
+[roslaunch][INFO] 2017-08-14 08:40:56,732: ... created process [bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,732: ProcessMonitor.register[bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,733: ProcessMonitor.register[bebop/joy_teleop-4] complete
+[roslaunch][INFO] 2017-08-14 08:40:56,733: ... registered process [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:40:56,734: process[bebop/joy_teleop-4]: starting os process
+[roslaunch][INFO] 2017-08-14 08:40:56,734: process[bebop/joy_teleop-4]: start w/ args [[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_teleop-4.log']]
+[roslaunch][INFO] 2017-08-14 08:40:56,735: process[bebop/joy_teleop-4]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:40:56,814: process[bebop/joy_teleop-4]: started with pid [77]
+[roslaunch][INFO] 2017-08-14 08:40:56,815: ... successfully launched [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:40:56,815: ... preparing to launch node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:40:56,816: create_node_process: package[drone_arena] type[diagnostics.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,816: process[bebop/diagnostics-5]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:40:56,829: process[bebop/diagnostics-5]: args[[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics']]
+[roslaunch][INFO] 2017-08-14 08:40:56,829: ... created process [bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,830: ProcessMonitor.register[bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,831: ProcessMonitor.register[bebop/diagnostics-5] complete
+[roslaunch][INFO] 2017-08-14 08:40:56,831: ... registered process [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:40:56,832: process[bebop/diagnostics-5]: starting os process
+[roslaunch][INFO] 2017-08-14 08:40:56,833: process[bebop/diagnostics-5]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-diagnostics-5.log']]
+[roslaunch][INFO] 2017-08-14 08:40:56,833: process[bebop/diagnostics-5]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:40:56,914: process[bebop/diagnostics-5]: started with pid [81]
+[roslaunch][INFO] 2017-08-14 08:40:56,915: ... successfully launched [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:40:56,915: ... preparing to launch node of type [drone_arena/led.py]
+[roslaunch][INFO] 2017-08-14 08:40:56,918: create_node_process: package[drone_arena] type[led.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:40:56,920: process[bebop/led-6]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:40:56,931: process[bebop/led-6]: args[[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led']]
+[roslaunch][INFO] 2017-08-14 08:40:56,932: ... created process [bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,933: ProcessMonitor.register[bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:40:56,933: ProcessMonitor.register[bebop/led-6] complete
+[roslaunch][INFO] 2017-08-14 08:40:56,934: ... registered process [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:40:56,934: process[bebop/led-6]: starting os process
+[roslaunch][INFO] 2017-08-14 08:40:56,934: process[bebop/led-6]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log']]
+[roslaunch][INFO] 2017-08-14 08:40:56,935: process[bebop/led-6]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:40:57,031: process[bebop/led-6]: started with pid [83]
+[roslaunch][INFO] 2017-08-14 08:40:57,031: ... successfully launched [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:40:57,032: ... launch_nodes complete
+[roslaunch.pmon][INFO] 2017-08-14 08:40:57,032: registrations completed <ProcessMonitor(ProcessMonitor-1, started daemon 140554741806848)>
+[roslaunch.parent][INFO] 2017-08-14 08:40:57,032: ... roslaunch parent running, waiting for process exit
+[roslaunch][INFO] 2017-08-14 08:40:57,033: spin
+[roslaunch][ERROR] 2017-08-14 08:40:57,795: [bebop/led-6] process has died [pid 83, exit code 1, cmd /root/catkin_ws/src/drone_arena/scripts/led.py cmd_vel:=cmd_vel_input takeoff:=takeoff_input __name:=led __log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log].
+log file: /root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6*.log
+[roslaunch.pmon][INFO] 2017-08-14 08:40:57,795: ProcessMonitor.unregister[bebop/led-6] starting
+[roslaunch.pmon][INFO] 2017-08-14 08:40:57,796: ProcessMonitor.unregister[bebop/led-6] complete
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,888: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, started daemon 140554741806848)>
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,918: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140554741806848)>
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,919: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140554741806848)>: remaining procs are [<roslaunch.nodeprocess.LocalProcess object at 0x7fd573a0ec10>, <roslaunch.nodeprocess.LocalProcess object at 0x7fd573a0e290>, <roslaunch.nodeprocess.LocalProcess object at 0x7fd57399b850>, <roslaunch.nodeprocess.LocalProcess object at 0x7fd57399bc50>, <roslaunch.nodeprocess.LocalProcess object at 0x7fd57399bad0>]
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,920: ProcessMonitor exit: killing bebop/diagnostics-5
+[roslaunch][INFO] 2017-08-14 08:49:48,921: [bebop/diagnostics-5] killing on exit
+[roslaunch][INFO] 2017-08-14 08:49:48,921: process[bebop/diagnostics-5]: killing os process with pid[81] pgid[81]
+[roslaunch][INFO] 2017-08-14 08:49:48,922: [bebop/diagnostics-5] sending SIGINT to pgid [81]
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,920: ProcessMonitor exit: killing bebop/joy_node-3
+[roslaunch][INFO] 2017-08-14 08:49:48,924: [bebop/joy_node-3] killing on exit
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,922: ProcessMonitor exit: killing bebop/fence-2
+[roslaunch][INFO] 2017-08-14 08:49:48,925: [bebop/fence-2] killing on exit
+[roslaunch][INFO] 2017-08-14 08:49:48,925: process[bebop/fence-2]: killing os process with pid[71] pgid[71]
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,920: ProcessMonitor exit: killing bebop/joy_teleop-4
+[roslaunch][INFO] 2017-08-14 08:49:48,924: process[bebop/joy_node-3]: killing os process with pid[73] pgid[73]
+[roslaunch.pmon][INFO] 2017-08-14 08:49:48,922: ProcessMonitor exit: killing filtered_optitrack-1
+[roslaunch][INFO] 2017-08-14 08:49:48,923: [bebop/diagnostics-5] sent SIGINT to pgid [81]
+[roslaunch][INFO] 2017-08-14 08:49:48,926: [bebop/fence-2] sending SIGINT to pgid [71]
+[roslaunch][INFO] 2017-08-14 08:49:48,926: [bebop/joy_teleop-4] killing on exit
+[roslaunch][INFO] 2017-08-14 08:49:48,928: process[bebop/joy_teleop-4]: killing os process with pid[77] pgid[77]
+[roslaunch][INFO] 2017-08-14 08:49:48,928: [bebop/joy_teleop-4] sending SIGINT to pgid [77]
+[roslaunch][INFO] 2017-08-14 08:49:48,929: [bebop/joy_teleop-4] sent SIGINT to pgid [77]
+[roslaunch][INFO] 2017-08-14 08:49:48,926: [bebop/joy_node-3] sending SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:49:48,930: [bebop/joy_node-3] sent SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:49:48,928: [bebop/fence-2] sent SIGINT to pgid [71]
+[roslaunch][INFO] 2017-08-14 08:49:48,927: [filtered_optitrack-1] killing on exit
+[roslaunch][INFO] 2017-08-14 08:49:48,931: process[filtered_optitrack-1]: killing os process with pid[66] pgid[66]
+[roslaunch][INFO] 2017-08-14 08:49:48,932: [filtered_optitrack-1] sending SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:49:48,932: [filtered_optitrack-1] sent SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:50:13,424: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:50:13,430: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:50:13,431: roslaunch starting with args ['roscore', '--core']
+[roslaunch][INFO] 2017-08-14 08:50:13,431: roslaunch env is {'LANG': 'C.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'PWD': '/', 'ROS_MASTER_URI': 'http://localhost:11311', 'LC_ALL': 'C.UTF-8', 'PKG_CONFIG_PATH': '/opt/ros/kinetic/lib/pkgconfig', 'ROS_PACKAGE_PATH': '/opt/ros/kinetic/share', 'CMAKE_PREFIX_PATH': '/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:50:13,431: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:50:13,432: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:50:13,432: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:50:13,494: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,494: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,495: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,495: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:50:13,496: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:50:13,496: starting roslaunch XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:50:13,497: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:50:13,498: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:50:13,499: Started XML-RPC server [http://ubuntu:46384/]
+[xmlrpc][INFO] 2017-08-14 08:50:13,499: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:50:13,510: started roslaunch server http://ubuntu:46384/
+[roslaunch.parent][INFO] 2017-08-14 08:50:13,510: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:50:13,511: master.is_running[http://ubuntu:11311/]
+[roslaunch][ERROR] 2017-08-14 08:50:13,512: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+[roslaunch][ERROR] 2017-08-14 08:50:13,513: The traceback for the exception was written to the log file
+[roslaunch][ERROR] 2017-08-14 08:50:13,513: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/__init__.py", line 307, in main
+    p.start()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/parent.py", line 279, in start
+    self.runner.launch()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 654, in launch
+    self._setup()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 630, in _setup
+    self._launch_master()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/roslaunch/launch.py", line 391, in _launch_master
+    raise RLException("roscore cannot run as another roscore/master is already running. \nPlease kill other roscore/master processes before relaunching.\nThe ROS_MASTER_URI is %s"%(m.uri))
+RLException: roscore cannot run as another roscore/master is already running. 
+Please kill other roscore/master processes before relaunching.
+The ROS_MASTER_URI is http://ubuntu:11311/
+
+[rospy.core][INFO] 2017-08-14 08:50:13,514: signal_shutdown [atexit]
+[roslaunch][INFO] 2017-08-14 08:50:13,746: Checking log directory for disk usage. This may take awhile.
+Press Ctrl-C to interrupt
+[roslaunch][INFO] 2017-08-14 08:50:13,752: Done checking log file disk usage. Usage is <1GB.
+[roslaunch][INFO] 2017-08-14 08:50:13,752: roslaunch starting with args ['/opt/ros/kinetic/bin/roslaunch', 'drone_arena', 'main.launch']
+[roslaunch][INFO] 2017-08-14 08:50:13,753: roslaunch env is {'LANG': 'en_US.UTF-8', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PWD': '/root/catkin_ws', 'ROS_MASTER_URI': 'http://localhost:11311', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib'}
+[roslaunch][INFO] 2017-08-14 08:50:13,753: starting in server mode
+[roslaunch.parent][INFO] 2017-08-14 08:50:13,754: starting roslaunch parent run
+[roslaunch][INFO] 2017-08-14 08:50:13,754: loading roscore config file /opt/ros/kinetic/etc/ros/roscore.xml
+[roslaunch][INFO] 2017-08-14 08:50:13,835: Added core node of type [rosout/rosout] in namespace [/]
+[roslaunch.config][INFO] 2017-08-14 08:50:13,835: loading config file /root/catkin_ws/src/drone_arena/launch/main.launch
+[roslaunch][INFO] 2017-08-14 08:50:13,859: Added node of type [optitrack2odom/optitrack2odom] in namespace [/]
+[roslaunch][INFO] 2017-08-14 08:50:13,863: Added node of type [drone_arena/fence_control.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:50:13,900: Added node of type [joy/joy_node] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:50:13,901: Added node of type [joy_teleop/joy_teleop.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:50:13,901: Added node of type [drone_arena/diagnostics.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:50:13,902: Added node of type [drone_arena/led.py] in namespace [/bebop/]
+[roslaunch][INFO] 2017-08-14 08:50:13,902: ... selected machine [] for node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:50:13,902: ... selected machine [] for node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:50:13,903: ... selected machine [] for node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:50:13,903: ... selected machine [] for node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:50:13,903: ... selected machine [] for node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:50:13,904: ... selected machine [] for node of type [drone_arena/led.py]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,905: start_process_monitor: creating ProcessMonitor
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,906: created process monitor <ProcessMonitor(ProcessMonitor-1, initial daemon)>
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,906: start_process_monitor: ProcessMonitor started
+[roslaunch.parent][INFO] 2017-08-14 08:50:13,907: starting parent XML-RPC server
+[roslaunch.server][INFO] 2017-08-14 08:50:13,907: starting roslaunch XML-RPC server
+[xmlrpc][INFO] 2017-08-14 08:50:13,908: XML-RPC server binding to 0.0.0.0:0
+[roslaunch.server][INFO] 2017-08-14 08:50:13,908: waiting for roslaunch XML-RPC server to initialize
+[xmlrpc][INFO] 2017-08-14 08:50:13,908: Started XML-RPC server [http://ubuntu:40876/]
+[xmlrpc][INFO] 2017-08-14 08:50:13,909: xml rpc node: starting XML-RPC server
+[roslaunch][INFO] 2017-08-14 08:50:13,911: started roslaunch server http://ubuntu:40876/
+[roslaunch.parent][INFO] 2017-08-14 08:50:13,911: ... parent XML-RPC server started
+[roslaunch][INFO] 2017-08-14 08:50:13,912: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:13,914: master.is_running[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:13,915: ROS_MASTER_URI=http://localhost:11311
+[roslaunch][INFO] 2017-08-14 08:50:13,918: setting /roslaunch/uris/host_ubuntu__40876' to http://ubuntu:40876/
+[roslaunch][INFO] 2017-08-14 08:50:13,920: load_parameters starting ...
+[roslaunch][INFO] 2017-08-14 08:50:13,933: ... load_parameters complete
+[roslaunch][INFO] 2017-08-14 08:50:13,933: launch_nodes: launching local nodes ...
+[roslaunch][INFO] 2017-08-14 08:50:13,934: ... preparing to launch node of type [optitrack2odom/optitrack2odom]
+[roslaunch][INFO] 2017-08-14 08:50:13,934: create_node_process: package[optitrack2odom] type[optitrack2odom] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:13,934: process[filtered_optitrack-1]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:50:13,965: process[filtered_optitrack-1]: args[[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack']]
+[roslaunch][INFO] 2017-08-14 08:50:13,966: ... created process [filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,966: ProcessMonitor.register[filtered_optitrack-1]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:13,967: ProcessMonitor.register[filtered_optitrack-1] complete
+[roslaunch][INFO] 2017-08-14 08:50:13,967: ... registered process [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:50:13,968: process[filtered_optitrack-1]: starting os process
+[roslaunch][INFO] 2017-08-14 08:50:13,968: process[filtered_optitrack-1]: start w/ args [[u'/root/catkin_ws/devel/lib/optitrack2odom/optitrack2odom', u'__name:=filtered_optitrack', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/filtered_optitrack-1.log']]
+[roslaunch][INFO] 2017-08-14 08:50:13,968: process[filtered_optitrack-1]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:50:14,046: process[filtered_optitrack-1]: started with pid [66]
+[roslaunch][INFO] 2017-08-14 08:50:14,046: ... successfully launched [filtered_optitrack-1]
+[roslaunch][INFO] 2017-08-14 08:50:14,047: ... preparing to launch node of type [drone_arena/fence_control.py]
+[roslaunch][INFO] 2017-08-14 08:50:14,047: create_node_process: package[drone_arena] type[fence_control.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:14,048: process[bebop/fence-2]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:50:14,054: process[bebop/fence-2]: args[[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence']]
+[roslaunch][INFO] 2017-08-14 08:50:14,054: ... created process [bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,054: ProcessMonitor.register[bebop/fence-2]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,055: ProcessMonitor.register[bebop/fence-2] complete
+[roslaunch][INFO] 2017-08-14 08:50:14,055: ... registered process [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:50:14,056: process[bebop/fence-2]: starting os process
+[roslaunch][INFO] 2017-08-14 08:50:14,056: process[bebop/fence-2]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/fence_control.py', u'odom:=mocap_odom', u'__name:=fence', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-fence-2.log']]
+[roslaunch][INFO] 2017-08-14 08:50:14,056: process[bebop/fence-2]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:50:14,131: process[bebop/fence-2]: started with pid [67]
+[roslaunch][INFO] 2017-08-14 08:50:14,132: ... successfully launched [bebop/fence-2]
+[roslaunch][INFO] 2017-08-14 08:50:14,132: ... preparing to launch node of type [joy/joy_node]
+[roslaunch][INFO] 2017-08-14 08:50:14,133: create_node_process: package[joy] type[joy_node] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:14,133: process[bebop/joy_node-3]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:50:14,136: process[bebop/joy_node-3]: args[[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node']]
+[roslaunch][INFO] 2017-08-14 08:50:14,136: ... created process [bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,137: ProcessMonitor.register[bebop/joy_node-3]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,137: ProcessMonitor.register[bebop/joy_node-3] complete
+[roslaunch][INFO] 2017-08-14 08:50:14,138: ... registered process [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:50:14,138: process[bebop/joy_node-3]: starting os process
+[roslaunch][INFO] 2017-08-14 08:50:14,140: process[bebop/joy_node-3]: start w/ args [[u'/opt/ros/kinetic/lib/joy/joy_node', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_node', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_node-3.log']]
+[roslaunch][INFO] 2017-08-14 08:50:14,140: process[bebop/joy_node-3]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:50:14,258: process[bebop/joy_node-3]: started with pid [73]
+[roslaunch][INFO] 2017-08-14 08:50:14,259: ... successfully launched [bebop/joy_node-3]
+[roslaunch][INFO] 2017-08-14 08:50:14,259: ... preparing to launch node of type [joy_teleop/joy_teleop.py]
+[roslaunch][INFO] 2017-08-14 08:50:14,260: create_node_process: package[joy_teleop] type[joy_teleop.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:14,260: process[bebop/joy_teleop-4]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:50:14,263: process[bebop/joy_teleop-4]: args[[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop']]
+[roslaunch][INFO] 2017-08-14 08:50:14,263: ... created process [bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,264: ProcessMonitor.register[bebop/joy_teleop-4]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,264: ProcessMonitor.register[bebop/joy_teleop-4] complete
+[roslaunch][INFO] 2017-08-14 08:50:14,265: ... registered process [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:50:14,265: process[bebop/joy_teleop-4]: starting os process
+[roslaunch][INFO] 2017-08-14 08:50:14,267: process[bebop/joy_teleop-4]: start w/ args [[u'/opt/ros/kinetic/lib/joy_teleop/joy_teleop.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=joy_teleop', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-joy_teleop-4.log']]
+[roslaunch][INFO] 2017-08-14 08:50:14,272: process[bebop/joy_teleop-4]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:50:14,363: process[bebop/joy_teleop-4]: started with pid [78]
+[roslaunch][INFO] 2017-08-14 08:50:14,365: ... successfully launched [bebop/joy_teleop-4]
+[roslaunch][INFO] 2017-08-14 08:50:14,365: ... preparing to launch node of type [drone_arena/diagnostics.py]
+[roslaunch][INFO] 2017-08-14 08:50:14,367: create_node_process: package[drone_arena] type[diagnostics.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:14,367: process[bebop/diagnostics-5]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:50:14,375: process[bebop/diagnostics-5]: args[[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics']]
+[roslaunch][INFO] 2017-08-14 08:50:14,376: ... created process [bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,376: ProcessMonitor.register[bebop/diagnostics-5]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,376: ProcessMonitor.register[bebop/diagnostics-5] complete
+[roslaunch][INFO] 2017-08-14 08:50:14,377: ... registered process [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:50:14,377: process[bebop/diagnostics-5]: starting os process
+[roslaunch][INFO] 2017-08-14 08:50:14,377: process[bebop/diagnostics-5]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/diagnostics.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=diagnostics', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-diagnostics-5.log']]
+[roslaunch][INFO] 2017-08-14 08:50:14,378: process[bebop/diagnostics-5]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:50:14,464: process[bebop/diagnostics-5]: started with pid [81]
+[roslaunch][INFO] 2017-08-14 08:50:14,465: ... successfully launched [bebop/diagnostics-5]
+[roslaunch][INFO] 2017-08-14 08:50:14,466: ... preparing to launch node of type [drone_arena/led.py]
+[roslaunch][INFO] 2017-08-14 08:50:14,466: create_node_process: package[drone_arena] type[led.py] machine[Machine(name[] env_loader[None] address[localhost] ssh_port[22] user[None] assignable[True] timeout[10.0])] master_uri[http://localhost:11311]
+[roslaunch][INFO] 2017-08-14 08:50:14,467: process[bebop/led-6]: env[{'LANG': 'en_US.UTF-8', 'LD_LIBRARY_PATH': '/root/catkin_ws/devel/lib:/opt/ros/kinetic/lib', 'ROS_DISTRO': 'kinetic', 'SHLVL': '0', 'PYTHONPATH': '/root/catkin_ws/devel/lib/python2.7/dist-packages:/opt/ros/kinetic/lib/python2.7/dist-packages', 'HOSTNAME': 'ubuntu', 'PWD': '/root/catkin_ws', 'ROS_NAMESPACE': u'/bebop', 'ROS_ROOT': '/opt/ros/kinetic/share/ros', 'PATH': '/opt/ros/kinetic/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin', 'ROSLISP_PACKAGE_DIRECTORIES': '/root/catkin_ws/devel/share/common-lisp', 'ROS_ETC_DIR': '/opt/ros/kinetic/etc/ros', 'ROS_PACKAGE_PATH': '/root/catkin_ws/src/bebop_autonomy/bebop_autonomy:/root/catkin_ws/src/bebop_autonomy/bebop_description:/root/catkin_ws/src/bebop_autonomy/bebop_msgs:/root/catkin_ws/src/bebop_autonomy/bebop_driver:/root/catkin_ws/src/bebop_autonomy/bebop_tools:/root/catkin_ws/src/drone_arena:/root/catkin_ws/src/hl_navigation_msgs:/root/catkin_ws/src/ros-keyboard:/root/catkin_ws/src/lawa:/root/catkin_ws/src/optitrack_msgs:/root/catkin_ws/src/optitrack_odom:/opt/ros/kinetic/share', 'PKG_CONFIG_PATH': '/root/catkin_ws/devel/lib/pkgconfig:/opt/ros/kinetic/lib/pkgconfig', 'ROS_MASTER_URI': 'http://localhost:11311', 'CMAKE_PREFIX_PATH': '/root/catkin_ws/devel:/opt/ros/kinetic', 'HOME': '/root', 'ROS_LOG_FILENAME': '/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/roslaunch-ubuntu-1.log'}]
+[roslaunch][INFO] 2017-08-14 08:50:14,476: process[bebop/led-6]: args[[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led']]
+[roslaunch][INFO] 2017-08-14 08:50:14,479: ... created process [bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,479: ProcessMonitor.register[bebop/led-6]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,479: ProcessMonitor.register[bebop/led-6] complete
+[roslaunch][INFO] 2017-08-14 08:50:14,480: ... registered process [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:50:14,480: process[bebop/led-6]: starting os process
+[roslaunch][INFO] 2017-08-14 08:50:14,481: process[bebop/led-6]: start w/ args [[u'/root/catkin_ws/src/drone_arena/scripts/led.py', u'cmd_vel:=cmd_vel_input', u'takeoff:=takeoff_input', u'__name:=led', u'__log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log']]
+[roslaunch][INFO] 2017-08-14 08:50:14,481: process[bebop/led-6]: cwd will be [/root/.ros]
+[roslaunch][INFO] 2017-08-14 08:50:14,589: process[bebop/led-6]: started with pid [83]
+[roslaunch][INFO] 2017-08-14 08:50:14,591: ... successfully launched [bebop/led-6]
+[roslaunch][INFO] 2017-08-14 08:50:14,594: ... launch_nodes complete
+[roslaunch.pmon][INFO] 2017-08-14 08:50:14,595: registrations completed <ProcessMonitor(ProcessMonitor-1, started daemon 140347029309184)>
+[roslaunch.parent][INFO] 2017-08-14 08:50:14,595: ... roslaunch parent running, waiting for process exit
+[roslaunch][INFO] 2017-08-14 08:50:14,596: spin
+[roslaunch][ERROR] 2017-08-14 08:50:15,215: [bebop/led-6] process has died [pid 83, exit code 1, cmd /root/catkin_ws/src/drone_arena/scripts/led.py cmd_vel:=cmd_vel_input takeoff:=takeoff_input __name:=led __log:=/root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6.log].
+log file: /root/.ros/log/a9882212-80cb-11e7-974f-001c42bad620/bebop-led-6*.log
+[roslaunch.pmon][INFO] 2017-08-14 08:50:15,216: ProcessMonitor.unregister[bebop/led-6] starting
+[roslaunch.pmon][INFO] 2017-08-14 08:50:15,217: ProcessMonitor.unregister[bebop/led-6] complete
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,791: ProcessMonitor.shutdown <ProcessMonitor(ProcessMonitor-1, started daemon 140347029309184)>
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,828: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140347029309184)>
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,828: ProcessMonitor._post_run <ProcessMonitor(ProcessMonitor-1, started daemon 140347029309184)>: remaining procs are [<roslaunch.nodeprocess.LocalProcess object at 0x7fa516ffbc10>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa516ffb290>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa516f879d0>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa516f87b10>, <roslaunch.nodeprocess.LocalProcess object at 0x7fa516f87a50>]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,829: ProcessMonitor exit: killing bebop/joy_teleop-4
+[roslaunch][INFO] 2017-08-14 08:50:35,830: [bebop/joy_teleop-4] killing on exit
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,829: ProcessMonitor exit: killing bebop/diagnostics-5
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,830: ProcessMonitor exit: killing bebop/joy_node-3
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,830: ProcessMonitor exit: killing bebop/fence-2
+[roslaunch][INFO] 2017-08-14 08:50:35,831: process[bebop/joy_teleop-4]: killing os process with pid[78] pgid[78]
+[roslaunch.pmon][INFO] 2017-08-14 08:50:35,831: ProcessMonitor exit: killing filtered_optitrack-1
+[roslaunch][INFO] 2017-08-14 08:50:35,831: [bebop/diagnostics-5] killing on exit
+[roslaunch][INFO] 2017-08-14 08:50:35,832: [bebop/joy_node-3] killing on exit
+[roslaunch][INFO] 2017-08-14 08:50:35,832: [bebop/fence-2] killing on exit
+[roslaunch][INFO] 2017-08-14 08:50:35,832: [bebop/joy_teleop-4] sending SIGINT to pgid [78]
+[roslaunch][INFO] 2017-08-14 08:50:35,833: [filtered_optitrack-1] killing on exit
+[roslaunch][INFO] 2017-08-14 08:50:35,833: process[bebop/diagnostics-5]: killing os process with pid[81] pgid[81]
+[roslaunch][INFO] 2017-08-14 08:50:35,833: process[bebop/joy_node-3]: killing os process with pid[73] pgid[73]
+[roslaunch][INFO] 2017-08-14 08:50:35,834: process[bebop/fence-2]: killing os process with pid[67] pgid[67]
+[roslaunch][INFO] 2017-08-14 08:50:35,835: [bebop/fence-2] sending SIGINT to pgid [67]
+[roslaunch][INFO] 2017-08-14 08:50:35,834: process[filtered_optitrack-1]: killing os process with pid[66] pgid[66]
+[roslaunch][INFO] 2017-08-14 08:50:35,834: [bebop/diagnostics-5] sending SIGINT to pgid [81]
+[roslaunch][INFO] 2017-08-14 08:50:35,835: [bebop/joy_node-3] sending SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:50:35,834: [bebop/joy_teleop-4] sent SIGINT to pgid [78]
+[roslaunch][INFO] 2017-08-14 08:50:35,835: [bebop/fence-2] sent SIGINT to pgid [67]
+[roslaunch][INFO] 2017-08-14 08:50:35,836: [filtered_optitrack-1] sending SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:50:35,836: [bebop/diagnostics-5] sent SIGINT to pgid [81]
+[roslaunch][INFO] 2017-08-14 08:50:35,836: [bebop/joy_node-3] sent SIGINT to pgid [73]
+[roslaunch][INFO] 2017-08-14 08:50:35,837: [filtered_optitrack-1] sent SIGINT to pgid [66]
+[roslaunch][INFO] 2017-08-14 08:50:36,038: process[bebop/fence-2]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:50:36,038: process[bebop/diagnostics-5]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:50:36,038: process[bebop/joy_node-3]: SIGINT killed with return value 0
+[roslaunch][INFO] 2017-08-14 08:50:36,039: process[filtered_optitrack-1]: SIGINT killed with return value 0

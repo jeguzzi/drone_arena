@@ -1,0 +1,436 @@
+[rospy.client][INFO] 2017-08-14 09:08:10,101: init_node, name[/tf_monitor], pid[65]
+[xmlrpc][INFO] 2017-08-14 09:08:10,104: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 09:08:10,105: Started XML-RPC server [http://192.168.201.36:45236/]
+[rospy.impl.masterslave][INFO] 2017-08-14 09:08:10,107: _ready: http://192.168.201.36:45236/
+[rospy.init][INFO] 2017-08-14 09:08:10,105: ROS Slave URI: [http://192.168.201.36:45236/]
+[rospy.registration][INFO] 2017-08-14 09:08:10,109: Registering with master node http://192.168.201.4:11311
+[xmlrpc][INFO] 2017-08-14 09:08:10,110: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2017-08-14 09:08:10,208: registered with master
+[rospy.rosout][INFO] 2017-08-14 09:08:10,208: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 09:08:10,211: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 09:08:10,213: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 09:08:10,265: topic[/diagnostics] adding connection to [/rqt_gui_py_node_12527], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,291: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:10,302: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 1
+[rospy.internal][INFO] 2017-08-14 09:08:10,417: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:11,238: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:11,239: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:11,240: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:11,266: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:11,267: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 1
+[rospy.internal][INFO] 2017-08-14 09:08:12,252: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:12,253: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:12,254: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:12,269: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:12,270: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:13,268: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:13,269: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:13,269: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:13,286: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:13,287: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:14,282: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:14,283: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:14,284: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:14,296: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:14,297: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:15,295: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:15,296: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:15,297: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:15,315: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:15,316: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:16,311: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:16,312: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:16,313: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:16,331: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:16,332: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:17,325: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:17,326: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:17,327: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:17,349: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:17,350: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:18,342: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:18,343: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:18,344: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:18,366: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:18,367: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:19,359: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:19,359: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:19,360: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:19,383: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:19,384: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:20,375: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:20,376: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:20,377: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:20,401: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:20,402: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:21,393: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:21,393: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:21,394: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:21,410: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:21,411: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:22,407: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:22,408: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:22,409: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:22,427: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:22,427: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:23,424: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:23,425: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:23,426: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:23,445: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:23,445: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:24,437: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:24,438: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:24,439: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:24,453: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:24,453: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:25,450: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:25,451: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:25,451: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:25,469: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:25,469: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:26,461: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:26,462: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:26,463: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:26,473: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:26,474: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:27,472: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:27,473: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:27,474: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:27,490: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:27,491: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:28,487: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:28,488: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:28,488: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:28,498: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:28,499: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:29,497: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:29,498: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:29,499: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:29,516: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:29,517: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 1
+[rospy.internal][INFO] 2017-08-14 09:08:30,511: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:30,512: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:30,512: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:30,532: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:30,534: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 1
+[rospy.internal][INFO] 2017-08-14 09:08:31,525: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:31,526: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:31,526: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:31,551: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:31,551: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:32,541: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:32,542: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:32,543: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:32,559: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:32,560: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:33,557: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:33,557: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:33,558: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:33,576: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:33,577: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:34,570: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:34,571: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:34,572: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:34,585: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:34,586: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:35,582: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:35,583: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:35,584: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:35,603: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:35,604: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:36,596: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:36,597: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:36,598: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:36,622: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:36,623: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:37,613: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:37,615: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:37,616: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:37,640: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:37,641: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:38,631: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:38,632: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:38,633: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:38,649: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:38,649: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:39,645: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:39,646: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:39,649: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:39,667: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:39,668: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:40,663: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:40,665: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:40,666: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:40,684: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:40,685: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:41,677: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:41,678: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:41,679: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:41,702: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:41,703: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:42,693: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:42,694: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:42,695: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:42,718: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:42,719: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:43,711: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:43,712: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:43,713: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:43,727: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:43,728: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:44,726: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:44,727: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:44,728: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:44,745: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:44,746: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 1
+[rospy.internal][INFO] 2017-08-14 09:08:45,741: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:45,741: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:45,742: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:45,762: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:45,764: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 1
+[rospy.internal][INFO] 2017-08-14 09:08:46,755: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:46,756: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:46,757: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:46,780: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:46,781: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:47,771: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:47,772: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:47,773: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:47,790: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:47,790: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:48,787: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:48,787: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:48,788: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:48,807: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:48,807: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:49,799: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:49,800: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:49,801: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:49,824: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:49,825: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:50,815: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:50,816: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:50,818: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:50,833: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:50,833: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:51,831: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:51,832: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:51,833: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:51,850: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:51,851: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:52,849: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:52,850: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:52,850: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][WARNING] 2017-08-14 09:08:52,851: Unknown error initiating TCP/IP socket to 192.168.201.36:43827 (http://192.168.201.36:37639/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 632, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2017-08-14 09:08:52,851: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 307, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 820, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.internal][INFO] 2017-08-14 09:08:52,866: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:52,867: topic[/tf] adding connection to [http://192.168.201.36:37639/], count 0
+[rospy.internal][WARNING] 2017-08-14 09:08:53,687: Unknown error initiating TCP/IP socket to 192.168.201.36:43827 (http://192.168.201.36:37639/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 632, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2017-08-14 09:08:53,687: topic[/tf] removing connection to http://192.168.201.36:37639/
+[rospy.internal][INFO] 2017-08-14 09:08:55,459: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:55,460: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:55,524: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:56,476: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:56,477: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:56,526: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:57,492: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:57,493: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:57,527: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:58,508: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:58,509: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:58,528: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:08:59,523: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:08:59,524: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:08:59,545: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:00,540: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:00,541: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:00,563: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:01,556: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:01,557: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:01,573: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:02,572: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:02,573: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:02,591: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:03,588: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:03,590: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:03,608: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:04,604: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:04,606: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:04,625: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:05,621: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:05,622: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:05,641: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,507: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 1
+[rospy.internal][INFO] 2017-08-14 09:09:06,634: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:06,635: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:06,635: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:06,673: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:06,673: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:07,646: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:07,647: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:07,648: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:07,675: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:07,676: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:08,662: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:08,663: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:08,664: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:08,679: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:08,680: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:09,678: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:09,678: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:09,679: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:09,697: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:09,698: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:10,693: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:10,694: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:10,695: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:10,714: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:10,715: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:11,708: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:11,708: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:11,709: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:11,722: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:11,723: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:12,721: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:12,722: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:12,723: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][WARNING] 2017-08-14 09:09:12,723: Unknown error initiating TCP/IP socket to 192.168.201.36:36909 (http://192.168.201.36:35449/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 632, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2017-08-14 09:09:12,723: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 307, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 820, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.internal][INFO] 2017-08-14 09:09:12,740: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:12,740: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:13,736: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:13,737: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:13,738: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:13,757: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:13,758: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 1
+[rospy.internal][INFO] 2017-08-14 09:09:14,749: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:14,750: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:14,751: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:14,767: topic[/tf] adding connection to [http://192.168.201.36:35449/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:14,767: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][WARNING] 2017-08-14 09:09:15,182: Unknown error initiating TCP/IP socket to 192.168.201.36:36909 (http://192.168.201.36:35449/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 632, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rosgraph/network.py", line 362, in read_ros_handshake_header
+    d = sock.recv(buff_size)
+error: [Errno 104] Connection reset by peer
+
+[rospy.internal][INFO] 2017-08-14 09:09:15,183: topic[/tf] removing connection to http://192.168.201.36:35449/
+[rospy.internal][INFO] 2017-08-14 09:09:15,765: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:15,766: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:15,796: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:16,780: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:16,780: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:16,797: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:17,794: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:17,795: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:17,813: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:18,807: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:18,808: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:18,822: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:19,820: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:19,821: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:19,840: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:20,834: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:20,834: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:20,848: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:21,848: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:21,849: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:21,865: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:22,863: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:22,864: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:22,884: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:23,876: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:23,877: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:23,893: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:24,892: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:24,893: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:24,910: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:25,907: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:25,908: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:25,927: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:26,922: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:26,923: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:26,944: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:27,940: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:27,941: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:27,963: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:28,958: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:28,959: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:28,981: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:29,975: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:29,976: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:29,998: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:30,990: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:30,992: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:31,007: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:32,007: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:32,008: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:32,025: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:33,023: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:33,023: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:33,042: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:34,039: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:34,040: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:34,058: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:35,055: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:35,056: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:35,075: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:36,071: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:36,072: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:36,093: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:37,086: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:37,087: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:37,097: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:38,096: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:38,098: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:38,114: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:39,114: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:39,115: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:39,131: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:40,129: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:40,130: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:40,148: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:41,144: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:41,145: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:41,156: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:42,157: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:42,158: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:42,175: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0
+[rospy.internal][INFO] 2017-08-14 09:09:43,172: topic impl's ref count is zero, deleting topic /tf...
+[rospy.internal][INFO] 2017-08-14 09:09:43,173: topic[/tf] removing connection to http://192.168.201.36:33899/
+[rospy.internal][INFO] 2017-08-14 09:09:43,185: topic[/tf] adding connection to [http://192.168.201.36:33899/], count 0

@@ -59,7 +59,7 @@ teleop:
     message_value:
       - target: data
         value: true
-    deadman_buttons: [3]
+    deadman_buttons: [3] #Y
   path_0:
     type: topic
     message_type: "keyboard/Key"
@@ -67,7 +67,23 @@ teleop:
     message_value:
       - target: code
         value: 48
-    deadman_buttons: [0]
+    deadman_buttons: [0] #X
+  path_4:
+    type: topic
+    message_type: "keyboard/Key"
+    topic_name: "keyboard/keydown"
+    message_value:
+      - target: code
+        value: 52
+    deadman_buttons: [1] #A
+  path_7:
+    type: topic
+    message_type: "keyboard/Key"
+    topic_name: "keyboard/keydown"
+    message_value:
+      - target: code
+        value: 55
+    deadman_buttons: [2] #B
   # plan_on:
   #   type: topic
   #   message_type: "std_msgs/Empty"

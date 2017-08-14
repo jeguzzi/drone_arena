@@ -44,7 +44,6 @@ services:
       - ./logs:/root/.ros/log:rw
       - ./demo-dance.launch:/root/catkin_ws/src/drone_arena/launch/main.launch:ro
       - ./log710.yaml:/root/catkin_ws/src/drone_arena/config/log710.yaml:ro
-      - ./bags:/bags:rw
     env_file:
       - ./ros.env
     command: roslaunch drone_arena main.launch

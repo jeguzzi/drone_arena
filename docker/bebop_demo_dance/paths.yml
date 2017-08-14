@@ -31,14 +31,70 @@
    commands:
       - loop:
          name: 'circle'
+         loop: True
          frame_id: World
          center: [0, 0, 1]
          radius: 2
+         height: 0
 -
    key: KEY_4
    commands:
       - loop:
-         name: 'square'
+         name: 'circle'
+         loop: False
          frame_id: World
          center: [0, 0, 1]
          radius: 2
+         height: 1
+-
+   key: KEY_5
+   commands:
+      - loop:
+         name: 'square'
+         loop: False
+         frame_id: World
+         center: [0, 0, 1.5]
+         radius: 2
+         height: -1
+-
+   key: KEY_6
+   commands:
+      - loop:
+         name: 'arc'
+         frame_id: World
+         center: [0, 0, 1]
+         radius: 2
+         initial_angle: 0
+         final_angle: 3.14
+-
+   key: KEY_7
+   loop: True
+   commands:
+      - loop:
+         name: 'circle'
+         loop: False
+         frame_id: World
+         center: [0, 0, 0.5]
+         radius: 2
+         height: 0.5
+      - loop:
+         name: 'circle'
+         loop: False
+         frame_id: World
+         center: [0, 0, 1.0]
+         radius: 2
+         height: 0.5
+      - loop:
+         name: 'circle'
+         loop: False
+         frame_id: World
+         center: [0, 0, 1.5]
+         radius: 2
+         height: -0.5
+      - loop:
+         name: 'circle'
+         loop: False
+         frame_id: World
+         center: [0, 0, 1.0]
+         radius: 2
+         height: -0.5

@@ -1,0 +1,187 @@
+[rospy.client][INFO] 2017-08-14 08:36:40,061: init_node, name[/bebop/joy_teleop], pid[74]
+[xmlrpc][INFO] 2017-08-14 08:36:40,063: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:36:40,064: Started XML-RPC server [http://ubuntu:42247/]
+[rospy.init][INFO] 2017-08-14 08:36:40,064: ROS Slave URI: [http://ubuntu:42247/]
+[rospy.impl.masterslave][INFO] 2017-08-14 08:36:40,064: _ready: http://ubuntu:42247/
+[xmlrpc][INFO] 2017-08-14 08:36:40,070: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2017-08-14 08:36:40,071: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2017-08-14 08:36:40,165: registered with master
+[rospy.rosout][INFO] 2017-08-14 08:36:40,168: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 08:36:40,174: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 08:36:40,177: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 08:36:40,244: topic[/bebop/joy] adding connection to [http://ubuntu:35886/], count 0
+[rospy.internal][INFO] 2017-08-14 08:36:40,337: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2017-08-14 08:36:40,384: topic[/bebop/cmd_vel_input] adding connection to [/bebop/path_follower], count 0
+[rospy.internal][INFO] 2017-08-14 08:36:40,713: topic[/bebop/enable_tracking] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:36:40,717: topic[/bebop/land] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:36:40,717: topic[/bebop/cmd_vel_input] adding connection to [/bebop/fence], count 1
+[rospy.internal][INFO] 2017-08-14 08:36:40,719: topic[/bebop/takeoff_input] adding connection to [/bebop/fence], count 0
+[rospy.core][INFO] 2017-08-14 08:36:41,057: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2017-08-14 08:36:41,066: topic[/bebop/land] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:36:41,067: topic[/bebop/enable_tracking] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:36:41,067: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2017-08-14 08:36:41,068: topic[/bebop/takeoff_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:36:41,069: topic[/bebop/cmd_vel_input] removing connection to /bebop/path_follower
+[rospy.internal][INFO] 2017-08-14 08:36:41,070: topic[/bebop/cmd_vel_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:36:41,070: topic[/bebop/joy] removing connection to http://ubuntu:35886/
+[rospy.internal][WARNING] 2017-08-14 08:36:41,071: Unknown error initiating TCP/IP socket to ubuntu:51883 (http://ubuntu:35886/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 632, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2017-08-14 08:36:41,072: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 307, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 820, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.impl.masterslave][INFO] 2017-08-14 08:36:41,072: signal-2
+[rospy.core][INFO] 2017-08-14 08:36:41,693: signal_shutdown [atexit]
+[rospy.client][INFO] 2017-08-14 08:37:06,337: init_node, name[/bebop/joy_teleop], pid[77]
+[xmlrpc][INFO] 2017-08-14 08:37:06,352: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:37:06,353: Started XML-RPC server [http://ubuntu:34714/]
+[rospy.impl.masterslave][INFO] 2017-08-14 08:37:06,354: _ready: http://ubuntu:34714/
+[rospy.init][INFO] 2017-08-14 08:37:06,354: ROS Slave URI: [http://ubuntu:34714/]
+[xmlrpc][INFO] 2017-08-14 08:37:06,355: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2017-08-14 08:37:06,356: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2017-08-14 08:37:06,455: registered with master
+[rospy.rosout][INFO] 2017-08-14 08:37:06,456: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 08:37:06,459: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 08:37:06,461: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 08:37:06,528: topic[/bebop/joy] adding connection to [http://ubuntu:44079/], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:06,530: topic[/bebop/cmd_vel_input] adding connection to [/bebop/path_follower], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:06,661: topic[/bebop/takeoff_input] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:06,663: topic[/bebop/cmd_vel_input] adding connection to [/bebop/fence], count 1
+[rospy.internal][INFO] 2017-08-14 08:37:06,665: topic[/bebop/land] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:06,690: topic[/bebop/enable_tracking] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:06,696: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.core][INFO] 2017-08-14 08:37:13,130: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2017-08-14 08:37:13,141: topic[/bebop/land] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:37:13,142: topic[/bebop/enable_tracking] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:37:13,143: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2017-08-14 08:37:13,143: topic[/bebop/takeoff_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:37:13,143: topic[/bebop/cmd_vel_input] removing connection to /bebop/path_follower
+[rospy.internal][INFO] 2017-08-14 08:37:13,144: topic[/bebop/cmd_vel_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:37:13,145: topic[/bebop/joy] removing connection to http://ubuntu:44079/
+[rospy.internal][WARNING] 2017-08-14 08:37:13,145: Unknown error initiating TCP/IP socket to ubuntu:54204 (http://ubuntu:44079/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 558, in connect
+    self.local_endpoint = self.socket.getsockname()
+AttributeError: 'NoneType' object has no attribute 'getsockname'
+
+[rospy.impl.masterslave][INFO] 2017-08-14 08:37:13,146: signal-2
+[rospy.core][INFO] 2017-08-14 08:37:13,254: signal_shutdown [atexit]
+[rospy.client][INFO] 2017-08-14 08:37:45,539: init_node, name[/bebop/joy_teleop], pid[73]
+[xmlrpc][INFO] 2017-08-14 08:37:45,541: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:37:45,542: Started XML-RPC server [http://ubuntu:32994/]
+[rospy.init][INFO] 2017-08-14 08:37:45,542: ROS Slave URI: [http://ubuntu:32994/]
+[rospy.impl.masterslave][INFO] 2017-08-14 08:37:45,542: _ready: http://ubuntu:32994/
+[rospy.registration][INFO] 2017-08-14 08:37:45,544: Registering with master node http://localhost:11311
+[xmlrpc][INFO] 2017-08-14 08:37:45,545: xml rpc node: starting XML-RPC server
+[rospy.init][INFO] 2017-08-14 08:37:45,644: registered with master
+[rospy.rosout][INFO] 2017-08-14 08:37:45,645: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 08:37:45,650: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 08:37:45,653: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 08:37:45,713: topic[/bebop/joy] adding connection to [http://ubuntu:43773/], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:45,783: topic[/bebop/cmd_vel_input] adding connection to [/bebop/path_follower], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:45,861: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:45,924: topic[/bebop/takeoff_input] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:45,925: topic[/bebop/cmd_vel_input] adding connection to [/bebop/fence], count 1
+[rospy.internal][INFO] 2017-08-14 08:37:45,934: topic[/bebop/land] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:37:45,960: topic[/bebop/enable_tracking] adding connection to [/bebop/fence], count 0
+[rospy.core][INFO] 2017-08-14 08:38:09,124: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2017-08-14 08:38:09,134: topic[/bebop/land] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:38:09,135: topic[/bebop/enable_tracking] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:38:09,135: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2017-08-14 08:38:09,136: topic[/bebop/takeoff_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:38:09,136: topic[/bebop/cmd_vel_input] removing connection to /bebop/path_follower
+[rospy.internal][INFO] 2017-08-14 08:38:09,137: topic[/bebop/cmd_vel_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:38:09,137: topic[/bebop/joy] removing connection to http://ubuntu:43773/
+[rospy.internal][WARNING] 2017-08-14 08:38:09,138: Unknown error initiating TCP/IP socket to ubuntu:47829 (http://ubuntu:43773/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 632, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.topics][ERROR] 2017-08-14 08:38:09,138: Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/topics.py", line 307, in close
+    c.close()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 820, in close
+    self.socket.close()
+AttributeError: 'NoneType' object has no attribute 'close'
+
+[rospy.impl.masterslave][INFO] 2017-08-14 08:38:09,139: signal-2
+[rospy.core][INFO] 2017-08-14 08:38:09,271: signal_shutdown [atexit]
+[rospy.client][INFO] 2017-08-14 08:40:57,063: init_node, name[/bebop/joy_teleop], pid[77]
+[xmlrpc][INFO] 2017-08-14 08:40:57,064: XML-RPC server binding to 0.0.0.0:0
+[rospy.init][INFO] 2017-08-14 08:40:57,065: ROS Slave URI: [http://ubuntu:37466/]
+[xmlrpc][INFO] 2017-08-14 08:40:57,065: Started XML-RPC server [http://ubuntu:37466/]
+[rospy.impl.masterslave][INFO] 2017-08-14 08:40:57,066: _ready: http://ubuntu:37466/
+[xmlrpc][INFO] 2017-08-14 08:40:57,069: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2017-08-14 08:40:57,070: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2017-08-14 08:40:57,166: registered with master
+[rospy.rosout][INFO] 2017-08-14 08:40:57,166: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 08:40:57,169: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 08:40:57,171: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 08:40:57,239: topic[/bebop/joy] adding connection to [http://ubuntu:39828/], count 0
+[rospy.internal][INFO] 2017-08-14 08:40:57,246: topic[/bebop/keyboard/keydown] adding connection to [/bebop/path_controller], count 0
+[rospy.internal][INFO] 2017-08-14 08:40:57,275: topic[/bebop/cmd_vel_input] adding connection to [/bebop/path_follower], count 0
+[rospy.internal][INFO] 2017-08-14 08:40:57,433: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2017-08-14 08:40:57,440: topic[/bebop/cmd_vel_input] adding connection to [/bebop/fence], count 1
+[rospy.internal][INFO] 2017-08-14 08:40:57,441: topic[/bebop/takeoff_input] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:40:57,448: topic[/bebop/land] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:40:57,472: topic[/bebop/enable_tracking] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:41:48,670: topic[/bebop/keyboard/keydown] adding connection to [/rostopic_4684_1502700108424], count 1
+[rospy.core][INFO] 2017-08-14 08:49:48,929: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2017-08-14 08:49:48,941: topic[/bebop/land] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:49:48,941: topic[/bebop/enable_tracking] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:49:48,942: topic[/bebop/keyboard/keydown] removing connection to /bebop/path_controller
+[rospy.internal][INFO] 2017-08-14 08:49:48,942: topic[/bebop/keyboard/keydown] removing connection to /rostopic_4684_1502700108424
+[rospy.internal][INFO] 2017-08-14 08:49:48,943: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2017-08-14 08:49:48,943: topic[/bebop/takeoff_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:49:48,944: topic[/bebop/cmd_vel_input] removing connection to /bebop/path_follower
+[rospy.internal][INFO] 2017-08-14 08:49:48,945: topic[/bebop/cmd_vel_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:49:48,947: topic[/bebop/joy] removing connection to http://ubuntu:39828/
+[rospy.impl.masterslave][INFO] 2017-08-14 08:49:48,948: signal-2
+[rospy.internal][WARNING] 2017-08-14 08:49:48,948: Unknown error initiating TCP/IP socket to ubuntu:56057 (http://ubuntu:39828/): Traceback (most recent call last):
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 557, in connect
+    self.read_header()
+  File "/opt/ros/kinetic/lib/python2.7/dist-packages/rospy/impl/tcpros_base.py", line 632, in read_header
+    self._validate_header(read_ros_handshake_header(sock, self.read_buff, self.protocol.buff_size))
+AttributeError: 'NoneType' object has no attribute 'buff_size'
+
+[rospy.core][INFO] 2017-08-14 08:49:49,064: signal_shutdown [atexit]
+[rospy.client][INFO] 2017-08-14 08:50:14,624: init_node, name[/bebop/joy_teleop], pid[78]
+[xmlrpc][INFO] 2017-08-14 08:50:14,626: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 08:50:14,628: Started XML-RPC server [http://ubuntu:44628/]
+[rospy.init][INFO] 2017-08-14 08:50:14,628: ROS Slave URI: [http://ubuntu:44628/]
+[rospy.impl.masterslave][INFO] 2017-08-14 08:50:14,630: _ready: http://ubuntu:44628/
+[xmlrpc][INFO] 2017-08-14 08:50:14,638: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2017-08-14 08:50:14,638: Registering with master node http://localhost:11311
+[rospy.init][INFO] 2017-08-14 08:50:14,731: registered with master
+[rospy.rosout][INFO] 2017-08-14 08:50:14,731: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 08:50:14,735: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 08:50:14,737: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rospy.internal][INFO] 2017-08-14 08:50:14,792: topic[/bebop/keyboard/keydown] adding connection to [/bebop/path_controller], count 0
+[rospy.internal][INFO] 2017-08-14 08:50:14,798: topic[/bebop/keyboard/keydown] adding connection to [/rostopic_4684_1502700108424], count 1
+[rospy.internal][INFO] 2017-08-14 08:50:14,806: topic[/bebop/joy] adding connection to [http://ubuntu:41669/], count 0
+[rospy.internal][INFO] 2017-08-14 08:50:14,837: topic[/bebop/cmd_vel_input] adding connection to [/bebop/path_follower], count 0
+[rospy.internal][INFO] 2017-08-14 08:50:14,957: topic[/rosout] adding connection to [/rosout], count 0
+[rospy.internal][INFO] 2017-08-14 08:50:15,022: topic[/bebop/cmd_vel_input] adding connection to [/bebop/fence], count 1
+[rospy.internal][INFO] 2017-08-14 08:50:15,026: topic[/bebop/takeoff_input] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:50:15,032: topic[/bebop/land] adding connection to [/bebop/fence], count 0
+[rospy.internal][INFO] 2017-08-14 08:50:15,048: topic[/bebop/enable_tracking] adding connection to [/bebop/fence], count 0
+[rospy.core][INFO] 2017-08-14 08:50:35,834: signal_shutdown [signal-2]
+[rospy.internal][INFO] 2017-08-14 08:50:35,848: topic[/bebop/land] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:50:35,849: topic[/bebop/enable_tracking] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:50:35,849: topic[/bebop/keyboard/keydown] removing connection to /bebop/path_controller
+[rospy.internal][INFO] 2017-08-14 08:50:35,851: topic[/bebop/keyboard/keydown] removing connection to /rostopic_4684_1502700108424
+[rospy.internal][INFO] 2017-08-14 08:50:35,851: topic[/rosout] removing connection to /rosout
+[rospy.internal][INFO] 2017-08-14 08:50:35,852: topic[/bebop/takeoff_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:50:35,853: topic[/bebop/cmd_vel_input] removing connection to /bebop/path_follower
+[rospy.internal][INFO] 2017-08-14 08:50:35,854: topic[/bebop/cmd_vel_input] removing connection to /bebop/fence
+[rospy.internal][INFO] 2017-08-14 08:50:35,854: topic[/bebop/joy] removing connection to http://ubuntu:41669/
+[rospy.impl.masterslave][INFO] 2017-08-14 08:50:35,855: signal-2

@@ -1,0 +1,28 @@
+[rospy.client][INFO] 2017-08-14 09:05:54,924: init_node, name[/bebop/led], pid[82]
+[xmlrpc][INFO] 2017-08-14 09:05:54,925: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 09:05:54,926: Started XML-RPC server [http://192.168.201.36:37975/]
+[rospy.init][INFO] 2017-08-14 09:05:54,926: ROS Slave URI: [http://192.168.201.36:37975/]
+[rospy.impl.masterslave][INFO] 2017-08-14 09:05:54,926: _ready: http://192.168.201.36:37975/
+[xmlrpc][INFO] 2017-08-14 09:05:54,928: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2017-08-14 09:05:54,928: Registering with master node http://192.168.201.4:11311
+[rospy.init][INFO] 2017-08-14 09:05:55,027: registered with master
+[rospy.rosout][INFO] 2017-08-14 09:05:55,027: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 09:05:55,031: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 09:05:55,034: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][ERROR] 2017-08-14 09:05:55,070: No blinkstick device found
+[rospy.core][INFO] 2017-08-14 09:05:55,071: signal_shutdown [atexit]
+[rospy.impl.masterslave][INFO] 2017-08-14 09:05:55,082: atexit
+[rospy.client][INFO] 2017-08-14 09:08:10,702: init_node, name[/bebop/led], pid[82]
+[xmlrpc][INFO] 2017-08-14 09:08:10,704: XML-RPC server binding to 0.0.0.0:0
+[xmlrpc][INFO] 2017-08-14 09:08:10,705: Started XML-RPC server [http://192.168.201.36:45774/]
+[rospy.init][INFO] 2017-08-14 09:08:10,705: ROS Slave URI: [http://192.168.201.36:45774/]
+[rospy.impl.masterslave][INFO] 2017-08-14 09:08:10,707: _ready: http://192.168.201.36:45774/
+[xmlrpc][INFO] 2017-08-14 09:08:10,714: xml rpc node: starting XML-RPC server
+[rospy.registration][INFO] 2017-08-14 09:08:10,714: Registering with master node http://192.168.201.4:11311
+[rospy.init][INFO] 2017-08-14 09:08:10,808: registered with master
+[rospy.rosout][INFO] 2017-08-14 09:08:10,812: initializing /rosout core topic
+[rospy.rosout][INFO] 2017-08-14 09:08:10,815: connected to core topic /rosout
+[rospy.simtime][INFO] 2017-08-14 09:08:10,819: /use_sim_time is not set, will not subscribe to simulated time [/clock] topic
+[rosout][ERROR] 2017-08-14 09:08:10,862: No blinkstick device found
+[rospy.core][INFO] 2017-08-14 09:08:10,942: signal_shutdown [atexit]
+[rospy.impl.masterslave][INFO] 2017-08-14 09:08:10,953: atexit
