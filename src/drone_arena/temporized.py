@@ -3,7 +3,7 @@ import rospy
 
 class Temporized(object):
 
-    def __init__(self, period,):
+    def __init__(self, period):
         self.period = period
         self.last = None
 

@@ -5,11 +5,12 @@ from __future__ import division
 import math
 
 import numpy as np
+import rospy
+from std_msgs.msg import Bool, Empty, Header, String, UInt8
 
 import actionlib
 import diagnostic_msgs
 import diagnostic_updater
-import rospy
 import tf2_geometry_msgs
 import tf2_ros
 from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
@@ -20,7 +21,6 @@ from dynamic_reconfigure.server import Server
 from geometry_msgs.msg import (PointStamped, PoseStamped, Twist, TwistStamped,
                                Vector3Stamped)
 from nav_msgs.msg import Odometry
-from std_msgs.msg import Bool, Empty, Header, String, UInt8
 # from shapely.geometry import Polygon, Point
 from tf.transformations import (euler_from_quaternion, quaternion_conjugate,
                                 quaternion_from_euler, quaternion_multiply)
@@ -618,15 +618,14 @@ class Controller(object):
         msg.linear.z = min(msg.linear.z, 2 * (self.max_height - self.z))
         if self.observe:
             self.update_observe(msg)
-        vyaw = msg.angular.z
         # rospy.logwarn("too high")
         if self.inside_fence:
             # TODO apply when outside too
-            a = self.clamp_in_fence_cmd(msg)
             if self.tracked_teleop and not is_stop(msg):
-                t_pos, t_yaw, t_v = self.tracked_teleop_cmd_v(a, vz, vyaw)
+                t_pos, t_yaw, t_v = self.tracked_teleop_cmd_v(msg, vz)
                 self.update_pose_control(t_pos, t_yaw, t_v)
                 return
+            self.clamp_in_fence_cmd(msg)
             self.pub_cmd.publish(msg)
         else:
             self.pub_cmd.publish(Twist())
@@ -638,28 +637,29 @@ class Controller(object):
         else:
             return pos
 
-    def tracked_teleop_cmd_v(self, acc, vz, vyaw):
+    def tracked_teleop_cmd_v(self, twist_msg, vz):
+        vyaw = twist_msg.angular.z
         # world frame
+        acc = self.acc_from_teleop_cmd(twist_msg)
         a = np.array(acc[:2])
-        v = a / np.linalg.norm(a) / F * self.s_max
+        v = a / np.linalg.norm(a) * self.s_max
         v = [v[0], v[1], vz]
         target_position = self.position
         target_yaw = self.yaw + vyaw * self.tracked_teleop_d
         target_v = v
         return target_position, target_yaw, target_v
 
-    def tracked_teleop_cmd_pos(self, acc, vz, vyaw):
-        # world frame
-        d = self.tracked_teleop_d
-        a = np.array(acc[:2])
-        v = a / np.linalg.norm(a) / F * self.s_max
-        v = [v[0], v[1], vz]
-        target_position = np.array(self.position) + np.array(v) * d
-        target_yaw = self.yaw + vyaw * d
-        return target_position, target_yaw
+    # def tracked_teleop_cmd_pos(self, acc, vz, vyaw):
+    #     # world frame
+    #     d = self.tracked_teleop_d
+    #     a = np.array(acc[:2])
+    #     v = a / np.linalg.norm(a) / F * self.s_max
+    #     v = [v[0], v[1], vz]
+    #     target_position = np.array(self.position) + np.array(v) * d
+    #     target_yaw = self.yaw + vyaw * d
+    #     return target_position, target_yaw
 
-    def clamp_in_fence_cmd(self, cmd_vel):
-        rospy.logdebug("clamp %s" % cmd_vel)
+    def acc_from_teleop_cmd(self, cmd_vel):
         if self.teleop_mode == ArenaConfig.Arena_Head:
             transform = get_transform(self.tf_buffer, self.frame_id, self.head_frame_id)
             if transform:
@@ -667,13 +667,17 @@ class Controller(object):
             else:
                 q = None
             if q is not None:
-                a = acc_from_cmd(cmd_vel, q)
+                return acc_from_cmd(cmd_vel, q)
             else:
-                a = [0, 0]
+                return [0, 0]
         elif self.teleop_mode == ArenaConfig.Arena_World:
-            a = acc_from_cmd(cmd_vel, [0, 0, 0, 1])
+            return acc_from_cmd(cmd_vel, [0, 0, 0, 1])
         elif self.teleop_mode == ArenaConfig.Arena_Body:
-            a = acc_from_cmd(cmd_vel, self.q)
+            return acc_from_cmd(cmd_vel, self.q)
+
+    def clamp_in_fence_cmd(self, cmd_vel):
+        rospy.logdebug("clamp %s" % cmd_vel)
+        a = self.acc_from_teleop_cmd(cmd_vel)
         rospy.logdebug("acc %s", a)
         a = clamp(a, self.max_acc_bounds)
         if self.enable_fence:

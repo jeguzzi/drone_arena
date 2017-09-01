@@ -107,6 +107,7 @@ class SafetyPose(object):
                 elif _type == NavSatFix:
                     pose_c = PoseWithCovarianceStamped()
                     pose_c.header.frame_id = 'utm'
+                    pose_c.pose.pose.orientation.w = 1.0
                     x, y, _, _ = utm.from_latlon(msg.latitude, msg.longitude)
                     z = msg.altitude
                     position = pose_c.pose.pose.position

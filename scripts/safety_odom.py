@@ -62,7 +62,7 @@ class SafetyOdom(object):
             if dt > self.timeout:
                 stat.summary(WARN, "Last updated {0:.0f} seconds ago".format(dt))
             else:
-                stat.summary(OK, "")
+                stat.summary(OK, "Alive")
             return stat
         return f
 
@@ -78,7 +78,7 @@ class SafetyOdom(object):
                             self.topics[index], self.topics[self.active_index]))
                         self.active_index = index
             if index == self.active_index:
-                self.pub.publish(self.imu_msg)
+                self.pub.publish(msg)
         return f
 
     def reconfigure(self, config, level):
