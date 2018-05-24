@@ -2,13 +2,13 @@
 
 ## Interfaces
 
-Topic and messages provide are an API for ROS nodes.
+Topic and messages provide an API for ROS nodes.
 
 ### Bebop driver
 
 [bebop_autonomy](https://bebop-autonomy.readthedocs.io) is a ROS driver for the Parrot Bebop drone.
 
-Among other topic, it exposes the following API
+Among other topics, it exposes the following API.
 
 #### Input (topic subscribers)
 
@@ -16,8 +16,8 @@ Among other topic, it exposes the following API
 - `land: std_msgs/Empty`
 - `cmd_vel: geometry_msgs/Twist`
 
-  + `cmd_vel.linear.x` in [0, 1] maps to (desired) pitch (i.e,  acceleration)
-  + `cmd_vel.linear.y` in [0, 1] maps to (desired) roll (i.e,  acceleration)
+  + `cmd_vel.linear.x` in [0, 1] maps to (desired) pitch (i.e, acceleration)
+  + `cmd_vel.linear.y` in [0, 1] maps to (desired) roll (i.e, acceleration)
   + `cmd_vel.linear.z` in [0, 1] maps to (desired) vertical speed
   + `cmd_vel.angular.z` in [0, 1] maps to (desired) angular speed
 
@@ -58,15 +58,15 @@ Specific information is encoded in *custom* (package) messages, general informat
 
 ### Our interface
 
-  1. we [interface with the bebop driver](https://github.com/jeguzzi/drone_arena/blob/master/scripts/fence_control.py#L160), i.e., sending a
+  1. we [interface with the bebop driver](https://github.com/jeguzzi/drone_arena/blob/master/scripts/fence_control.py#L160), i.e., sending
       - `cmd_vel: geometry_msgs/Twist`
       - `land|takeoff: std_msgs/Empty`
   2. we get poses and velocities from the Optitrack
       - `bebop/mocap_odom: nav_msgs/Odometry` (in a fixed WORLD frame)
       - `head/mocap_odom: nav_msgs/Odometry` (in a fixed WORLD frame)
-  3. we catch (and bypass) some of the driver inputs
-      - `cmd_vel_input: geometry_msgs/Twist`
-      - `takeoff_input: geometry_msgs/Twist`
+  3. we catch (and bypass to add safety) some of the driver inputs (ROS allows topic renaming at launch time)
+      - `cmd_vel: geometry_msgs/Twist` => `cmd_vel_input: geometry_msgs/Twist` (driver)
+      - `takeoff: geometry_msgs/Twist` => `takeoff_input: geometry_msgs/Twist` (driver)
   4. (as a library) we [offer services](https://github.com/jeguzzi/drone_arena/blob/master/scripts/fence_control.py#L242):
       - `target: geometry_msgs/PoseStamped`
       - `des_body_vel: geometry_msgs/Twist`
@@ -75,7 +75,7 @@ Specific information is encoded in *custom* (package) messages, general informat
 
 ## Our controller
 
-Every time we receive an updated odometry, we update the drone state as:
+Every time we receive an odometry, we update the drone state:
 
 ```python
 def has_received_odometry(self, msg):
@@ -123,4 +123,4 @@ def update(self, evt):
             self.pub_cmd.publish(msg)
 ```
 
-<img src="https://raw.githubusercontent.com/jeguzzi/drone_arena/master/notes/fence_control.png" width="400"/>
+<img src="https://raw.githubusercontent.com/jeguzzi/drone_arena/master/notes/fence_control.png" width="700"/>
