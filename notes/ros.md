@@ -16,10 +16,10 @@ Among other topics, it exposes the following API.
 - `land: std_msgs/Empty`
 - `cmd_vel: geometry_msgs/Twist`
 
-  + `cmd_vel.linear.x` in [0, 1] maps to (desired) pitch (i.e, acceleration)
-  + `cmd_vel.linear.y` in [0, 1] maps to (desired) roll (i.e, acceleration)
-  + `cmd_vel.linear.z` in [0, 1] maps to (desired) vertical speed
-  + `cmd_vel.angular.z` in [0, 1] maps to (desired) angular speed
+  + `cmd_vel.linear.x` in [-1, 1] maps to (desired) pitch (i.e, acceleration)
+  + `cmd_vel.linear.y` in [-1, 1] maps to (desired) roll (i.e, acceleration)
+  + `cmd_vel.linear.z` in [-1, 1] maps to (desired) vertical speed
+  + `cmd_vel.angular.z` in [-1, 1] maps to (desired) angular speed
 
   > The linear.x and linear.y parts of this message set the pitch and roll angles of the Bebop, respectively, hence control its forward and lateral accelerations. The resulting pitch/roll angles depend on the value of ~PilotingSettingsMaxTiltCurrent parameter, which is specified in degrees and is dynamically reconfigurable (Dynamically Reconfigurable Parameters for Bebop).
 
@@ -71,6 +71,7 @@ Specific information is encoded in *custom* (package) messages, general informat
       - `target: geometry_msgs/PoseStamped`
       - `des_body_vel: geometry_msgs/Twist`
       - `des_vel: geometry_msgs/TwistStamped`
+      - `des_cmd_vel: geometry_msgs/Twist`
 
 
 ## Our controller
