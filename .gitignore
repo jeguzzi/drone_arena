@@ -50,3 +50,5 @@ CATKIN_IGNORE
 
 logs
 bags
+
+.mypy_cache
