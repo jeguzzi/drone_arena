@@ -9,15 +9,21 @@ import actionlib
 import diagnostic_msgs
 import diagnostic_updater
 import rospy
+import rostopic
+import std_srvs.srv
 import tf2_geometry_msgs
 import tf2_ros
 from drone_arena.cfg import ArenaConfig
-from drone_arena.msg import GoToPoseAction, GoToPoseFeedback, GoToPoseResult
 from drone_arena.temporized import Temporized
+from drone_arena_msgs.msg import (GoToPoseAction, GoToPoseFeedback,
+                                  GoToPoseResult, TargetSource)
+from drone_arena_msgs.msg import State as StateMsg
 from dynamic_reconfigure.server import Server
+# from dynamic_reconfigure.client import Client
 from geometry_msgs.msg import (Point, PoseStamped, Quaternion, Twist,
-                               TwistStamped, Vector, Vector3Stamped)
+                               TwistStamped, Vector3, Vector3Stamped)
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import Joy
 from std_msgs.msg import Bool, Empty, Header, String
 from tf.transformations import (euler_from_quaternion, quaternion_conjugate,
                                 quaternion_from_euler, quaternion_multiply)
@@ -25,20 +31,29 @@ from tf.transformations import (euler_from_quaternion, quaternion_conjugate,
 from .fence_control import angular_control, fence_control, inside_fence_margin
 
 
+class BatteryState(enum.Enum):
+    ok = 0
+    critical = 1
+    empty = 2
+
+
 class TargetMode(enum.Enum):
-    cmd = 0
-    pos = 1
-    vel = 2
-    odom = 3
+    teleop = 1
+    cmd = 2
+    pos = 3
+    vel = 4
+    body_vel = 5
+    odom = 6
 
 
 class TargetAngleMode(enum.Enum):
-    cmd = 0
-    point = 1
-    vel = 2
-    target = 3
-    target_pose = 4
-    plane = 5
+    sync = 0
+    teleop = 1
+    cmd = 2
+    point = 3
+    vel = 4
+    target_point = 5
+    target_orientation = 6
 
 
 class TeleopMode(enum.Enum):
@@ -54,11 +69,30 @@ class TeleopFrame(enum.Enum):
 
 class State(enum.Enum):
     landed = 0
-    flying = 1
+    taking_off = 1
     hovering = 2
+    flying = 3
+    landing = 4
+    # flying_home = 5
 
 
 button = Temporized(1)
+
+
+def if_flying(f):
+    def g(self, *args, **kwargs):
+        if self.state not in [State.flying, State.hovering]:
+            return
+        return f(self, *args, **kwargs)
+    return g
+
+
+def if_battery_is_fine(f):
+    def g(self, *args, **kwargs):
+        if self.battery_state != BatteryState.ok:
+            return
+        return f(self, *args, **kwargs)
+    return g
 
 
 def get_transform(tf_buffer, from_frame, to_frame):
@@ -125,12 +159,13 @@ def is_stop(cmd_vel):
 def rotate(v, q, inverse=False):
     '''rotate vector v from world to body frame (with quaternion q)'''
     cq = quaternion_conjugate(q)
+    v = [v[0], v[1], v[2], 0]
     if inverse:
         z = quaternion_multiply(q, v)
-        return quaternion_multiply(z, cq)
+        return quaternion_multiply(z, cq)[:3]
     else:
         z = quaternion_multiply(v, q)
-        return quaternion_multiply(cq, z)
+        return quaternion_multiply(cq, z)[:3]
 
 
 def target_yaw_to_observe(observer_point, target_point):
@@ -139,102 +174,254 @@ def target_yaw_to_observe(observer_point, target_point):
 
 
 class Controller(object):
+
     """docstring for Controller"""
     def __init__(self):
         super(Controller, self).__init__()
         rospy.init_node('fence_control', anonymous=True)
+        self.srv = None
 
         self.tf_buffer = tf2_ros.Buffer()  # tf buffer length
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
 
-        self._target_mode = TargetMode.cmd
-        self.target_angle_mode = TargetAngleMode.cmd
         self.teleop_mode = TeleopMode.cmd
         self.teleop_frame = TeleopFrame.body
         self._state = State.landed
 
-        self.target_position = None
-        self.target_velocity = None
-        self.target_acceleration = None
-        self.target_yaw = None
-        self.target_angular_speed = None
+        self.state_pub = rospy.Publisher("flight_state", StateMsg, queue_size=1, latch=True)
 
-        self.publish_cmd_vel = True
-        self.publish_body_vel = True
-        self.publish_target = True
-        self.pub_cmd = rospy.Publisher('cmd_vel', Twist, queue_size=1)
-        self.pub_takeoff = rospy.Publisher('takeoff', Empty, queue_size=1)
-        self.pub_land = rospy.Publisher('land', Empty, queue_size=1)
+        self.should_publish_cmd = rospy.get_param("~publish_cmd", True)
+        self.should_publish_body_vel = rospy.get_param("~publish_body_vel", True)
+        self.should_publish_target = rospy.get_param("~publish_target", True)
+        self.des_cmd_pub = rospy.Publisher('cmd_vel', Twist, queue_size=1)
+        self.des_vel_pub = rospy.Publisher('des_vel', Twist, queue_size=1)
+        self.des_pose_pub = rospy.Publisher('des_pose', PoseStamped, queue_size=1)
+        self.repeat_same_des_pose = rospy.get_param("~repeat_des_pose", False)
 
         self.maximal_speed = rospy.get_param('max_speed', 0.5)
+        self.maximal_vertical_speed = rospy.get_param('max_vertical_speed', 0.5)
         self.maximal_angular_speed = rospy.get_param('max_angular_speed', 0.5)
         self.maximal_acceleration = rospy.get_param('max_acceleration', 1)
 
         self.frame_id = rospy.get_param('~frame_id', 'World')
         self.head_frame_id = rospy.get_param('~head_frame_id', 'head')
 
-        self.control_timeout = rospy.get_param('~control_timeout', 0.2)
-        self.latest_cmd_time = None
+        self.target_source_timeout = rospy.get_param('~target_source_timeout', 0.3)
+        self.output_timeout = rospy.get_param('~output_timeout', 0.2)
+        self.latest_source_time = None
+        self.latest_output_time = None
+
+        self.init_target()
 
         self.srv = Server(ArenaConfig, self.callback)
+        self.config = None
 
         self.observe_point = None
         self.head_point = None
 
-        rospy.Subscriber('takeoff/safe', Empty, button(self.has_received_takeoff))
-        rospy.Subscriber('land', Empty, button(self.has_received_land))
-        rospy.Subscriber('odom', Odometry, self.has_received_odometry)
-        rospy.Subscriber('target', PoseStamped, self.has_received_target)
-        rospy.Subscriber('target/body_vel', Twist, self.has_received_target_body_vel)
-        rospy.Subscriber('target/vel', TwistStamped, self.has_received_target_vel)
-        rospy.Subscriber('target/odom', Odometry, self.has_received_target_odom)
-        # TODO: /head/mocap_odom
-        rospy.Subscriber('target/cmd_vel', Twist, self.has_received_input_cmd)
-
-        rospy.Subscriber('target/enable', Bool,
-                         button(self.has_received_enable_tracking), callback_args='pos')
-        rospy.Subscriber('target/vel/enable', Bool,
-                         button(self.has_received_enable_tracking, callback_args='vel'))
-        rospy.Subscriber('target/odom/enable', Bool,
-                         button(self.has_received_enable_tracking, callback_args='odom'))
-
-        self.enable_target_pub = rospy.Publisher(
-            'target/enable', Bool, queue_size=1, latch=True)
-        self.enable_vel_target_pub = rospy.Publisher(
-            'target/vel/enable', Bool, queue_size=1, latch=True)
-        self.enable_odom_target_pub = rospy.Publisher(
-            'target/odom/enable', Bool, queue_size=1, latch=True)
-
-        self.timer = rospy.Timer(rospy.Duration(0.05), self.update)
+        self.init_battery()
+        self.init_localization()
+        self.init_fence()
         self.init_diagnostics()
-        rospy.spin()
+        self.init_action_server()
+        self.init_odom_following()
+        self.init_teleop()
+
+        self.giving_feedback = False
+
+        rospy.Subscriber('safe_takeoff', Empty, button(self.has_received_takeoff), queue_size=1)
+        rospy.Subscriber('safe_land', Empty, self.has_received_safe_land, queue_size=1)
+        rospy.Subscriber('odom', Odometry, self.has_received_odometry, queue_size=1)
+        rospy.Subscriber('joy', Joy, self.has_received_joy, queue_size=1)
+        rospy.Subscriber('hover', Empty, self.has_received_hover, queue_size=1)
+        rospy.Subscriber('give_feedback', Empty, button(self.has_received_give_feedback),
+                         queue_size=1)
+
+        # rospy.Subscriber('target', PoseStamped, self.has_received_target)
+        # rospy.Subscriber('target/body_vel', Twist, self.has_received_target_body_vel)
+        # rospy.Subscriber('target/vel', TwistStamped, self.has_received_target_vel)
+        # rospy.Subscriber('target/odom', Odometry, self.has_received_target_odom)
+        # # TODO: /head/mocap_odom
+        # rospy.Subscriber('target/cmd_vel', Twist, self.has_received_target_cmd)
+
+        # rospy.Subscriber('target/enable', Bool,
+        #                  button(self.has_received_enable_tracking), TargetMode.pos)
+        # rospy.Subscriber('target/vel/enable', Bool,
+        #                  button(self.has_received_enable_tracking), TargetMode.vel)
+        # rospy.Subscriber('target/odom/enable', Bool,
+        #                  button(self.has_received_enable_tracking), TargetMode.odom)
+
+        # self.enable_target_pub = rospy.Publisher(
+        #     'target/enable', Bool, queue_size=1, latch=True)
+        # self.enable_vel_target_pub = rospy.Publisher(
+        #     'target/vel/enable', Bool, queue_size=1, latch=True)
+        # self.enable_odom_target_pub = rospy.Publisher(
+        #     'target/odom/enable', Bool, queue_size=1, latch=True)
+
+        rospy.Subscriber('target_source', TargetSource, button(self.has_received_target_source),
+                         queue_size=1)
+
+        period = rospy.get_param('~control_period', 0.05)
+        self.timer = rospy.Timer(rospy.Duration(period), self.update)
+        self.init_diagnostics()
+
+
+# -------------- outputs
+
+
+
+
+
+# --------------- target
+
+    def init_target(self):
+        self.target_mode = TargetMode.teleop
+        self.target_source_sub = None
+        self.target_source_topic = None
+        self.reset_target()
+        self.target_angle_mode = TargetAngleMode.sync
+        self.target_yaw = None
+        self.target_angular_speed = None
+
+    def reset_target(self):
+        self.target_position = None
+        self.target_velocity = None
+        self.target_acceleration = None
+        self.target_source_is_active = False
+        self.output_pose_is_active = False
+
+    def has_received_target_source(self, msg):
+        rospy.loginfo('has_received_target_source %s', msg)
+        topic = rospy.resolve_name(msg.topic)
+        if msg.mode < 0 or msg.mode > 6:
+            topic_class = rostopic.get_topic_type(topic)
+            mode = self.target_mode_from_msg_type(topic_class) or TargetMode.teleop
+            if topic_class is None:
+                rospy.warn("Cannot recover the target mode from topic %s with msg class %s,"
+                           " please specify a mode", topic, topic_class)
+                return
+        else:
+            mode = TargetMode(msg.mode)
+        self.set_target_source(mode, topic)
+
+    def set_target_source(self, mode, topic):
+        if mode == self.target_mode and topic == self.target_source_topic:
+            return
+        callback, msg_type = self.target_callback(mode)
+        rospy.loginfo("mode %s, topic %s, cb %s, msg_type %s", mode, topic, callback, msg_type)
+        if msg_type is None or mode is None or callback is None:
+            mode = TargetMode.teleop
+        if self.target_mode != mode:
+            self.target_mode = mode
+            self.reset_target()
+
+        if self.srv and self.config:
+            if(self.config['target_mode'] != mode.value or
+               self.config['target_source_topic'] != topic):
+                self.srv.update_configuration(
+                    {'target_mode': mode.value, 'target_source_topic': topic})
+
+        if topic == self.target_source_topic:
+            return
+        self.target_source_topic = topic
+        if self.target_source_sub:
+            self.target_source_sub.unregister()
+        if topic and mode != TargetSource.Teleop:
+            self.target_source_sub = rospy.Subscriber(topic, msg_type, callback, queue_size=1)
+        else:
+            self.target_source_sub = None
+
+    @staticmethod
+    def target_mode_from_msg_type(msg):
+        return {
+            PoseStamped: TargetMode.pos,
+            Twist: TargetMode.body_vel,
+            TwistStamped: TargetMode.vel,
+            Odometry: TargetMode.odom}.get(msg, None)
+
+    def target_callback(self, mode):
+        return {
+            TargetMode.pos: (self.has_received_target, PoseStamped),
+            TargetMode.cmd: (self.has_received_target_cmd, Twist),
+            TargetMode.vel: (self.has_received_target_vel, TwistStamped),
+            TargetMode.body_vel: (self.has_received_target_body_vel, Twist),
+            TargetMode.odom: (self.has_received_target_odom, Odometry)}.get(
+                mode, (None, None))
+
+    @property
+    def effective_angular_target_mode(self):
+        if self.target_angle_mode == TargetAngleMode.sync:
+            return {TargetMode.teleop: TargetAngleMode.teleop,
+                    TargetMode.cmd: TargetAngleMode.cmd,
+                    TargetMode.pos: TargetAngleMode.target_orientation,
+                    TargetMode.vel: TargetAngleMode.vel,
+                    TargetMode.body_vel: TargetAngleMode.vel,
+                    TargetMode.odom: TargetAngleMode.target_point}.get(self.target_mode)
+        return self.target_angle_mode
+
+# --------------- teleop
+
+    def init_teleop(self):
+        self.deadman_button = rospy.get_param("~deadman", 7)
+        self.joy_axes = rospy.get_param("~joy_axes", [3, 2, 1, 0])
+        self.joy_set_teleop_mode = rospy.get_param("~joy_set_teleop_mode", True)
+
+# --------------- battery
+
+    @property
+    def battery_state(self):
+        return self._battery_state
+
+    @battery_state.setter
+    def battery_state(self, value):
+        if value != self._battery_state:
+            self._battery_state = value
+            rospy.loginfo("Battery state %s", value)
+            if value == BatteryState.critical and self.state in [State.flying, State.hovering]:
+                self.go_home_and_land()
+            if value == BatteryState.empty and self.state not in [State.landing, State.landed]:
+                self.land()
+
+    def init_battery(self):
+        self._battery_state = BatteryState.ok
 
 # --------------- dynamic reconfig
 
     def callback(self, config, level):
+
+        self.config = config
         self.eta = config['eta']
         self.tau = config['tau']
         self.rotation_tau = config['rotation_tau']
         self.delay = config['delay']
+        self.pos_tol = config['position_tol']
+        self.angle_tol = config['angle_tol']
         self.maximal_acceleration = config['max_acceleration']
         self.maximal_speed = config['max_speed']
+        self.maximal_vertical_speed = config['max_vertical_speed']
         self.maximal_angular_speed = config['max_angular_speed']
-
         self.enforce_fence = config['enable_fence']
-
         self.teleop_mode = TeleopMode(config['teleop_mode'])
         self.teleop_frame = TeleopFrame(config['teleop_frame'])
 
         self.target_odom_r = config['track_distance']
-        self.target_odom_z_is_relative = config['track_vertical_relative']
-        self.target_odom_z = config['track_vertical']
+        self.target_odom_z_is_relative = config['track_altitude_as_relative']
+        self.target_odom_z = config['track_altitude']
+        self.target_odom_rel_z = config['track_relative_altitude']
         self.target_odom_yaw = config['track_yaw']
 
         self.localization_timeout = config['localization_timeout']
-        self.control_timeout = config['control_timeout']
+        self.target_source_timeout = config['target_source_timeout']
+        self.output_timeout = config['output_timeout']
 
-        self.pos_tol = config['position_tol']
-        self.angle_tol = config['angle_tol']
+        mode = TargetMode(config['target_mode'])
+        topic = config['target_source_topic']
+        self.set_target_source(mode, topic)
+        self.target_angle_mode = TargetAngleMode(config['target_angle_mode'])
+
+        self.should_publish_cmd = config["publish_cmd"]
+        self.should_publish_body_vel = config["publish_body_vel"]
+        self.should_publish_target = config["publish_target"]
 
         return config
 
@@ -242,9 +429,10 @@ class Controller(object):
 
     def init_odom_following(self):
         self.target_odom_r = rospy.get_param('~track_distance', False)
-        self.target_odom_z_is_relative = rospy.get_param('~track_vertical_head', False)
-        self.target_odom_dz = rospy.get_param('~head_altitude_difference', -0.2)
-        self.target_odom_z = rospy.get_param('~head_altitude', 1.5)
+        self.target_odom_z_is_relative = rospy.get_param('~track_altitude_as_relative', False)
+        self.target_odom_rel_z = rospy.get_param('~track_relative_altitude', -0.2)
+        self.target_odom_z = rospy.get_param('~track_altitude', 1.5)
+        self.target_odom_yaw = rospy.get_param('~track_yaw', 0)
 
 # --------------- Diagnostics
 
@@ -252,6 +440,9 @@ class Controller(object):
         self.updater = diagnostic_updater.Updater()
         self.updater.setHardwareID("fence controller")
         self.updater.add("Localization", self.localization_diagnostics)
+        self.updater.add("Battery", self.battery_diagnostics)
+        self.updater.add("State", self.state_diagnostics)
+        self.updater.add("Source", self.source_diagnostics)
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
 
     def update_diagnostics(self, event):
@@ -266,6 +457,33 @@ class Controller(object):
         else:
             stat.summary(
                 diagnostic_msgs.msg.DiagnosticStatus.ERROR, "Not localized")
+
+    def battery_diagnostics(self, stat):
+        if self.battery_state == BatteryState.ok:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
+        elif self.battery_state == BatteryState.critical:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN, "Critical battery level")
+        else:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR, "Empty battery")
+
+    def source_diagnostics(self, stat):
+        if self.target_source_is_active:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, "")
+        else:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN, "not active")
+        stat.add('Target Mode', self.target_mode.name)
+        stat.add('Target source topic', self.target_source_topic)
+        tmode = self.target_angle_mode
+        etmode = self.effective_angular_target_mode
+        # rospy.loginfo("%s %s", tmode, etmode)
+        if tmode != etmode:
+            tmode = '{tmode.name} ({etmode.name})'.format(**locals())
+        else:
+            tmode = tmode.name
+        stat.add('Angular Target Mode', tmode)
+
+    def state_diagnostics(self, stat):
+        stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, self.state.name)
 
 # --------------- Localization
 
@@ -305,6 +523,7 @@ class Controller(object):
             if (rospy.Time.now() - self.last_localization).to_sec() > self.localization_timeout:
                 rospy.logwarn("No more localized")
                 self.localized = False
+                self.inside_fence = False
 
 # --------------- fence
 
@@ -313,17 +532,21 @@ class Controller(object):
         return self.pos_bounds[2][1]
 
     def init_fence(self):
-        self.fence = rospy.get_param("~pos_bounds", ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0)))
-        _home = rospy.get_param("~home", (0, 0, 1))
-        self.home_p = _home
-        self.home = PoseStamped()
-        self.home.header.frame_id = self.frame_id
-        self.home.pose.position.x = _home[0]
-        self.home.pose.position.y = _home[1]
-        self.home.pose.position.z = _home[2]
-        self.home.pose.orientation.w = 1
+        pos_bounds = rospy.get_param("~pos_bounds", ((-1.8, 1.8), (-1.8, 1.8), (0.5, 2.0)))
+        self.pos_bounds = [(float(x), float(y)) for x, y in pos_bounds]
+        _home = rospy.get_param("~home", None)
+        if _home is not None:
+            self.home = PoseStamped()
+            self.home.header.frame_id = self.frame_id
+            self.home.pose.position.x = _home[0]
+            self.home.pose.position.y = _home[1]
+            self.home.pose.position.z = _home[2]
+            self.home.pose.orientation.w = 1
+        else:
+            self.home = None
         self.fence_margin = 0.5
         self.inside_fence = False
+        self.enforce_fence = rospy.get_param('~enable_fence', True)
 
 # --------------- Go to pose action
 
@@ -334,39 +557,47 @@ class Controller(object):
             d_y = d_y - 2 * math.pi
         if d_y < - math.pi:
             d_y = d_y + 2 * math.pi
+        # rospy.loginfo("%s (%s), %s (%s)", d_p, self.pos_tol, abs(d_y), self.angle_tol)
         return (d_p < self.pos_tol and abs(d_y) < self.angle_tol, d_p, d_y)
 
     def execute_cb(self, goal):
-        rospy.loginfo('Executing action Go To Pose %s' % goal.target_pose)
-        self.go_to_pose(goal.target_pose)
+        rospy.loginfo('Go to pose %s' % goal.target_pose.pose)
+        self.go_to_pose_action(goal.target_pose)
+
+    def go_to_pose_no_feedback(self, target_pose):
+        for near, _ in self.go_to_pose(target_pose):
+            if near:
+                return True
+        return False
 
     def go_to_pose(self, target_pose):
+        self.set_target_source(TargetMode.pos, '')
         self.has_received_target(target_pose)
         p = self.target_position
         y = self.target_yaw
-        r = rospy.Rate(5.0)
-        feedback = GoToPoseFeedback()
-        result = GoToPoseResult()
-        while(self.target_position and self.localized and not self.track_head):
-            if self._as.is_preempt_requested():
-                rospy.loginfo('Preempted')
-                self._as.set_preempted()
-                self.target_position = None
-                self.pub_cmd.publish(Twist())
-                return
-            near, feedback.distance, _ = self.is_near(p, y)
+        r = rospy.Rate(20)
+        near = False
+        while not near and self.target_position is not None and self.localized:
+            near, distance, _ = self.is_near(p, y)
+            yield (near, distance)
             if near:
-                rospy.loginfo('Succeeded')
-                self._as.set_succeeded(result)
-                self.target_position = None
-                return
-            # publish the feedback
-            self._as.publish_feedback(feedback)
+                break
             r.sleep()
-        if not (self.target_position and self.localized and
-                not self.track_head):
+        if self.target_position is None:
+            self.hover()
+        rospy.loginfo("RESET target")
+        self.reset_target()
+
+    def go_to_pose_action(self, target_pose):
+        for near, distance in self.go_to_pose(target_pose):
+            if self._as.is_preempt_requested():
+                self.target_position = None
+            else:
+                self._as.publish_feedback(GoToPoseFeedback(distance=distance))
+        if near:
+            self._as.set_succeeded(GoToPoseResult())
+        else:
             self._as.set_preempted()
-        self.target_position = None
 
     def init_action_server(self):
         self.pos_tol = rospy.get_param('position_tol', 0.1)
@@ -379,6 +610,21 @@ class Controller(object):
         self._as.start()
         rospy.loginfo('Started SimpleActionServer fence_control')
 
+        rospy.Service('safe_land', std_srvs.srv.Trigger, self.land_service)
+        rospy.Service('safe_takeoff', std_srvs.srv.Trigger, self.takeoff_service)
+
+        rospy.loginfo('Started land/takeoff services')
+
+    def land_service(self, req):
+        res = std_srvs.srv.TriggerResponse()
+        res.success = self.blocking_land()
+        return res
+
+    def takeoff_service(self, req):
+        res = std_srvs.srv.TriggerResponse()
+        res.success = self.blocking_takeoff()
+        return res
+
 # ----------------- Controller
 
     @property
@@ -388,190 +634,333 @@ class Controller(object):
     @state.setter
     def state(self, value):
         if self._state != value:
+            # rospy.loginfo("flying state %s -> %s", self._state, value)
             self._state = value
-            if value == State.hovering:
-                self.hover()
+            self.state_pub.publish(value.value)
 
     def handle_non_localized(self):
         pass
 
+    def output_too_old(self):
+        if self.output_pose_is_active:
+            return False
+        if not self.latest_output_time:
+            return False
+        delta = rospy.Time.now() - self.latest_output_time
+        if delta.to_sec() < self.output_timeout:
+            return False
+        return True
+
     def update(self, evt):
         self.update_localization_state()
-        self.update_cmd_timeout()
-        if self.state not in [State.flying, State.hovering] or not self.localized:
-            return
-        if self.flying:
+        self.update_source_timeout()
+
+        if self.state == State.flying:
+            if self.enforce_fence and self.localized and not self.inside_fence:
+                rospy.logwarn("Outside fence => switch to hovering")
+                self.hover()
+                return
+            if not self.target_source_is_active:
+                rospy.logwarn("No recent control => switch to hovering")
+                self.hover()
+            if self.output_too_old():
+                rospy.logwarn("No recent output => switch to hovering")
+                self.hover()
+                self.latest_output_time = None
+
+        # rospy.loginfo("State %s, localized %s, target_mode %s, target_source_is_active %s",
+        #               self.state, self.localized, self.target_mode, self.target_source_is_active)
+
+        if(self.localized and self.target_mode != TargetMode.teleop and
+           self.target_source_is_active):
             self.update_control()
 
-    def update_cmd_timeout(self):
-        if self.flying and self.latest_cmd_time:
-            delta = rospy.Time.now() - self.latest_cmd_time
-            if delta.to_sec() > self.control_timeout:
-                rospy.logwarn("No recent control => switch to hovering")
-                self.state = State.hovering
+
+    def update_source_timeout(self):
+        if not self.target_source_is_active:
+            return
+        if self.target_mode == TargetMode.pos:
+            return
+        if self.latest_source_time:
+            delta = rospy.Time.now() - self.latest_source_time
+            if delta.to_sec() < self.target_source_timeout:
+                return
+        self.target_source_is_active = False
 
 # ----------------- Flying
-
+    @if_flying
     def update_control(self):
-        if not self.localized:
-            self.hover()  # TODO: self.pub_cmd.publish(Twist())
-            return
 
-        if not self.inside_fence:
-            self.hover()  # TODO: better safety
-            return
+        # rospy.loginfo("State %s, target mode %s", self.state, self.target_mode)
+
+        # if not self.inside_fence:
+        #     self.hover()  # TODO: better safety
+        #     return
+
+        # rospy.loginfo("Target %s %s %s", self.target_position, self.target_velocity,
+        #               self.target_acceleration)
+
+        if self.enforce_fence:
+            fence = self.pos_bounds
+        else:
+            fence = None
 
         des_target, des_velocity, des_acceleration = fence_control(
             self.position, self.velocity, self.target_position, self.target_velocity,
-            self.target_acceleration, delay=self.delay, fence=self.fence,
+            self.target_acceleration, delay=self.delay, fence=fence,
             maximal_acceleration=self.maximal_acceleration, maximal_speed=self.maximal_speed,
-            maximal_vertical_speed=self.maximal_vertical_speed, eta=self.eta, tau=self.tau)
+            maximal_vertical_speed=self.maximal_vertical_speed, eta=self.eta, tau=self.tau,
+            compute_velocity=self.should_publish_body_vel,
+            compute_acceleration=self.should_publish_cmd)
+
+        # if self.target_angle_mode == TargetAngleMode.plane and des_velocity:
+        #     if np.linalg.norm(des_velocity[:2]) > 0.1:
+        #         self.target_yaw = np.arctan2(des_velocity[1], des_velocity[0])
+        #         self.target_angular_speed = None
+        #     else:
+        #         self.target_yaw = None
+        #         self.target_angular_speed = 0
+        # rospy.loginfo("%s %s %s %s", self.yaw, self.target_yaw,
+        # self.target_angular_speed, self.target_angle_mode)
+
+        # rospy.loginfo("Target Angle %s %s", self.target_yaw, self.target_angular_speed)
 
         des_target_yaw, des_angular_speed = angular_control(
             self.yaw, self.target_yaw, self.target_angular_speed, rotation_tau=self.rotation_tau,
-            maximal_angular_speed=self.max_angular_speed)
+            maximal_angular_speed=self.maximal_angular_speed)
 
-        if self.publish_target:  # Maybe just a Point (lets see what cf needs)
-            msg = PoseStamped()
-            msg.header.stamp = rospy.Time.now()
-            msg.header.frame_id = self.frame_id
-            msg.pose.position = Point(*des_target)
-            msg.pose.orientation = Quaternion(*quaternion_from_euler(0, 0, des_target_yaw))
-            self.des_pose_pub.publish(msg)
+        # rospy.loginfo("des_target %s, des_velocity %s, des_acceleration %s",
+        #               des_target, des_velocity, des_acceleration)
 
-        if self.publish_body_vel:
-            vec = [self.des_velocity[0], self.des_velocity[1], self.des_velocity[2], 0]
-            vec = rotate(vec, self.q, inverse=False)[:2]
-            msg = Twist()
-            msg.linear = Vector(*vec)
-            msg.angular = Vector(0, 0, des_angular_speed)
-            self.des_vel_pub.publish(msg)
+        output = False
+        self.output_pose_is_active = True
 
-        if self.publish_cmd:
-            vec = [des_acceleration[0], des_acceleration[1], 0, 0]
-            vec = rotate(vec, self.q, inverse=False)[:2]
-            vec = self.cmd_from_acc(des_acceleration, des_velocity[2])
-            msg = Twist()
-            msg.linear = Vector(*vec)
-            msg.angular = Vector(0, 0, des_angular_speed)
-            self.des_cmd.publish(msg)
+        if self.should_publish_target and des_target is not None:
+            # Maybe just a Point (lets see what cf needs)
+            self.publish_target(des_target, des_target_yaw)
+            self.output_pose_is_active = True
+            output = True
 
-    @property
-    def target_mode(self):
-        return self._target_mode
+        # rospy.loginfo("%s?", self.should_publish_body_vel)
 
-    @target_mode.setter
-    def target_mode(self, value):
-        if value != self._target_mode:
-            if self._target_mode == TargetMode.pos:
-                self.enable_target_pub.publish(False)
-            if self._target_mode == TargetMode.vel:
-                self.enable_target_vel_pub.publish(False)
-            if self._target_mode == TargetMode.odom:
-                self.enable_target_odom_pub.publish(False)
-            self._target_mode = value
+        if not output and self.should_publish_body_vel and des_velocity is not None:
+            vec = rotate(des_velocity, self.q, inverse=False)
+            # rospy.loginfo("!")
+            self.publish_target_body_vel(vec, des_angular_speed)
+            self.output_pose_is_active = False
+            output = True
 
-    def has_received_enable_tracking(self, msg, mode):
-        if self.target_mode == mode and not msg.value:
-            self.target_mode = TargetMode.cmd
-        if msg.value:
-            self.target_mode = mode
+        if not output and self.should_publish_cmd and des_acceleration is not None:
+            vec = [des_acceleration[0], des_acceleration[1], 0]
+            vec = rotate(vec, self.q, inverse=False)
+            self.publish_target_cmd(vec[:2], des_velocity[2], des_angular_speed)
+            self.output_pose_is_active = False
+            output = True
 
-    def has_received_target_cmd(self, msg):
+        if output:
+            self.latest_output_time = rospy.Time.now()
 
-        if not self.localized:
+    def publish_target(self, des_target, des_target_yaw):
+        msg = PoseStamped()
+        msg.header.stamp = rospy.Time.now()
+        msg.header.frame_id = self.frame_id
+        msg.pose.position = Point(*des_target)
+        msg.pose.orientation = Quaternion(*quaternion_from_euler(0, 0, des_target_yaw or 0))
+        self.des_pose_pub.publish(msg)
+
+    def publish_target_body_vel(self, velocity, angular_speed):
+        msg = Twist()
+        msg.linear = Vector3(*velocity)
+        msg.angular = Vector3(0, 0, angular_speed)
+        self.des_vel_pub.publish(msg)
+
+    def publish_target_cmd(self, acc, vert_vel, angular_speed):
+        vec = self.cmd_from_acc(acc, vert_vel)
+        msg = Twist()
+        msg.linear = Vector3(*vec)
+        msg.angular = Vector3(0, 0, self.cmd_from_angular_speed(angular_speed))
+        self.des_cmd_pub.publish(msg)
+
+    #
+    # @property
+    # def target_mode(self):
+    #     return self._target_mode
+    #
+    # @target_mode.setter
+    # def target_mode(self, value):
+    #     if value != self._target_mode:
+    #         rospy.loginfo('Change target mode from %s to %s', self._target_mode, value)
+    #         prev_value = self._target_mode
+    #         self._target_mode = value
+    #         if prev_value == TargetMode.pos:
+    #             self.enable_target_pub.publish(False)
+    #         if prev_value == TargetMode.vel:
+    #             self.enable_vel_target_pub.publish(False)
+    #         if prev_value == TargetMode.odom:
+    #             self.enable_odom_target_pub.publish(False)
+    #
+    #         if self.srv and self.config and self.config['target_mode'] != value.value:
+    #             # rospy.loginfo("Propagate")
+    #             self.srv.update_configuration({'target_mode': value.value})
+    #         else:
+    #             pass
+    #             # rospy.loginfo("Do not propagate")
+
+    @if_flying
+    def has_received_give_feedback(self, msg):
+        if self.giving_feedback:
+            return
+        self.set_target_source(TargetMode.teleop, '')
+        self.latest_source_time = rospy.Time.now()
+        self.target_source_is_active = True
+        self.hover()
+        while self.state != State.hovering:
+            rospy.sleep(0.1)
+        self.giving_feedback = True
+        self.give_feedback()
+        self.giving_feedback = False
+        self.hover()
+
+    @if_flying
+    def has_received_hover(self, msg):
+        self.hover()
+
+    @if_flying
+    def has_received_joy(self, msg):
+        if not msg.buttons[self.deadman_button]:
             return
 
-        self.target_mode = TargetMode.cmd
-        vec = [msg.linear, msg.linear.y, msg.linear.z]
+        if self.enforce_fence and not self.localized:
+            return
+
+        if self.target_mode != TargetMode.teleop and self.joy_set_teleop_mode:
+            self.set_target_source(TargetMode.teleop, '')
+
+        values = [msg.axes[axis] for axis in self.joy_axes]
+
+        self.latest_source_time = rospy.Time.now()
+        self.target_source_is_active = True
+
+        if all([abs(v) < 0.01 for v in values]):
+            self.hover()
+            return
+
+        if self.teleop_mode == TeleopMode.cmd:
+            # the original bebop cmd
+            self.target_acceleration = self.rotate_teleop(self.acc_from_cmd(values[:2]))
+            self.target_velocity = [0, 0, self.vert_vel_from_cmd(values[2])]
+            if self.effective_angular_target_mode == TargetAngleMode.teleop:
+                self.target_angular_speed = self.angular_speed_from_cmd(values[3])
+        else:
+            self.target_acceleration = None
+            self.target_velocity = self.rotate_teleop(
+                [self.maximal_speed * values[0], self.maximal_speed * values[1],
+                 self.maximal_vertical_speed * values[2]])
+            if self.effective_angular_target_mode == TargetAngleMode.teleop:
+                self.target_angular_speed = self.maximal_angular_speed * values[3]
+        self.update_control()
+
+    def rotate_teleop(self, vec):
         if self.teleop_frame == TeleopFrame.body:
-            # TODO: ArenaConfig.Arena_World|Arena_Body|Arena_Head
-            vec = rotate(vec, self.q, inverse=True)[:2]
-        elif self.teleop_frame == TeleopFrame.world:
+            return rotate(vec, self.q, inverse=True)
+        if self.teleop_frame == TeleopFrame.head:
+            #  TODO: ignore head
             transform = get_transform(self.tf_buffer, self.frame_id, self.head_frame_id)
             if transform:
-                vec = rotate(vec, transform[1], inverse=True)[:2]
+                vec = rotate(vec, transform[1], inverse=True)
             else:
                 rospy.logwarn("Has received target cmd but cannot transform from %s to %s",
                               self.frame_id, self.head_frame_id)
                 return
         else:
-            vec = vec[:2]
+            return vec
 
-        self.latest_cmd_time = rospy.Time.now()
-
-        if self.teleop_mode == TeleopMode.cmd:
-            self.target_acceleration = self.acc_from_cmd(vec)
+    @if_flying
+    def has_received_target_cmd(self, msg):
+        if self.target_mode == TargetMode.cmd:
+            vec = [msg.linear.x, msg.linear.y, msg.linear.z]
+            self.target_acceleration = rotate(self.acc_from_cmd(vec[:2]), self.q, inverse=True)
             self.target_velocity = [0, 0, self.vert_vel_from_cmd(vec[2])]
-        else:
-            self.target_velocity = self.vel_from_cmd(vec)
-            self.target_acceleration = None
+            self.latest_source_time = rospy.Time.now()
+            self.target_source_is_active = True
 
-        if self.target_angle_mode == TargetAngleMode.cmd:
+        if self.effective_angular_target_mode == TargetAngleMode.cmd:
             self.target_angular_speed = self.angular_speed_from_cmd(msg.angular.z)
 
-        self.update_control()
-
+    @if_flying
     def has_received_target(self, msg):
+        rospy.loginfo("has_received_target")
         target_pose = pose_in_frame(self.tf_buffer, msg, self.frame_id)
         if not target_pose:
             rospy.logwarn("Has received target pose but cannot transform %s to %s",
                           msg, self.frame_id)
             return
+        # else:
+        #     rospy.logwarn("Has received target pose")
 
         _p = target_pose.pose.position
         _p = np.array([_p.x, _p.y, _p.z])
 
-        if self.target_angle_mode == TargetAngleMode.target and self.localized:
+        if self.effective_angular_target_mode == TargetAngleMode.target_point and self.localized:
             self.target_yaw = target_yaw_to_observe(self.position, _p)
             self.target_angular_speed = None
+            # rospy.loginfo("target_yaw %s, yaw %s", self.target_yaw, self.yaw)
 
         if self.target_mode != TargetMode.pos:
             return
 
-        self.latest_cmd_time = rospy.Time.now()
+        self.latest_source_time = rospy.Time.now()
+        self.target_source_is_active = True
+        rospy.loginfo("target_source_is_active => active")
 
         self.target_position = _p
-        self.target_velocity = np.array([0, 0, 0])
 
-        if self.target_angle_mode == TargetAngleMode.target_pose:
+        if self.effective_angular_target_mode == TargetAngleMode.target_orientation:
             _o = target_pose.pose.orientation
             _, _, self.target_yaw = euler_from_quaternion([_o.x, _o.y, _o.z, _o.w])
             self.target_angular_speed = None
 
     def has_received_target_vel_in_world_frame(self, vel, omega):
-        self.latest_cmd_time = rospy.Time.now()
+        self.latest_source_time = rospy.Time.now()
+        self.target_source_is_active = True
         self.target_velocity = np.array(vel)
-        self.target_position = None
-        if self.target_angle_mode == TargetAngleMode.plane:
-            self.target_yaw = np.arctan2(vel[1], vel[0])
-            self.target_angular_speed = None
-        if self.target_angle_mode == TargetAngleMode.vel:
-            self.target_angular_speed = rotate(omega, self.q, inverse=True)[2]
+        if self.effective_angular_target_mode == TargetAngleMode.vel:
+            self.target_angular_speed = omega
             self.target_yaw = None
 
     def has_received_target_body_vel(self, msg):
+
+        if self.state not in [State.flying, State.hovering]:
+            return
+
         if self.target_mode != TargetMode.vel or not self.localized:
             return
         # convert in world frame
-        vel = [msg.linear.x, msg.linear.y, msg.linear.z, 0]
-        ang_vel = [msg.angular.x, msg.angular.y, msg.angular.z, 0]
-        vel_world = rotate(vel, self.q, inverse=True)[:3]
+        vel = [msg.linear.x, msg.linear.y, msg.linear.z]
+        ang_vel = [msg.angular.x, msg.angular.y, msg.angular.z]
+        vel_world = rotate(vel, self.q, inverse=True)
         omega_world = rotate(ang_vel, self.q, inverse=True)[2]
         self.has_received_target_vel_in_world_frame(vel_world, omega_world)
 
+    @if_flying
     def has_received_target_vel(self, msg):
         if self.target_mode != TargetMode.vel:
             return
         # convert in world frame
         twist_s = twist_in_frame(self.tf_buffer, msg, self.frame_id)
+
+        if not twist_s:
+            rospy.logwarn("Has received target vel but cannot transform %s to %s",
+                          msg, self.frame_id)
+            return
+
         v = twist_s.twist.linear
         vel_world = [v.x, v.y, v.z]
         omega_world = twist_s.twist.angular.z
         self.has_received_target_vel_in_world_frame(vel_world, omega_world)
 
+    @if_flying
     def has_received_target_odom(self, msg):
-
         odom = odometry_in_frame(self.tf_buffer, msg, self.frame_id, self.frame_id)
         if not odom:
             rospy.logwarn("Has received target odom but cannot transform %s to %s",
@@ -580,14 +969,15 @@ class Controller(object):
 
         _p = odom.pose.pose.position
         _p = np.array([_p.x, _p.y, _p.z])
-        if self.target_angle_mode == TargetAngleMode.target and self.localized:
+        if self.effective_angular_target_mode == TargetAngleMode.target_point and self.localized:
             self.target_yaw = target_yaw_to_observe(self.position, _p)
-            self.target_angular_yaw = None
+            self.target_angular_speed = None
 
         if self.target_mode != TargetMode.odom:
             return
 
-        self.latest_cmd_time = rospy.Time.now()
+        self.latest_source_time = rospy.Time.now()
+        self.target_source_is_active = True
 
         _o = odom.pose.pose.orientation
         _v = odom.twist.twist.linear
@@ -597,10 +987,10 @@ class Controller(object):
         q = quaternion_from_euler(0, 0, yaw + self.target_odom_yaw)
 
         if self.target_odom_z_is_relative:
-            f = [self.target_odom_r, 0, self.target_odom_dz]
+            f = [self.target_odom_r, 0, self.target_odom_rel_z]
         else:
-            f = [self.target_odom_r, 0, -_p.z + self.target_odom_z]
-        f = np.array(rotate(f, q, inverse=True)[:3])
+            f = [self.target_odom_r, 0, -_p[2] + self.target_odom_z]
+        f = np.array(rotate(f, q, inverse=True))
         self.target_position = _p + f
         self.target_velocity = v
 
@@ -610,6 +1000,7 @@ class Controller(object):
         # Transform pose to World and twist to world
         odom = odometry_in_frame(self.tf_buffer, msg, self.frame_id, self.frame_id)
         if not odom:
+            rospy.logwarn("Could not transform frame")
             return
         msg = odom
         self.last_localization = msg.header.stamp
@@ -620,8 +1011,9 @@ class Controller(object):
         # position in world_frame
         self.position = [_p.x, _p.y, _p.z]
         self.inside_fence = inside_fence_margin(self.position, self.pos_bounds, self.fence_margin)
-        self.q = [o.x, o.y, o.z, o.w]
-        _, _, self.yaw = euler_from_quaternion(self.q)
+        _, _, self.yaw = euler_from_quaternion([o.x, o.y, o.z, o.w])
+        self.q = quaternion_from_euler(0, 0, self.yaw)
+
         # velocity in world frame
         self.velocity = [_v.x, _v.y, _v.z]
         self.localized = True
@@ -629,16 +1021,51 @@ class Controller(object):
 
 # ----------------- Land/Takeoff
 
-    def has_received_land(self, msg):
-        rospy.loginfo("Received landing")
-        self.state = State.landed
+    def blocking_land(self):
+        if self.state not in [State.flying, State.hovering]:
+            return False
+        while self.state != State.landing:
+            self.land()
+            rospy.sleep(0.1)
+        while self.state != State.landed:
+            rospy.sleep(0.1)
+        return True
+
+    def blocking_takeoff(self):
+        if self.state != State.landed:
+            return False
+        while self.state != State.taking_off:
+            self.safe_takeoff()
+            rospy.sleep(0.1)
+        while self.state != State.hovering:
+            rospy.sleep(0.1)
+        return True
+
+    @if_flying
+    def go_home_and_land(self):
+        rospy.loginfo("Go home and land")
+        if self.home is not None and self.go_to_pose_no_feedback(self.home):
+            rospy.loginfo("Land")
+            self.blocking_land()
+
+    def safe_takeoff(self):
+        if self.state != State.landed:
+            rospy.logwarn("Will not takeoff: not landed!")
+            return
+        if self.enforce_fence and not self.inside_fence:
+            rospy.logwarn("Will not takeoff: not inside fence!")
+            return
+        if self.battery_state != BatteryState.ok:
+            rospy.logwarn("Will not takeoff: battery level is critical")
+        self.reset_target()
+        self.takeoff()
 
     def has_received_takeoff(self, msg):
         rospy.loginfo("Received takeoff")
-        if self.inside_fence:
-            self.pub_takeoff.publish(Empty())
-            self._state = State.hovering
-        else:
-            rospy.logwarn("Outside fence, will not takeoff")
+        self.safe_takeoff()
+
+    def has_received_safe_land(self, msg):
+        rospy.loginfo("Received safe land")
+        self.go_home_and_land()
 
 # ----------------- TODO: Observe
