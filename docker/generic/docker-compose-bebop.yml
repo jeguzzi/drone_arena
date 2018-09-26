@@ -1,0 +1,11 @@
+version: '2'
+services:
+  cf:
+    privileged: true
+    network_mode: host
+    image: jeguzzi/drone_arena:melodic
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roslaunch drone_arena bebop.launch
