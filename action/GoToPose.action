@@ -1,8 +1,0 @@
-#goal definition
-geometry_msgs/PoseStamped target_pose
----
-#result definition
-
----
-#feedback
-int32 distance
