@@ -15,7 +15,7 @@ import tf2_geometry_msgs
 import tf2_ros
 from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
 from drone_arena.cfg import ArenaConfig
-from drone_arena.msg import GoToPoseAction, GoToPoseFeedback, GoToPoseResult
+from drone_arena_msgs.msg import GoToPoseAction, GoToPoseFeedback, GoToPoseResult
 from drone_arena.temporized import Temporized
 from dynamic_reconfigure.server import Server
 from geometry_msgs.msg import (PointStamped, PoseStamped, Twist, TwistStamped,

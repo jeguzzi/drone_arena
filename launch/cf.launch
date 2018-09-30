@@ -25,7 +25,7 @@
     <rosparam param="pos_bounds">[[-inf, inf], [-inf, inf], [0.2, 1.0]]</rosparam>
   </node>
   <include file="$(find drone_arena)/launch/joy_teleop.launch">
-    <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-generic.yaml" />
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-generic-vo.yaml" />
     <arg name="namespace" value="cf"/>
   </include>
 </launch>

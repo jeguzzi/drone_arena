@@ -2,12 +2,10 @@ version: '2'
 services:
   cf:
     privileged: true
-    network_mode: *nm
+    network_mode: host
     image: jeguzzi/drone_arena:melodic
     volumes:
       - ./logs:/root/.ros/log:rw
-      - ./demo-nav.launch:/root/catkin_ws/src/drone_arena/launch/main.launch:ro
-      - ./bags:/bags:rw
     env_file:
       - ./ros.env
-    command: roslaunch drone_arena main.launch
+    command: roslaunch drone_arena cf.launch

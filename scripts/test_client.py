@@ -2,7 +2,7 @@
 
 import rospy
 import actionlib
-from drone_arena.msg import GoToPoseAction, GoToPoseGoal
+from drone_arena_msgs.msg import GoToPoseAction, GoToPoseGoal
 from geometry_msgs.msg import PoseStamped, Quaternion, Point
 from tf.transformations import quaternion_from_euler
 from itertools import cycle

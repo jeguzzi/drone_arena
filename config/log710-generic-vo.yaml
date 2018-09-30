@@ -11,7 +11,7 @@ teleop:
   land:
     type: topic
     message_type: "std_msgs/Empty"
-    topic_name: land
+    topic_name: safe_land
     deadman_buttons: [1, 7]  # RT + A
     axis_mappings: []
   emergency:
@@ -20,12 +20,12 @@ teleop:
     topic_name: reset
     deadman_buttons: [2, 7] # RT + B
     axis_mappings: []
-  flattrim:
-    type: topic
-    message_type: "std_msgs/Empty"
-    topic_name: flattrim
-    deadman_buttons: [0, 7] # RT + X
-    axis_mappings: []
+  # flattrim:
+  #   type: topic
+  #   message_type: "std_msgs/Empty"
+  #   topic_name: flattrim
+  #   deadman_buttons: [0, 7] # RT + X
+  #   axis_mappings: []
   follow_on:
     type: topic
     message_type: "drone_arena/TargetSource"
@@ -61,7 +61,8 @@ teleop:
         value: 0
       - target: orientation.w
         value: 1
-    feedback:
+    deadman_buttons: [0, 7]
+  feedback:
       type: topic
       message_type: "std_msgs/Empty"
       topic_name: "give_feedback"
