@@ -188,6 +188,7 @@ class Controller(object):
     """docstring for Controller"""
     def __init__(self):
         # type: () -> None
+
         super(Controller, self).__init__()
         rospy.init_node('fence_control', anonymous=True)
         self.srv = None
@@ -383,15 +384,15 @@ class Controller(object):
 # --------------- battery
 
     def init_battery(self):  # type: () -> None
-        self._battery_state = BatteryState.ok  # type: BatteryState
+        self._battery_state = None  # type: Optional[BatteryState]
         self.battery_percent = None
 
     @property
-    def battery_state(self):  # type: () -> BatteryState
+    def battery_state(self):  # type: () -> Optional[BatteryState]
         return self._battery_state
 
     @battery_state.setter
-    def battery_state(self, value):  # type: (BatteryState) -> None
+    def battery_state(self, value):  # type: (Optional[BatteryState]) -> None
         if value != self._battery_state:
             self._battery_state = value
             rospy.loginfo("Battery state %s", value)
@@ -458,7 +459,6 @@ class Controller(object):
         self.updater.add("Battery", self.battery_diagnostics)
         self.updater.add("State", self.state_diagnostics)
         self.updater.add("Source", self.source_diagnostics)
-        self.battery_state = None  # type: Optional[BatteryState]
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
 
     def update_diagnostics(self, event):  # type: (rospy.TimerEvent) -> None
