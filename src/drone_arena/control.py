@@ -186,7 +186,8 @@ class Controller(object):
     __metaclass__ = ABCMeta
 
     """docstring for Controller"""
-    def __init__(self):  # type: () -> None
+    def __init__(self):
+        # type: () -> None
         super(Controller, self).__init__()
         rospy.init_node('fence_control', anonymous=True)
         self.srv = None
@@ -196,7 +197,7 @@ class Controller(object):
 
         self.teleop_mode = TeleopMode.cmd
         self.teleop_frame = TeleopFrame.body
-        self._state = State.landed
+        self._state = State.landed  # type: State
 
         self.state_pub = rospy.Publisher("flight_state", StateMsg, queue_size=1, latch=True)
 
@@ -244,7 +245,7 @@ class Controller(object):
         rospy.Subscriber('odom', Odometry, self.has_received_odometry, queue_size=1)
         rospy.Subscriber('joy', Joy, self.has_received_joy, queue_size=1)
         rospy.Subscriber('hover', Empty, self.has_received_hover, queue_size=1)
-        rospy.Subscriber('give_feedback', Empty, button(self.has_received_give_feedback),
+        rospy.Subscriber('give_feedback', Empty, Temporized(5)(self.has_received_give_feedback),
                          queue_size=1)
 
         # rospy.Subscriber('target', PoseStamped, self.has_received_target)
@@ -268,7 +269,7 @@ class Controller(object):
         # self.enable_odom_target_pub = rospy.Publisher(
         #     'target/odom/enable', Bool, queue_size=1, latch=True)
 
-        rospy.Subscriber('target_source', TargetSource, button(self.has_received_target_source),
+        rospy.Subscriber('target_source', TargetSource, self.has_received_target_source,
                          queue_size=1)
 
         period = rospy.get_param('~control_period', 0.05)
@@ -301,8 +302,11 @@ class Controller(object):
 
     def has_received_target_source(self, msg):  # type: (TargetSource) -> None
         rospy.loginfo('has_received_target_source %s', msg)
-        topic = rospy.resolve_name(msg.topic)
-        if msg.mode < 0 or msg.mode > 6:
+        if msg.topic:
+            topic = rospy.resolve_name(msg.topic)
+        else:
+            topic = ''
+        if (msg.mode < 0 or msg.mode > 6) and topic:
             topic_class = rostopic.get_topic_type(topic)
             mode = self.target_mode_from_msg_type(topic_class) or TargetMode.teleop
             if topic_class is None:
@@ -335,7 +339,7 @@ class Controller(object):
         self.target_source_topic = topic
         if self.target_source_sub:
             self.target_source_sub.unregister()
-        if topic and mode != TargetSource.Teleop:
+        if topic and mode != TargetMode.teleop:
             self.target_source_sub = rospy.Subscriber(topic, msg_type, callback, queue_size=1)
         else:
             self.target_source_sub = None
@@ -380,6 +384,7 @@ class Controller(object):
 
     def init_battery(self):  # type: () -> None
         self._battery_state = BatteryState.ok  # type: BatteryState
+        self.battery_percent = None
 
     @property
     def battery_state(self):  # type: () -> BatteryState
@@ -453,6 +458,7 @@ class Controller(object):
         self.updater.add("Battery", self.battery_diagnostics)
         self.updater.add("State", self.state_diagnostics)
         self.updater.add("Source", self.source_diagnostics)
+        self.battery_state = None  # type: Optional[BatteryState]
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
 
     def update_diagnostics(self, event):  # type: (rospy.TimerEvent) -> None
@@ -465,18 +471,28 @@ class Controller(object):
                 stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
             else:
                 stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN, "Outside fence")
+            if self.position:
+                stat.add('x', self.position[0])
+                stat.add('y', self.position[1])
+                stat.add('z', self.position[2])
         else:
             stat.summary(
                 diagnostic_msgs.msg.DiagnosticStatus.ERROR, "Not localized")
 
-    def battery_diagnostics(self, stat
-                            ):  # type: (diagnostic_updater.DiagnosticStatusWrapper) -> None
+    def battery_diagnostics(self, stat):
+        # type: (diagnostic_updater.DiagnosticStatusWrapper) -> None
+        if self.battery_state is None:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN, "No info")
+            return
+
         if self.battery_state == BatteryState.ok:
             stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
         elif self.battery_state == BatteryState.critical:
             stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN, "Critical battery level")
         else:
             stat.summary(diagnostic_msgs.msg.DiagnosticStatus.ERROR, "Empty battery")
+        if self.battery_percent is not None:
+            stat.add('percentage', int(self.battery_percent))
 
     def source_diagnostics(self, stat
                            ):  # type: (diagnostic_updater.DiagnosticStatusWrapper) -> None
@@ -495,14 +511,23 @@ class Controller(object):
             tmode_text = tmode.name
         stat.add('Angular Target Mode', tmode_text)
 
-    def state_diagnostics(self, stat):  # type: (diagnostic_updater.DiagnosticStatusWrapper) -> None
-        stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, self.state.name)
+    def state_diagnostics(self, stat):
+        # type: (diagnostic_updater.DiagnosticStatusWrapper) -> None
+        if self.can_fly():
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, self.state.name)
+        else:
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN,
+                         '{0} (not safe to fly)'.format(self.state.name))
+        stat.add('battery is safe', self.battery_state == BatteryState.ok)
+        stat.add('orientation is safe', self.orientation_is_safe)
 
 # --------------- Localization
 
     def init_localization(self):  # type: () -> None
         self.pitch = self.roll = self.yaw = 0
         self.orientation_is_safe = False
+        self.max_safe_pitch = self.max_safe_roll = rospy.get_param(
+            '~max_safe_angle', math.pi * 0.5)
         self.localization_pub = rospy.Publisher('location', String, queue_size=1, latch=True)
         self._localized = None  # type: Optional[bool]
         self.localized = False
@@ -585,8 +610,8 @@ class Controller(object):
                 return True
         return False
 
-    def go_to_pose(self, target_pose
-                   ):  # type: (PoseStamped) -> Generator[Tuple[bool, float], None, None]
+    def go_to_pose(self, target_pose):
+        # type: (PoseStamped) -> Generator[Tuple[bool, float], None, None]
 
         if self.position is None or self.yaw is None:
             return
@@ -624,37 +649,35 @@ class Controller(object):
         else:
             self._as.set_preempted()
 
-    def init_action_server(self):   # type: () -> None
+    def init_action_server(self):
+        # type: () -> None
         self.pos_tol = rospy.get_param('position_tol', 0.1)
         self.angle_tol = rospy.get_param('angle_tol', 0.2)
-
         rospy.loginfo('Will start SimpleActionServer fence_control')
         self._as = actionlib.SimpleActionServer(
             'fence_control', GoToPoseAction, execute_cb=self.execute_cb,
             auto_start=False)
         self._as.start()
         rospy.loginfo('Started SimpleActionServer fence_control')
-
         rospy.Service('safe_land', std_srvs.srv.Trigger, self.land_service)
         rospy.Service('safe_takeoff', std_srvs.srv.Trigger, self.takeoff_service)
         rospy.Service('give_feedback', std_srvs.srv.Trigger, self.give_feedback_service)
-
         rospy.loginfo('Started land/takeoff services')
 
-    def land_service(self, req
-                     ):  # type: (std_srvs.srv.TriggerRequest) -> std_srvs.srv.TriggerResponse
+    def land_service(self, req):
+        # type: (std_srvs.srv.TriggerRequest) -> std_srvs.srv.TriggerResponse
         res = std_srvs.srv.TriggerResponse()
         res.success = self.blocking_land()
         return res
 
-    def takeoff_service(self, req
-                        ):  # type: (std_srvs.srv.TriggerRequest) -> std_srvs.srv.TriggerResponse
+    def takeoff_service(self, req):
+        # type: (std_srvs.srv.TriggerRequest) -> std_srvs.srv.TriggerResponse
         res = std_srvs.srv.TriggerResponse()
         res.success = self.blocking_takeoff()
         return res
 
-    def give_feedback_service(
-            self, req):  # type: (std_srvs.srv.TriggerRequest) -> std_srvs.srv.TriggerResponse
+    def give_feedback_service(self, req):
+        # type: (std_srvs.srv.TriggerRequest) -> std_srvs.srv.TriggerResponse
         res = std_srvs.srv.TriggerResponse()
         res.success = self.blocking_give_feedback()
         return res
@@ -662,11 +685,13 @@ class Controller(object):
 # ----------------- Controller
 
     @property
-    def state(self):  # type: () -> State
+    def state(self):
+        # type: () -> State
         return self._state
 
     @state.setter
-    def state(self, value):   # type: (State) -> None
+    def state(self, value):
+        # type: (State) -> None
         if self._state != value:
             # rospy.loginfo("flying state %s -> %s", self._state, value)
             self._state = value
@@ -691,7 +716,8 @@ class Controller(object):
     def update_safety(self):  # type: () -> None
         if self.pitch is None or self.roll is None:
             return
-        if abs(self.pitch) > 1.5 or abs(self.roll) > 1.5:
+        # rospy.loginfo('update_safety %s %s', self.pitch, self.roll)
+        if abs(self.pitch) > self.max_safe_pitch or abs(self.roll) > self.max_safe_roll:
             self.orientation_is_safe = False
         else:
             self.orientation_is_safe = True
@@ -701,7 +727,7 @@ class Controller(object):
         self.update_source_timeout()
         self.update_safety()
 
-        if not self.can_fly and self.state != self.landed:
+        if not self.can_fly() and self.state != State.landed:
             self.stop()
             return
 
@@ -856,7 +882,9 @@ class Controller(object):
 
     @if_flying
     def has_received_give_feedback(self, msg):  # type: (Empty) -> None
+        # rospy.loginfo("Got a gesture message")
         self.blocking_give_feedback()
+        # rospy.loginfo("Gesture message callback done")
 
     def blocking_give_feedback(self):  # type: () -> bool
         if self.giving_feedback:
@@ -871,7 +899,6 @@ class Controller(object):
         self.giving_feedback = True
         self.give_feedback()
         self.giving_feedback = False
-        self.hover()
         return True
 
     @if_flying
@@ -1105,7 +1132,6 @@ class Controller(object):
     def go_home_and_land(self):  # type: () -> None
         rospy.loginfo("Go home and land")
         if self.home is None or self.go_to_pose_no_feedback(self.home):
-            rospy.loginfo("Land")
             self.blocking_land()
 
     def safe_takeoff(self):  # type: () -> None
@@ -1118,7 +1144,7 @@ class Controller(object):
         if self.battery_state != BatteryState.ok:
             rospy.logwarn("Not allowed to take off (battery level is critical)")
             return
-        if not self.can_fly:
+        if not self.can_fly():
             rospy.logwarn("Not allowed to take off (unsafe)")
             return
         self.reset_target()

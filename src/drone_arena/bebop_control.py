@@ -87,6 +87,7 @@ class BebopController(Controller):
             self.battery_state = BatteryState.critical
         if msg.percent < 2 and self.battery_state == BatteryState.critical:
             self.battery_state = BatteryState.empty
+        self.battery_percent = msg.percent
 
     def state_has_changed(self, msg):
         # type: (FlyingStateChanged) -> None

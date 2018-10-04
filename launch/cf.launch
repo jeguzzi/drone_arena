@@ -1,31 +1,45 @@
 <launch>
   <node pkg="crazyflie_driver" type="crazyflie_server" name="crazyflie_server" output="screen"/>
-  <node name='cf_supervisor' pkg='drone_arena' type='cf_supervisor.py' output="screen">
-    <rosparam param="crazyradio" command="load" file="$(find drone_arena)/config/crazyradio_one23.yaml"/>
+  <node name='supervisor' pkg='drone_arena' type='cf_supervisor.py' output="screen" ns="cf">
+    <rosparam param="" command="load" file="$(find drone_arena)/config/cf.yaml"/>
+    <param name='name' value='cf'/>
   </node>
-  <node name="external_pose" pkg="crazyflie_demo" type="publish_external_position.py" output="screen" ns="cf">
-    <param name="use_mocap" value="false"/>
-    <param name="with_orientation" value="true"/>
-  </node>
+  <!-- <node name="external_pose" pkg="crazyflie_demo" type="publish_external_position.py" output="screen" ns="cf"> <param name="use_mocap" value="false"/> <param name="with_z" value="false"/> <param name="with_orientation" value="false"/> </node> -->
   <node pkg="drone_arena" type="cf_controller.py" name="fence_controller" output="screen" ns="cf">
     <remap from="cf_odom" to="odom"/>
     <param name="enable_fence" value="true"/>
     <param name="frame_id" value="cf/odom"/>
-    <param name="publish_target" value="True" />
-    <param name="publish_body_vel" value="True" />
-    <param name="publish_cmd" value="False" />
+    <param name="publish_target" value="False"/>
+    <param name="publish_body_vel" value="True"/>
+    <param name="publish_cmd" value="False"/>
     <param name="teleop_mode" value="1"/>
-    <param name="max_speed" value="0.6"/>
-    <param name="max_vertical_speed" value="0.5"/>
-    <param name="max_angular_speed" value="1"/>
-    <param name="tau" value="0.5"/>
-    <param name="eta" value="1.0"/>
+    <param name="max_speed" value="1.2"/>
+    <param name="max_vertical_speed" value="1"/>
+    <param name="max_angular_speed" value="2"/>
+    <param name="tau" value="0.25"/>
+    <param name="eta" value="0.5"/>
     <param name="delay" value="0"/>
     <param name="joy_set_teleop_mode" value="true"/>
-    <rosparam param="pos_bounds">[[-inf, inf], [-inf, inf], [0.2, 1.0]]</rosparam>
+    <param name="max_safe_angle" value="0.75"/>
+    <rosparam param="pos_bounds">
+      - [-inf, inf]
+      - [-inf, inf]
+      - [0.2, 1.0]
+    </rosparam>
+    <rosparam param="feedback">
+      amplitude: 0.5
+      movements: 1
+      up: 0.15
+      down: 0.0
+    </rosparam>
   </node>
   <include file="$(find drone_arena)/launch/joy_teleop.launch">
-    <arg name="teleop_config" default="$(find drone_arena)/config/log710-generic-vo.yaml" />
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-generic-vo.yaml"/>
     <arg name="namespace" value="cf"/>
   </include>
+  <node pkg="drone_arena" type="cf_led.py" name="blinkstick" output="screen" ns="cf">
+    <param name="leds" value="8"/>
+    <param name="max_intensity" value="100"/>
+    <param name="ns" value="cf"/>
+  </node>
 </launch>

@@ -4,14 +4,20 @@ import rospy
 
 from crazyflie_driver.srv import AddCrazyflie, RemoveCrazyflie, UpdateParams
 from crazyflie_driver.srv import AddCrazyflieRequest, RemoveCrazyflieRequest
-from crazyflie_driver.msg import LogBlock
-from std_msgs.msg import Float32
+from crazyflie_driver.msg import FlightState
+from std_msgs.msg import Bool
 import diagnostic_msgs
 import diagnostic_updater
 
 
-def uri(radio_id, channel, bandwith, adress):
-    return "radio://{radio_id}/{channel}/{bandwith}/E7E7E7E7{adress:02X}".format(**locals())
+def uri(radio_id, channel, bandwith, id):
+    return "radio://{radio_id}/{channel}/{bandwith}/E7E7E7E7{id:02X}".format(**locals())
+
+
+def connection_request(uri, name):
+    return AddCrazyflieRequest(
+        uri=uri, tf_prefix=name, enable_logging=True, enable_parameters=True, use_ros_time=True,
+        enable_logging_battery=True, enable_logging_odom=True, enable_logging_state=True)
 
 
 class CFSupervisor(object):
@@ -19,130 +25,109 @@ class CFSupervisor(object):
     def init_diagnostics(self):
         self.updater = diagnostic_updater.Updater()
         self.updater.setHardwareID("Crazyradio")
-        self.updater.add("Connections", self.connections_diagnostics)
+        self.updater.add("Crazyflie {0}".format(self.name), self.connection_diagnostics)
         rospy.Timer(rospy.Duration(1), self.update_diagnostics)
 
     def update_diagnostics(self, event):
         self.updater.update()
 
-    def connections_diagnostics(self, stat):
-        if self.connectable == self.connected:
-            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.OK, "Ok")
+    def connection_diagnostics(self, stat):
+        if self.current_id:
+            stat.summary(
+                diagnostic_msgs.msg.DiagnosticStatus.OK,
+                "Connected to {0} {1}".format(self.current_id, list(self.ids - {self.current_id})))
         else:
-            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN, "Missing some crazyflies")
-        for cf in self.connectable:
-            if cf in self.connections:
-                connected = self.connections[cf]
-                others = list(self.cf[cf] - {connected})
-                stat.add(cf, '{connected} ({others})'.format(**locals()))
+            stat.summary(diagnostic_msgs.msg.DiagnosticStatus.WARN,
+                         "Not connected {0}".format(list(self.ids)))
+
+    def check_connection(self, evt=None):
+        if self.current_id is not None and not self.connected:
+            rospy.loginfo("Unconnect %s", self.current_id)
+            if self.unconnect(self.current_id):
+                self.current_id = None
+                self.connected_pub.publish(False)
+                if self.state_sub:
+                    self.state_sub.unregister()
+                    self.state_sub = None
+                self.try_to_connect()
+                return
             else:
-                others = self.cf[cf]
-                stat.add(cf, '({others})'.format(**locals()))
+                rospy.logerr("Failed to unconnect %s", self.current_id)
 
-    def update_rssi(self, msg, name):
-        # print(msg, name)
-        self.rssi[name] = (rospy.Time.now(), msg.data)
+    def try_to_connect(self, evt=None):
+        if self.current_id is None:
+            for id in self.ids:
+                if self.connect(id):
+                    self.upload_params(id)
+                    self.connected_pub.publish(True)
+                    self.last_update = rospy.Time.now()
+                    # rospy.loginfo("Reset last_update %s", self.last_update)
+                    self.current_id = id
+                    self.state_sub = rospy.Subscriber('state', FlightState, self.update_state,
+                                                      queue_size=1)
+                    return
+            rospy.loginfo("Will retry")
+            rospy.Timer(rospy.Duration(self.retry_interval), self.try_to_connect, oneshot=True)
 
-    def check_connections(self):
-        for name in list(self.connected):
-            if name not in self.rssi or (rospy.Time.now() - self.rssi[name][0]).to_sec() > 5:
-                rospy.loginfo("Unconnect %s %s", name, self.connections[name])
-                res = self.unconnect(name, self.connections[name])
-                if res:
-                    del self.connections[name]
-                    if name in self.rssi:
-                        del self.rssi[name]
-                    self.connected.remove(name)
-                    self.rssi_sub[name].unregister()
-                else:
-                    rospy.error("Should never happen %s", name)
-
-    def update(self, evt=None):
-        self.check_connections()
-        for name in self.connectable - self.connected:
-            for id in self.cf[name]:
-                rospy.loginfo("Try to connect %s at id %s", name, id)
-                if self.connect(name, id):
-                    rospy.loginfo("Connected")
-                    self.connected.add(name)
-                    self.connections[name] = id
-                    self.rssi_sub[name] = rospy.Subscriber(
-                        '{name}/rssi'.format(**locals()), Float32, self.update_rssi, name)
-                    rospy.loginfo("Set params")
-                    self.set_params(name)
-                    rospy.loginfo("Done")
-                    break
-                else:
-                    rospy.loginfo("Not connected")
-                    rospy.sleep(0.1)
-
-    def set_params(self, name):
-        service_name = '{name}/update_params'.format(**locals())
-        rospy.wait_for_service(service_name)
-        update_params = rospy.ServiceProxy(service_name, UpdateParams)
-        for param in self.params[name]:
-            param_name = param["name"]
-            rospy.set_param('{name}/{param_name}'.format(**locals()), param['value'])
-        update_params([param['name'] for param in self.params[name]])
-
-    def unconnect(self, name, id):
+    def unconnect(self, id):
         req = RemoveCrazyflieRequest()
         req.uri = self.uri(id)
-        res = self.remove_crazyflie(req)
+        self.remove_crazyflie(req)
         return True
 
-    def connect(self, name, id):
-        req = AddCrazyflieRequest()
-        req.uri = self.uri(id)
-        req.tf_prefix = name
-        req.roll_trim = 0
-        req.pitch_trim = 0
-        req.enable_logging = True
-        req.enable_parameters = True
-        req.use_ros_time = True
-        req.enable_logging_imu = False
-        req.enable_logging_temperature = False
-        req.enable_logging_magnetic_field = False
-        req.enable_logging_pressure = False
-        req.enable_logging_battery = True
-        req.enable_logging_packets = False
-        req.enable_logging_odom = True
-        req.enable_logging_state = True
-        # Make the destroyer of the CF on the server timeout (and crash)
-        # req.log_blocks = [
-        #     LogBlock(topic_name='thrust', frequency=100, variables=['stabilizer.thrust'])]
+    def connect(self, id):
+        req = connection_request(self.uri(id), self.name)
         try:
             res = self.add_crazyflie(req)
         except Exception as e:
-            print(e)
+            rospy.logerr('Exception %s while connecting %s to id %s',
+                           e, self.name, id)
             return False
         return res.result
 
     def __init__(self):
-        crazyradio = rospy.get_param('~crazyradio')
-        channel = crazyradio['channel']
-        bandwidth = crazyradio['bandwidth']
-        radio_id = crazyradio['id']
-        self.uri = lambda adress: uri(radio_id, channel, bandwidth, adress)
-        self.cf = {}
-        self.rssi = {}
-        self.params = {}
-        print(crazyradio['crazyflies'])
-        for cf in crazyradio['crazyflies']:
-            self.cf.setdefault(cf['name'], set()).add(cf['adress'])
-            self.params[cf['name']] = cf['params']
-        self.connectable = set(self.cf.keys())
-        self.connected = set()
-        self.connections = {}
-        self.rssi_sub = {}
-        rospy.wait_for_service('add_crazyflie')
-        self.add_crazyflie = rospy.ServiceProxy('add_crazyflie', AddCrazyflie)
-        rospy.wait_for_service('remove_crazyflie')
-        self.remove_crazyflie = rospy.ServiceProxy('remove_crazyflie', RemoveCrazyflie)
-        rospy.Timer(rospy.Duration(10), self.update)
-        self.init_diagnostics()
+        self.name = rospy.get_param('~name')
+        channel = rospy.get_param('~radio/channel')
+        bandwidth = rospy.get_param('~radio/bandwidth', '2M')
+        radio_id = rospy.get_param('~radio/id', 0)
+        self.uri = lambda id: uri(radio_id, channel, bandwidth, id)
+        params = {}
+        self.ids = set([cf['id'] for cf in rospy.get_param('~crazyflies')])
+        self.params = {cf['id']: dict((cf.get('params', {}).items()) + params.items())
+                       for cf in rospy.get_param('~crazyflies')}
+        self.current_id = None
+        self.retry_interval = rospy.get_param('~retry_interval', 10)
+        self.state_timeout = rospy.get_param('~connection_timeout', 3)
+        self.color_period = rospy.get_param('~color_period', 2)
 
-        self.update()
+        self.connected_pub = rospy.Publisher('connected', Bool, queue_size=1, latch=True)
+        self.connected_pub.publish(False)
+        self.state_sub = None
+        rospy.wait_for_service('/add_crazyflie')
+        self.add_crazyflie = rospy.ServiceProxy('/add_crazyflie', AddCrazyflie)
+        rospy.wait_for_service('/remove_crazyflie')
+        self.remove_crazyflie = rospy.ServiceProxy('/remove_crazyflie', RemoveCrazyflie)
+        self.init_diagnostics()
+        self.try_to_connect()
+        rospy.Timer(rospy.Duration(1), self.check_connection)
+
+    def update_state(self, msg):
+        self.last_update = msg.header.stamp
+        # rospy.loginfo("Has received state at %s", msg.header.stamp)
+
+    @property
+    def connected(self):
+        # rospy.loginfo("Check connected %s", self.last_update)
+        return (rospy.Time.now() - self.last_update).to_sec() < self.state_timeout
+
+    def upload_params(self, id):
+        params = self.params[id]
+        for name, value in params.items():
+            if value is not None:
+                rospy.set_param('{0}/{1}'.format(self.name, name), value)
+        rospy.wait_for_service('update_params')
+        update_params = rospy.ServiceProxy('update_params', UpdateParams)
+        update_params(list(params.keys()))
 
 
 if __name__ == '__main__':

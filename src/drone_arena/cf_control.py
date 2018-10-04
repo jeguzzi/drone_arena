@@ -1,21 +1,26 @@
-import math
+from collections import deque
 from threading import RLock as Lock
+from typing import Optional, Tuple  # noqa
 
 import numpy as np
+from tf.transformations import euler_from_quaternion
 
 import rospy
 from crazyflie_driver.msg import FlightState, Hover, Position
 from crazyflie_driver.srv import UpdateParams
+from geometry_msgs.msg import PointStamped, Pose
 from nav_msgs.msg import Odometry
+from sensor_msgs.msg import BatteryState as BatteryStateMsg
 from std_msgs.msg import Empty
-from tf.transformations import euler_from_quaternion
-from typing import Optional, Tuple  # noqa
 
 from .control import BatteryState, Controller, State, button
 
 TAU = 0.02
 ANGLE_TOL = 0.2
 TOL = 0.1
+RESET_TOL = 0.05
+RESET_TIMEOUT = 2
+THRUST_BUFFER_LENGTH = 3
 
 
 class CFController(Controller):
@@ -25,6 +30,7 @@ class CFController(Controller):
         super(CFController, self).__init__()
         self.last_state_update = None  # type: Optional[rospy.Time]
         self.cf_can_fly = False
+        self.thrust_buffer = deque([], maxlen=THRUST_BUFFER_LENGTH)  # type: deque
         self.lock = Lock()  # type: Lock
         self.state_estimate = None  # type: Optional[Odometry]
         self.hover_timer = None  # type: Optional[rospy.Timer]
@@ -36,6 +42,7 @@ class CFController(Controller):
         self.position_pub = rospy.Publisher('cmd_position', Position, queue_size=1)
         self.hover_pub = rospy.Publisher('cmd_hover', Hover, queue_size=1)
         self.stop_pub = rospy.Publisher('cmd_stop', Empty, queue_size=1)
+        self.external_pose_pub = rospy.Publisher("external_position", PointStamped, queue_size=1)
 
         rospy.wait_for_service('update_params')
         rospy.loginfo("found update_params service")
@@ -45,6 +52,84 @@ class CFController(Controller):
         rospy.Subscriber('reset', Empty, self.stop, queue_size=1)
         rospy.Subscriber('land', Empty, button(self.cf_land), queue_size=1)
         rospy.Subscriber('cf_odom', Odometry, self.update_odometry, queue_size=1)
+        rospy.Subscriber('battery', BatteryStateMsg, self.update_battery, queue_size=1)
+        rospy.Subscriber('set_pose', Pose, button(self.has_updated_pose), queue_size=1)
+
+    def update_pose(self, pose, reset=False):
+        # type: (Pose, bool) -> bool
+        if not self.state_estimate:
+            rospy.logwarn("will not update pose: no state estimation")
+            return False
+        rospy.loginfo("will update pose")
+        if reset:
+            self.reset(pose)
+        msg = PointStamped()
+        msg.header.stamp = rospy.Time.now()
+        tx = pose.position.x
+        ty = pose.position.y
+        msg.point.x = tx
+        msg.point.y = ty
+        msg.point.z = self.state_estimate.pose.position.z
+        # self.external_pose_pub.publish(msg)
+        t = rospy.Time.now()
+        while (rospy.Time.now() - t).to_sec() < RESET_TIMEOUT:
+            x = self.state_estimate.pose.position.x
+            y = self.state_estimate.pose.position.y
+            if (abs(x - tx) < RESET_TOL and abs(y - ty) < RESET_TOL):
+                rospy.loginfo("Pose updated")
+                return True
+            rospy.sleep(0.1)
+        rospy.logwarn("Pose not updated")
+        return False
+
+    def reset(self, pose):
+        # type: (Pose) -> bool
+        if not self.state_estimate:
+            return False
+        rospy.loginfo("Reset Kalman filter")
+        rospy.set_param("kalman/initialX", pose.position.x)
+        rospy.set_param("kalman/initialY", pose.position.y)
+        rospy.set_param("kalman/initialZ", self.state_estimate.pose.position.z)
+        params = ["kalman/initialX", "kalman/initialY", "kalman/initialZ"]
+
+        orientation = self.state_estimate.pose.orientation
+        rospy.set_param("kalman/initialQx", orientation.x)
+        rospy.set_param("kalman/initialQy", orientation.y)
+        rospy.set_param("kalman/initialQz", orientation.z)
+        rospy.set_param("kalman/initialQw", orientation.w)
+
+        params += ["kalman/initialQx", "kalman/initialQy", "kalman/initialQz",
+                   "kalman/initialQw"]
+
+        rospy.loginfo("Reset pose to (%s, %s, %s), (%s, %s, %s, %s)",
+                      pose.position.x, pose.position.y, self.state_estimate.pose.position.z,
+                      orientation.x, orientation.y, orientation.z, orientation.w)
+
+        self.update_params(params)
+        rospy.set_param("kalman/resetEstimation", 1)
+        self.update_params(["kalman/resetEstimation"])
+        return True
+
+    def has_updated_pose(self, msg):
+        # TODO: allow only if landed or hovering
+        # type: (Pose) -> None
+        with self.lock:
+            restart_hovering = False
+            if self.hover_timer:
+                restart_hovering = True
+                self.stop_hovering()
+                self.start_hovering_vel()
+            self.update_pose(msg, reset=True)
+            if restart_hovering:
+                self.stop_hovering()
+                self.start_hovering()
+        # if self.state == State.hovering:
+        #     self.hover_target[0] = msg.position.x
+        #     self.hover_target[1] = msg.position.y
+
+    def update_battery(self, msg):
+        # type: (BatteryStateMsg) -> None
+        self.battery_percent = msg.percentage * 100
 
     # ---- concrete implementation
 
@@ -54,24 +139,39 @@ class CFController(Controller):
         if self.state_estimate is None:
             rospy.logwarn("No state estimate")
             return
-        z = self.state_estimate.pose.position.z
-        t = 0.0
-        A = 0.1
-        n = 2
-        omega = 6.0
-        T = 2 * math.pi * n / omega
-        dt = 0.1
+        # t = 0.0
+        A = rospy.get_param('~feedback/amplitude', 1)
+        n = rospy.get_param('~feedback/movements', 1)
+        t_up = rospy.get_param('~feedback/up', 0.15)
+        t_down = rospy.get_param('~feedback/down', 0.5)
+        # T = T = 2 * math.pi * n / omega
+        # omega = 6.0
+        # T = 2 * math.pi * n / omega
+        # dt = 0.1
+
         msg = Hover()
         msg.vx = 0
         msg.vy = 0
         msg.yawrate = 0
-        while t < T:
-            dz = A * math.sin(t * omega)
-            msg.zDistance = z + dz
-            msg.header.stamp = rospy.Time.now()
-            self.hover_pub.publish(msg)
-            t += dt
-            rospy.sleep(dt)
+        z = self.state_estimate.pose.position.z
+        with self.lock:
+            rospy.loginfo("Start gesture with A %s, n %s, dt (%s, %s)", A, n, t_up, t_down)
+            for _ in range(n):
+                for dz, dt in zip([A, 0], [t_up, t_down]):
+                    msg.zDistance = z + dz
+                    msg.header.stamp = rospy.Time.now()
+                    # rospy.loginfo("Send hover cmd %s", msg)
+                    self.hover_pub.publish(msg)
+                    rospy.sleep(dt)
+        # rospy.loginfo("Gesture done")
+
+        # while t < T:
+        #     dz = A * math.sin(t * omega)
+        #     msg.zDistance = z + dz
+        #     msg.header.stamp = rospy.Time.now()
+        #     self.hover_pub.publish(msg)
+        #     t += dt
+        #     rospy.sleep(dt)
 
     # def give_feedback(self):
     #     with self.lock:
@@ -132,6 +232,43 @@ class CFController(Controller):
         rospy.error('publish_target_cmd not implemented')
         pass
 
+    def start_hovering_vel(self, delta=[0, 0, 0]):
+        # type: (np.ndarray) -> None
+        if not self.state_estimate:
+            return
+
+        msg = Hover()
+        msg.vx = 0
+        msg.vy = 0
+        msg.yawrate = 0
+        msg.zDistance = self.state_estimate.pose.position.z + delta[2]
+
+        def callback(event):
+            # type: (rospy.Timer) -> None
+            msg.header.stamp = rospy.Time.now()
+            self.hover_pub.publish(msg)
+        self.hover_pub.publish(msg)
+        self.hover_timer = rospy.Timer(rospy.Duration(0.25), callback, oneshot=False)
+
+    def start_hovering(self, delta=[0, 0, 0]):
+        # type: (np.ndarray) -> None
+        if not self.state_estimate:
+            return
+        p = self.state_estimate.pose.position
+        q = self.state_estimate.pose.orientation
+        _, _, yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])
+        hover_target = np.array([p.x, p.y, p.z]) + delta
+
+        rospy.loginfo("Start hovering at %s", hover_target)
+
+        def callback(event):
+            # type: (rospy.Timer) -> None
+            if not self.giving_feedback:
+                self.publish_target(hover_target, yaw, hovering=True)
+        self.publish_target(hover_target, yaw, hovering=True)
+
+        self.hover_timer = rospy.Timer(rospy.Duration(0.25), callback, oneshot=False)
+
     def hover(self, delta=[0, 0, 0]):
         # type: (np.ndarray) -> None
         if not self.state_estimate:
@@ -140,31 +277,25 @@ class CFController(Controller):
         with self.lock:
             if self.state == State.hovering:
                 return
-            # rospy.loginfo('hover')
             self.stop_hovering()
-            p = self.state_estimate.pose.position
-            q = self.state_estimate.pose.orientation
-            _, _, yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])
-            target = np.array([p.x, p.y, p.z]) + delta
-
-            # rospy.loginfo("Start hovering at %s %s", target, yaw)
-
-            def callback(event):  # type: (rospy.Timer) -> None
-                self.publish_target(target, yaw, hovering=True)
-            self.publish_target(target, yaw, hovering=True)
-
-            self.hover_timer = rospy.Timer(rospy.Duration(0.25), callback, oneshot=False)
+            self.start_hovering(delta=delta)
 
     def update_state(self, msg):
         # type: (FlightState) -> None
         self.last_state_update = rospy.Time.now()
-        if msg.battery_low:
-            rospy.loginfo("update_state => battery critical")
-            self.battery_state = BatteryState.critical
-        else:
-            self.battery_state = BatteryState.ok
-        if self.state != State.landed and msg.thrust == 0:
-            rospy.loginfo("update_state, thrust = 0 =>  landed")
+        self.thrust_buffer.append(msg.thrust)
+        if self.battery_percent is not None:
+            if self.battery_state is None:
+                self.battery_state = BatteryState.ok
+            if self.battery_state == BatteryState.critical:
+                if not msg.battery_low and self.battery_percent > 0.15:
+                    self.battery_state = BatteryState.ok
+            else:
+                if msg.battery_low or self.battery_percent < 0.05:
+                    rospy.loginfo("update_state => battery critical")
+                    self.battery_state = BatteryState.critical
+        if self.state not in [State.landed, State.taking_off] and not any(self.thrust_buffer):
+            rospy.loginfo("update_state %s, thrust = 0 for 3 seconds =>  landed", self.state)
             self.state = State.landed
         self.cf_can_fly = msg.can_fly
 
@@ -185,6 +316,7 @@ class CFController(Controller):
                     rospy.logwarn("lost connection => stop and set to landed")
                     self.stop()
                     self.state = State.landed
+                    self.battery_state = None
 
         if self.state in [State.landing] and self.state_estimate is not None:
             z = self.state_estimate.pose.position.z
@@ -218,20 +350,21 @@ class CFController(Controller):
         rospy.loginfo("Land")
         p = self.state_estimate.pose.position
         self.state = State.landing
-        self.hover(delta=[0, 0, -p.z])
+        self.hover(delta=[0, 0, -p.z + 0.05])
 
     def takeoff(self):
         # type: (Empty) -> None
-        rospy.loginfo("Takeoff")
-        self.hover(delta=[0, 0, 0.5])
-        self.state = State.taking_off
+        with self.lock:
+            rospy.loginfo("Takeoff")
+            self.hover(delta=[0, 0, 0.5])
+            self.state = State.taking_off
 
     def stop(self, msg=None):
         # type: (Optional[Empty]) -> None
-        rospy.loginfo("Stop")
         self.stop_hovering()
         self.stop_pub.publish()
         self.state = State.landed
+        rospy.loginfo("Stop")
 
     def update_odometry(self, msg):
         # type: (Odometry) -> None

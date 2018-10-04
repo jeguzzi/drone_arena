@@ -26,22 +26,22 @@ teleop:
   #   topic_name: flattrim
   #   deadman_buttons: [0, 7] # RT + X
   #   axis_mappings: []
-  follow_on:
-    type: topic
-    message_type: "drone_arena/TargetSource"
-    topic_name: "target_source"
-    message_value:
-      - target: mode
-        value: 6
-      - target: topic
-        value: /head/mocap_odom
-    deadman_buttons: [3, 6]
-  land_home:
-    type: topic
-    message_type: "std_msgs/Empty"
-    topic_name: "safe_land"
-    deadman_buttons: [1, 6]
-    axis_mappings: []
+  # follow_on:
+  #   type: topic
+  #   message_type: "drone_arena_msgs/TargetSource"
+  #   topic_name: "target_source"
+  #   message_value:
+  #     - target: mode
+  #       value: 6
+  #     - target: topic
+  #       value: /head/mocap_odom
+  #   deadman_buttons: [3, 6]
+  # land_home:
+  #   type: topic
+  #   message_type: "std_msgs/Empty"
+  #   topic_name: "safe_land"
+  #   deadman_buttons: [1, 6]
+  #   axis_mappings: []
   sync:
     type: topic
     message_type: "geometry_msgs/Pose"
@@ -66,4 +66,5 @@ teleop:
       type: topic
       message_type: "std_msgs/Empty"
       topic_name: "give_feedback"
-      deadman_buttons: [2, 6]
+      deadman_buttons: [0, 6]
+      axis_mappings: []
