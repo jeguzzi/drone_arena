@@ -1,7 +1,38 @@
 <launch>
   <node pkg="crazyflie_driver" type="crazyflie_server" name="crazyflie_server" output="screen"/>
   <node name='supervisor' pkg='drone_arena' type='cf_supervisor.py' output="screen" ns="cf">
-    <rosparam param="" command="load" file="$(find drone_arena)/config/cf.yaml"/>
+    <rosparam param="">
+      radio:
+        id: 0
+        channel: 100
+        bandwidth : 2M
+      params: []
+      crazyflies:
+        -
+          id: 1
+          params:
+            kalman/thetapix: 3.75
+            stabilizer/controller: 1
+            stabilizer/estimator: 2
+        -
+          id: 2
+          params:
+            kalman/thetapix: 3.75
+            stabilizer/controller: 1
+            stabilizer/estimator: 2
+        -
+          id: 3
+          params:
+            kalman/thetapix: 3.75
+            stabilizer/controller: 1
+            stabilizer/estimator: 2
+        -
+          id: 4
+          params:
+            kalman/thetapix: 3.75
+            stabilizer/controller: 1
+            stabilizer/estimator: 2
+    </rosparam>
     <param name='name' value='cf'/>
   </node>
   <!-- <node name="external_pose" pkg="crazyflie_demo" type="publish_external_position.py" output="screen" ns="cf"> <param name="use_mocap" value="false"/> <param name="with_z" value="false"/> <param name="with_orientation" value="false"/> </node> -->
