@@ -1112,6 +1112,8 @@ class Controller(object):
         if self.state not in [State.flying, State.hovering]:
             return False
         while self.state != State.landing:
+            if self.state == State.landed:
+                return True
             self.land()
             rospy.sleep(0.1)
         while self.state != State.landed:
