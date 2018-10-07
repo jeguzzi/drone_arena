@@ -8,6 +8,7 @@ from tf.transformations import euler_from_quaternion
 import rospy
 from crazyflie_driver.msg import FlightState, Hover, Position
 from crazyflie_driver.srv import UpdateParams
+from drone_arena_msgs.srv import SetXY, SetXYRequest, SetXYResponse  # noqa
 from geometry_msgs.msg import PointStamped, Pose
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import BatteryState as BatteryStateMsg
@@ -54,41 +55,77 @@ class CFController(Controller):
         rospy.Subscriber('cf_odom', Odometry, self.update_odometry, queue_size=1)
         rospy.Subscriber('battery', BatteryStateMsg, self.update_battery, queue_size=1)
         rospy.Subscriber('set_pose', Pose, button(self.has_updated_pose), queue_size=1)
+        rospy.Service('set_xy', SetXY, self.set_position_service)
+        rospy.loginfo('Started set position service')
 
-    def update_pose(self, pose, reset=False):
-        # type: (Pose, bool) -> bool
-        if not self.state_estimate:
-            rospy.logwarn("will not update pose: no state estimation")
+    def set_position_service(self, req):
+        # type: (SetXYRequest) -> SetXYResponse
+        with self.lock:
+            restart_hovering = False
+            if self.hover_timer:
+                restart_hovering = True
+                self.stop_hovering()
+                self.start_hovering_vel()
+            r = self.set_position(x=req.x, y=req.y)
+            if restart_hovering:
+                self.stop_hovering()
+                self.start_hovering()
+            res = SetXYResponse()
+            res.success = r
+            return res
+
+    def set_position(self, x, y):
+        # type: (float, float) -> bool
+        if not self.state_estimate or not self.reset_position(x, y):
             return False
-        rospy.loginfo("will update pose")
-        if reset:
-            self.reset(pose)
-        msg = PointStamped()
-        msg.header.stamp = rospy.Time.now()
-        tx = pose.position.x
-        ty = pose.position.y
-        msg.point.x = tx
-        msg.point.y = ty
-        msg.point.z = self.state_estimate.pose.position.z
-        # self.external_pose_pub.publish(msg)
         t = rospy.Time.now()
         while (rospy.Time.now() - t).to_sec() < RESET_TIMEOUT:
-            x = self.state_estimate.pose.position.x
-            y = self.state_estimate.pose.position.y
-            if (abs(x - tx) < RESET_TOL and abs(y - ty) < RESET_TOL):
-                rospy.loginfo("Pose updated")
+            cx = self.state_estimate.pose.position.x
+            cy = self.state_estimate.pose.position.y
+            if (abs(x - cx) < RESET_TOL and abs(y - cy) < RESET_TOL):
+                rospy.loginfo("Position updated")
                 return True
             rospy.sleep(0.1)
-        rospy.logwarn("Pose not updated")
         return False
 
-    def reset(self, pose):
-        # type: (Pose) -> bool
+    def update_pose(self, pose, reset=True):
+        # type: (Pose, bool) -> bool
+        return self.set_position(x=pose.position.x, y=pose.position.y)
+
+    # def update_pose(self, pose, reset=False):
+        # # type: (Pose, bool) -> bool
+        # if not self.state_estimate:
+        #     rospy.logwarn("will not update pose: no state estimation")
+        #     return False
+        # rospy.loginfo("will update pose")
+        # if reset:
+        #     self.reset(pose)
+        # msg = PointStamped()
+        # msg.header.stamp = rospy.Time.now()
+        # tx = pose.position.x
+        # ty = pose.position.y
+        # msg.point.x = tx
+        # msg.point.y = ty
+        # msg.point.z = self.state_estimate.pose.position.z
+        # self.external_pose_pub.publish(msg)
+        # t = rospy.Time.now()
+        # while (rospy.Time.now() - t).to_sec() < RESET_TIMEOUT:
+        #     x = self.state_estimate.pose.position.x
+        #     y = self.state_estimate.pose.position.y
+        #     if (abs(x - tx) < RESET_TOL and abs(y - ty) < RESET_TOL):
+        #         rospy.loginfo("Pose updated")
+        #         return True
+        #     rospy.sleep(0.1)
+        # rospy.logwarn("Pose not updated")
+        # return False
+
+    def reset_position(self, x, y):
+        # type: (float, float) -> bool
         if not self.state_estimate:
             return False
         rospy.loginfo("Reset Kalman filter")
-        rospy.set_param("kalman/initialX", pose.position.x)
-        rospy.set_param("kalman/initialY", pose.position.y)
+        rospy.set_param("kalman/initialX", x)
+        rospy.set_param("kalman/initialY", y)
         rospy.set_param("kalman/initialZ", self.state_estimate.pose.position.z)
         params = ["kalman/initialX", "kalman/initialY", "kalman/initialZ"]
 
@@ -102,13 +139,17 @@ class CFController(Controller):
                    "kalman/initialQw"]
 
         rospy.loginfo("Reset pose to (%s, %s, %s), (%s, %s, %s, %s)",
-                      pose.position.x, pose.position.y, self.state_estimate.pose.position.z,
+                      x, y, self.state_estimate.pose.position.z,
                       orientation.x, orientation.y, orientation.z, orientation.w)
 
         self.update_params(params)
         rospy.set_param("kalman/resetEstimation", 1)
         self.update_params(["kalman/resetEstimation"])
         return True
+
+    # def reset(self, pose):
+    #     # type: (Pose) -> bool
+    #     return self.reset_position(x=pose.position.x, y=pose.position.y)
 
     def has_updated_pose(self, msg):
         # TODO: allow only if landed or hovering
@@ -296,7 +337,7 @@ class CFController(Controller):
                     self.battery_state = BatteryState.critical
         if self.state not in [State.landed, State.taking_off] and not any(self.thrust_buffer):
             rospy.loginfo("update_state %s, thrust = 0 for 3 seconds =>  landed", self.state)
-            self.state = State.landed
+            self.stop()
         self.cf_can_fly = msg.can_fly
 
     def can_fly(self):
@@ -315,7 +356,6 @@ class CFController(Controller):
                     # is disconnected (maybe shutdown)
                     rospy.logwarn("lost connection => stop and set to landed")
                     self.stop()
-                    self.state = State.landed
                     self.battery_state = None
 
         if self.state in [State.landing] and self.state_estimate is not None:
