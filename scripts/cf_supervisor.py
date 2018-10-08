@@ -80,8 +80,7 @@ class CFSupervisor(object):
         try:
             res = self.add_crazyflie(req)
         except Exception as e:
-            rospy.logerr('Exception %s while connecting %s to id %s',
-                           e, self.name, id)
+            rospy.logerr('Exception %s while connecting %s to id %s', e, self.name, id)
             return False
         return res.result
 
@@ -124,7 +123,7 @@ class CFSupervisor(object):
         params = self.params[id]
         for name, value in params.items():
             if value is not None:
-                rospy.set_param('{0}/{1}'.format(self.name, name), value)
+                rospy.set_param(name, value)
         rospy.wait_for_service('update_params')
         update_params = rospy.ServiceProxy('update_params', UpdateParams)
         update_params(list(params.keys()))
