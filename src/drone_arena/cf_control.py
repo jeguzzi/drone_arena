@@ -1,3 +1,4 @@
+import enum
 from collections import deque
 from threading import RLock as Lock
 from typing import Optional, Tuple  # noqa
@@ -24,6 +25,11 @@ RESET_TIMEOUT = 2
 THRUST_BUFFER_LENGTH = 3
 
 
+class HoverType(enum.Enum):
+    position = 0
+    velocity = 1
+
+
 class CFController(Controller):
 
     def __init__(self):
@@ -39,6 +45,7 @@ class CFController(Controller):
         self.hover_target_position = None  # type: Optional[np.ndarray]
         self.hover_target_yaw = None  # type: Optional[float]
         self.hover_takeoff_altitude = rospy.get_param('~takeoff_altitude', 0.5)
+        self.hover_type = HoverType(rospy.get_param('~hover_type', 0))
 
         self.position_pub = rospy.Publisher('cmd_position', Position, queue_size=1)
         self.hover_pub = rospy.Publisher('cmd_hover', Hover, queue_size=1)
@@ -62,7 +69,7 @@ class CFController(Controller):
         # type: (SetXYRequest) -> SetXYResponse
         with self.lock:
             restart_hovering = False
-            if self.hover_timer:
+            if self.hover_timer and self.hover_type == HoverType.position:
                 restart_hovering = True
                 self.stop_hovering()
                 self.start_hovering_vel()
@@ -156,7 +163,7 @@ class CFController(Controller):
         # type: (Pose) -> None
         with self.lock:
             restart_hovering = False
-            if self.hover_timer:
+            if self.hover_timer and self.hover_type == HoverType.position:
                 restart_hovering = True
                 self.stop_hovering()
                 self.start_hovering_vel()
@@ -283,6 +290,7 @@ class CFController(Controller):
         msg.vy = 0
         msg.yawrate = 0
         msg.zDistance = self.state_estimate.pose.position.z + delta[2]
+        self.hover_target_position = [None, None, msg.zDistance]
 
         def callback(event):
             # type: (rospy.Timer) -> None
@@ -310,8 +318,8 @@ class CFController(Controller):
 
         self.hover_timer = rospy.Timer(rospy.Duration(0.25), callback, oneshot=False)
 
-    def hover(self, delta=[0, 0, 0]):
-        # type: (np.ndarray) -> None
+    def hover(self, delta=[0, 0, 0], type=None):
+        # type: (np.ndarray, Optional[HoverType]) -> None
         if not self.state_estimate:
             rospy.logwarn("No state estimate")
             return
@@ -319,7 +327,12 @@ class CFController(Controller):
             if self.state == State.hovering:
                 return
             self.stop_hovering()
-            self.start_hovering(delta=delta)
+            if type is None:
+                type = self.hover_type
+            if type == HoverType.position:
+                self.start_hovering(delta=delta)
+            else:
+                self.start_hovering_vel(delta=delta)
 
     def update_state(self, msg):
         # type: (FlightState) -> None
@@ -372,13 +385,21 @@ class CFController(Controller):
         if self.hover_target_position is not None and self.state_estimate is not None:
             p = self.state_estimate.pose.position
             # rospy.loginfo("near target? %s %s", self.target_position, [p.x, p.y, p.z])
-            dist = np.linalg.norm(np.array(self.hover_target_position) - np.array([p.x, p.y, p.z]))
+            if self.hover_type == HoverType.position:
+                dist = np.linalg.norm(
+                    np.array(self.hover_target_position) - np.array([p.x, p.y, p.z]))
+                rospy.loginfo('dist1 %s', dist)
+            else:
+                dist = abs(self.hover_target_position[2] - p.z)
+                rospy.loginfo('dist2 %s', dist)
             if dist > TOL:
                 return False
             if self.hover_target_yaw is not None:
                 q = self.state_estimate.pose.orientation
                 _, _, yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])
                 return abs(np.unwrap([0, self.hover_target_yaw - yaw])[1]) < ANGLE_TOL
+            else:
+                return True
         return False
 
     def cf_land(self, msg):
