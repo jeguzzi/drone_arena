@@ -13,7 +13,7 @@ from drone_arena_msgs.srv import SetXY, SetXYRequest, SetXYResponse  # noqa
 from geometry_msgs.msg import PointStamped, Pose
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import BatteryState as BatteryStateMsg
-from std_msgs.msg import Empty
+from std_msgs.msg import Empty, ColorRGBA
 
 from .control import BatteryState, Controller, State, button
 
@@ -62,8 +62,21 @@ class CFController(Controller):
         rospy.Subscriber('cf_odom', Odometry, self.update_odometry, queue_size=1)
         rospy.Subscriber('battery', BatteryStateMsg, self.update_battery, queue_size=1)
         rospy.Subscriber('set_pose', Pose, button(self.has_updated_pose), queue_size=1)
+        rospy.Subscriber('led', ColorRGBA, self.has_updated_led, queue_size=1)
         rospy.Service('set_xy', SetXY, self.set_position_service)
         rospy.loginfo('Started set position service')
+
+    def set_led(self, red, green, blue):
+        # type: (int, int, int) -> None
+        params = ["blinkM/solidRed1", "blinkM/solidGreen1", "blinkM/solidBlue1"]
+        for param, color in zip(params, (red, green, blue)):
+            rospy.set_param(param, color)
+        self.update_params(params)
+
+    def has_updated_led(self, msg):
+        # type: (ColorRGBA) -> None
+        rgb = [int(round(255 * color)) for color in (msg.r, msg.g, msg.b)]
+        self.set_led(*rgb)
 
     def set_position_service(self, req):
         # type: (SetXYRequest) -> SetXYResponse
