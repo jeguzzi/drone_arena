@@ -907,7 +907,7 @@ class Controller(object):
 
     @if_flying
     def has_received_joy(self, msg):   # type: (Joy) -> None
-        if not msg.buttons[self.deadman_button]:
+        if self.deadman_button >= 0 and not msg.buttons[self.deadman_button]:
             return
 
         if self.enforce_fence and not self.localized:
