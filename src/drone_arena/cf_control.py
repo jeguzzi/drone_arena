@@ -39,6 +39,7 @@ class CFController(Controller):
         self.cf_can_fly = False
         self.thrust_buffer = deque([], maxlen=THRUST_BUFFER_LENGTH)  # type: deque
         self.lock = Lock()  # type: Lock
+        self.param_lock = Lock()  # type: Lock
         self.state_estimate = None  # type: Optional[Odometry]
         self.hover_timer = None  # type: Optional[rospy.Timer]
         self.hover_distance = None  # type: Optional[float]
@@ -68,10 +69,11 @@ class CFController(Controller):
 
     def set_led(self, red, green, blue):
         # type: (int, int, int) -> None
-        params = ["blinkM/solidRed1", "blinkM/solidGreen1", "blinkM/solidBlue1"]
-        for param, color in zip(params, (red, green, blue)):
-            rospy.set_param(param, color)
-        self.update_params(params)
+        with self.param_lock:
+            params = ["blinkM/solidRed1", "blinkM/solidGreen1", "blinkM/solidBlue1"]
+            for param, color in zip(params, (red, green, blue)):
+                rospy.set_param(param, color)
+            self.update_params(params)
 
     def has_updated_led(self, msg):
         # type: (ColorRGBA) -> None
@@ -143,29 +145,32 @@ class CFController(Controller):
         # type: (float, float) -> bool
         if not self.state_estimate:
             return False
-        rospy.loginfo("Reset Kalman filter")
-        rospy.set_param("kalman/initialX", x)
-        rospy.set_param("kalman/initialY", y)
-        rospy.set_param("kalman/initialZ", self.state_estimate.pose.position.z)
-        params = ["kalman/initialX", "kalman/initialY", "kalman/initialZ"]
 
-        orientation = self.state_estimate.pose.orientation
-        rospy.set_param("kalman/initialQx", orientation.x)
-        rospy.set_param("kalman/initialQy", orientation.y)
-        rospy.set_param("kalman/initialQz", orientation.z)
-        rospy.set_param("kalman/initialQw", orientation.w)
+        with self.param_lock:
+            rospy.loginfo("Reset Kalman filter")
+            rospy.set_param("kalman/initialX", x)
+            rospy.set_param("kalman/initialY", y)
+            rospy.set_param("kalman/initialZ", self.state_estimate.pose.position.z)
+            params = ["kalman/initialX", "kalman/initialY", "kalman/initialZ"]
 
-        params += ["kalman/initialQx", "kalman/initialQy", "kalman/initialQz",
-                   "kalman/initialQw"]
+            orientation = self.state_estimate.pose.orientation
+            rospy.set_param("kalman/initialQx", orientation.x)
+            rospy.set_param("kalman/initialQy", orientation.y)
+            rospy.set_param("kalman/initialQz", orientation.z)
+            rospy.set_param("kalman/initialQw", orientation.w)
 
-        rospy.loginfo("Reset pose to (%s, %s, %s), (%s, %s, %s, %s)",
-                      x, y, self.state_estimate.pose.position.z,
-                      orientation.x, orientation.y, orientation.z, orientation.w)
+            params += ["kalman/initialQx", "kalman/initialQy", "kalman/initialQz",
+                       "kalman/initialQw"]
 
-        self.update_params(params)
-        rospy.set_param("kalman/resetEstimation", 1)
-        self.update_params(["kalman/resetEstimation"])
-        return True
+            self.update_params(params)
+            rospy.set_param("kalman/resetEstimation", 1)
+            self.update_params(["kalman/resetEstimation"])
+
+            rospy.loginfo("Reset pose to (%s, %s, %s), (%s, %s, %s, %s)",
+                          x, y, self.state_estimate.pose.position.z,
+                          orientation.x, orientation.y, orientation.z, orientation.w)
+
+            return True
 
     # def reset(self, pose):
     #     # type: (Pose) -> bool
