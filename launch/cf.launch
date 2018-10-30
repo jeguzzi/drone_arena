@@ -14,24 +14,40 @@
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
+            blinkM/mode: 1
+            blinkM/solidRed1: 255
+            blinkM/solidGreen1: 0
+            blinkM/solidBlue1: 128
         -
           id: 2
           params:
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
+            blinkM/mode: 1
+            blinkM/solidRed1: 255
+            blinkM/solidGreen1: 0
+            blinkM/solidBlue1: 128
         -
           id: 3
           params:
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
+            blinkM/mode: 1
+            blinkM/solidRed1: 255
+            blinkM/solidGreen1: 0
+            blinkM/solidBlue1: 128
         -
           id: 4
           params:
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
+            blinkM/mode: 1
+            blinkM/solidRed1: 255
+            blinkM/solidGreen1: 0
+            blinkM/solidBlue1: 128
     </rosparam>
     <param name='name' value='cf'/>
   </node>

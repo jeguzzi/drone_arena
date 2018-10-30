@@ -1,7 +1,9 @@
 import enum
 from collections import deque
 from threading import RLock as Lock
-from typing import Optional, Tuple  # noqa
+from typing import Any, Optional, Tuple  # noqa
+
+import struct
 
 import numpy as np
 from tf.transformations import euler_from_quaternion
@@ -10,10 +12,11 @@ import rospy
 from crazyflie_driver.msg import FlightState, Hover, Position
 from crazyflie_driver.srv import UpdateParams
 from drone_arena_msgs.srv import SetXY, SetXYRequest, SetXYResponse  # noqa
+from drone_arena_msgs.msg import BlinkMScript
 from geometry_msgs.msg import PointStamped, Pose
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import BatteryState as BatteryStateMsg
-from std_msgs.msg import Empty, ColorRGBA
+from std_msgs.msg import ColorRGBA, Empty, Int8, UInt8
 
 from .control import BatteryState, Controller, State, button
 
@@ -22,7 +25,7 @@ ANGLE_TOL = 0.2
 TOL = 0.1
 RESET_TOL = 0.05
 RESET_TIMEOUT = 2
-THRUST_BUFFER_LENGTH = 3
+THRUST_BUFFER_LENGTH = 3  # type: int
 
 
 class HoverType(enum.Enum):
@@ -35,6 +38,8 @@ class CFController(Controller):
     def __init__(self):
         # type: () -> None
         super(CFController, self).__init__()
+        self.led_enabled = None  # type: Optional[bool]
+        self.led_mode = None  # type: Optional[int]
         self.last_state_update = None  # type: Optional[rospy.Time]
         self.cf_can_fly = False
         self.thrust_buffer = deque([], maxlen=THRUST_BUFFER_LENGTH)  # type: deque
@@ -64,21 +69,67 @@ class CFController(Controller):
         rospy.Subscriber('battery', BatteryStateMsg, self.update_battery, queue_size=1)
         rospy.Subscriber('set_pose', Pose, button(self.has_updated_pose), queue_size=1)
         rospy.Subscriber('led', ColorRGBA, self.has_updated_led, queue_size=1)
+        rospy.Subscriber('led/mode', Int8, self.has_updated_led_mode, queue_size=1)
+        rospy.Subscriber('led/script', BlinkMScript, self.has_updated_led_script, queue_size=1)
+        rospy.Subscriber('led/fade_speed', UInt8, self.has_updated_led_fade_speed, queue_size=1)
         rospy.Service('set_xy', SetXY, self.set_position_service)
         rospy.loginfo('Started set position service')
 
     def set_led(self, red, green, blue):
         # type: (int, int, int) -> None
         with self.param_lock:
+            if self.led_mode != 1:
+                self.set_led_mode(1)
             params = ["blinkM/solidRed1", "blinkM/solidGreen1", "blinkM/solidBlue1"]
             for param, color in zip(params, (red, green, blue)):
                 rospy.set_param(param, color)
             self.update_params(params)
 
+    def set_led_mode(self, mode):
+        # type: (int) -> None
+        with self.param_lock:
+            param = 'blinkM/mode'
+            rospy.set_param(param, mode)
+            self.update_params([param])
+            self.led_mode = mode
+
+    def set_led_script(self, id, repetitions=1, speed=0):
+        # type: (int, int, int) -> None
+        with self.param_lock:
+            param = 'blinkM/script'
+            data = struct.pack('BBbB', id, repetitions, speed, 0)
+            value, = struct.unpack('I', data)
+            rospy.loginfo("Set blinkM script %d", value)
+            rospy.set_param(param, value)
+            self.update_params([param])
+
+    def set_led_fade_speed(self, speed):
+        # type: (int) -> None
+        with self.param_lock:
+            param = 'blinkM/fadeSpeed'
+            rospy.set_param(param, speed)
+            self.update_params([param])
+
     def has_updated_led(self, msg):
         # type: (ColorRGBA) -> None
-        rgb = [int(round(255 * color)) for color in (msg.r, msg.g, msg.b)]
-        self.set_led(*rgb)
+        if self.led_enabled:
+            rgb = [int(round(255 * color)) for color in (msg.r, msg.g, msg.b)]
+            self.set_led(*rgb)
+
+    def has_updated_led_mode(self, msg):
+        # type: (Int8) -> None
+        if self.led_enabled:
+            self.set_led_mode(msg.data)
+
+    def has_updated_led_script(self, msg):
+        # type: (BlinkMScript) -> None
+        if self.led_enabled:
+            self.set_led_script(msg.id, msg.repetitions, msg.speed)
+
+    def has_updated_led_fade_speed(self, msg):
+        # type: (Int8) -> None
+        if self.led_enabled:
+            self.set_led_fade_speed(msg.data)
 
     def set_position_service(self, req):
         # type: (SetXYRequest) -> SetXYResponse
@@ -104,7 +155,7 @@ class CFController(Controller):
         while (rospy.Time.now() - t).to_sec() < RESET_TIMEOUT:
             cx = self.state_estimate.pose.position.x
             cy = self.state_estimate.pose.position.y
-            if (abs(x - cx) < RESET_TOL and abs(y - cy) < RESET_TOL):
+            if abs(x - cx) < RESET_TOL and abs(y - cy) < RESET_TOL:
                 rospy.loginfo("Position updated")
                 return True
             rospy.sleep(0.1)
@@ -352,8 +403,19 @@ class CFController(Controller):
             else:
                 self.start_hovering_vel(delta=delta)
 
+    def has_connected(self):
+        # type: () -> None
+        self.led_enabled = rospy.get_param('blinkM/blinkM', False)
+        self.led_mode = rospy.get_param('blinkM/mode', None)
+        self.battery_state = None
+        self.cf_can_fly = False
+        self.thrust_buffer.clear()
+        self.state_estimate = None
+
     def update_state(self, msg):
         # type: (FlightState) -> None
+        if self.last_state_update is None:
+            self.has_connected()
         self.last_state_update = rospy.Time.now()
         self.thrust_buffer.append(msg.thrust)
         if self.battery_percent is not None:
@@ -388,6 +450,7 @@ class CFController(Controller):
                     rospy.logwarn("lost connection => stop and set to landed")
                     self.stop()
                     self.battery_state = None
+                    self.last_state_update = None
 
         if self.state in [State.landing] and self.state_estimate is not None:
             z = self.state_estimate.pose.position.z
