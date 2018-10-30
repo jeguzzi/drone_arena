@@ -83,15 +83,21 @@ class CFController(Controller):
             params = ["blinkM/solidRed1", "blinkM/solidGreen1", "blinkM/solidBlue1"]
             for param, color in zip(params, (red, green, blue)):
                 rospy.set_param(param, color)
-            self.update_params(params)
+            try:
+                self.update_params(params)
+            except rospy.ServiceException:
+                pass
 
     def set_led_mode(self, mode):
         # type: (int) -> None
         with self.param_lock:
             param = 'blinkM/mode'
             rospy.set_param(param, mode)
-            self.update_params([param])
-            self.led_mode = mode
+            try:
+                self.update_params([param])
+                self.led_mode = mode
+            except rospy.ServiceException:
+                pass
 
     def set_led_script(self, id, repetitions=1, speed=0):
         # type: (int, int, int) -> None
@@ -101,14 +107,20 @@ class CFController(Controller):
             value, = struct.unpack('I', data)
             rospy.loginfo("Set blinkM script %d", value)
             rospy.set_param(param, value)
-            self.update_params([param])
+            try:
+                self.update_params([param])
+            except rospy.ServiceException:
+                pass
 
     def set_led_fade_speed(self, speed):
         # type: (int) -> None
         with self.param_lock:
             param = 'blinkM/fadeSpeed'
             rospy.set_param(param, speed)
-            self.update_params([param])
+            try:
+                self.update_params([param])
+            except rospy.ServiceException:
+                pass
 
     def has_updated_led(self, msg):
         # type: (ColorRGBA) -> None
@@ -210,12 +222,15 @@ class CFController(Controller):
             rospy.set_param("kalman/initialQz", orientation.z)
             rospy.set_param("kalman/initialQw", orientation.w)
 
+            rospy.set_param("kalman/resetEstimation", 1)
             params += ["kalman/initialQx", "kalman/initialQy", "kalman/initialQz",
                        "kalman/initialQw"]
 
-            self.update_params(params)
-            rospy.set_param("kalman/resetEstimation", 1)
-            self.update_params(["kalman/resetEstimation"])
+            try:
+                self.update_params(params)
+                self.update_params(["kalman/resetEstimation"])
+            except rospy.ServiceException:
+                return False
 
             rospy.loginfo("Reset pose to (%s, %s, %s), (%s, %s, %s, %s)",
                           x, y, self.state_estimate.pose.position.z,
