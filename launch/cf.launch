@@ -14,10 +14,10 @@
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
-            blinkM/mode: 1
-            blinkM/solidRed1: 255
-            blinkM/solidGreen1: 0
-            blinkM/solidBlue1: 128
+            led/mode: 2
+            led/shared_mask: 3
+            led/color1: 0xFF00FF
+            led/sequence: 0
         -
           id: 2
           params:

@@ -1,9 +1,9 @@
 import enum
+import math
+import struct
 from collections import deque
 from threading import RLock as Lock
-from typing import Any, Optional, Tuple  # noqa
-
-import struct
+from typing import Any, List, Optional, Tuple  # noqa
 
 import numpy as np
 from tf.transformations import euler_from_quaternion
@@ -11,8 +11,8 @@ from tf.transformations import euler_from_quaternion
 import rospy
 from crazyflie_driver.msg import FlightState, Hover, Position
 from crazyflie_driver.srv import UpdateParams
+from drone_arena_msgs.msg import BlinkMSequence  # BlinkMScript
 from drone_arena_msgs.srv import SetXY, SetXYRequest, SetXYResponse  # noqa
-from drone_arena_msgs.msg import BlinkMScript
 from geometry_msgs.msg import PointStamped, Pose
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import BatteryState as BatteryStateMsg
@@ -70,28 +70,47 @@ class CFController(Controller):
         rospy.Subscriber('set_pose', Pose, button(self.has_updated_pose), queue_size=1)
         rospy.Subscriber('led', ColorRGBA, self.has_updated_led, queue_size=1)
         rospy.Subscriber('led/mode', Int8, self.has_updated_led_mode, queue_size=1)
-        rospy.Subscriber('led/script', BlinkMScript, self.has_updated_led_script, queue_size=1)
-        rospy.Subscriber('led/fade_speed', UInt8, self.has_updated_led_fade_speed, queue_size=1)
+        # rospy.Subscriber('led/script', BlinkMScript, self.has_updated_led_script, queue_size=1)
+        rospy.Subscriber('led/sequence', BlinkMSequence, self.has_updated_led_sequence,
+                         queue_size=1)
+        rospy.Subscriber('blinkM/brightness', UInt8, self.has_updated_led_brightness, 'blinkM',
+                         queue_size=1)
+        rospy.Subscriber('ring/brightness', UInt8, self.has_updated_led_brightness, 'ring',
+                         queue_size=1)
+        rospy.Subscriber('blinkM/fade_speed', UInt8, self.has_updated_led_fade_speed, queue_size=1)
         rospy.Service('set_xy', SetXY, self.set_position_service)
         rospy.loginfo('Started set position service')
 
-    def set_led(self, red, green, blue):
-        # type: (int, int, int) -> None
+    def set_led_brightness(self, name, value):
+        # type: (str, int) -> None
         with self.param_lock:
-            if self.led_mode != 1:
-                self.set_led_mode(1)
-            params = ["blinkM/solidRed1", "blinkM/solidGreen1", "blinkM/solidBlue1"]
-            for param, color in zip(params, (red, green, blue)):
-                rospy.set_param(param, color)
+            param = '{0}/brightness'.format(name)
+            rospy.set_param(param, value)
             try:
-                self.update_params(params)
+                self.update_params([param])
             except rospy.ServiceException:
                 pass
+
+    def set_led(self, red, green, blue):
+        # type: (int, int, int) -> None
+
+        self.set_led_sequence(colors=[(red, green, blue)], periods=[0], repetitions=0)
+
+        # with self.param_lock:
+        #     if self.led_mode == 0:
+        #         self.set_led_mode(1)
+        #     params = ["blinkM/solidRed1", "blinkM/solidGreen1", "blinkM/solidBlue1"]
+        #     for param, color in zip(params, (red, green, blue)):
+        #         rospy.set_param(param, color)
+        #     try:
+        #         self.update_params(params)
+        #     except rospy.ServiceException:
+        #         pass
 
     def set_led_mode(self, mode):
         # type: (int) -> None
         with self.param_lock:
-            param = 'blinkM/mode'
+            param = 'led/mode'
             rospy.set_param(param, mode)
             try:
                 self.update_params([param])
@@ -133,15 +152,53 @@ class CFController(Controller):
         if self.led_enabled:
             self.set_led_mode(msg.data)
 
-    def has_updated_led_script(self, msg):
-        # type: (BlinkMScript) -> None
+    # def has_updated_led_script(self, msg):
+    #     # type: (BlinkMScript) -> None
+    #     if self.led_enabled:
+    #         self.set_led_script(msg.id, msg.repetitions, msg.speed)
+
+    def set_led_sequence(self, colors, periods, repetitions):
+        # type: (List[Tuple[int, int, int]], List[int], int) -> None
+        with self.param_lock:
+            param = 'led/sequence'
+            periods += [0] * (3 - len(periods))
+            data = struct.pack('BBBB', periods[0], periods[1], periods[2], repetitions)
+            value, = struct.unpack('<i', data)
+            rospy.set_param(param, value)
+            params = [param]
+            for i, (c, p) in list(enumerate(zip(colors, periods)))[:3]:
+                if i > 0 and not p:
+                    break
+                param = 'led/color%d' % (i + 1)
+                data = struct.pack('BBBB', c[0], c[1], c[2], 0)
+                value, = struct.unpack('<i', data)
+                rospy.set_param(param, value)
+                params.append(param)
+            try:
+                self.update_params(params)
+            except rospy.ServiceException:
+                pass
+            if self.led_mode == 0:
+                self.set_led_mode(1)
+        pass
+
+    def has_updated_led_sequence(self, msg):
+        # type: (BlinkMSequence) -> None
         if self.led_enabled:
-            self.set_led_script(msg.id, msg.repetitions, msg.speed)
+            periods = [round(20 * t.to_sec()) for t in msg.periods]
+            colors = [(math.floor(c.r * 255), math.floor(c.g * 255), math.floor(c.b * 255))
+                      for c in msg.colors]
+            self.set_led_sequence(colors=colors, periods=periods, repetitions=msg.repetitions)
 
     def has_updated_led_fade_speed(self, msg):
         # type: (Int8) -> None
         if self.led_enabled:
             self.set_led_fade_speed(msg.data)
+
+    def has_updated_led_brightness(self, msg, name):
+        # type: (Int8, str) -> None
+        if self.led_enabled:
+            self.set_led_brightness(name, msg.data)
 
     def set_position_service(self, req):
         # type: (SetXYRequest) -> SetXYResponse
@@ -421,7 +478,7 @@ class CFController(Controller):
     def has_connected(self):
         # type: () -> None
         self.led_enabled = rospy.get_param('blinkM/blinkM', False)
-        self.led_mode = rospy.get_param('blinkM/mode', None)
+        self.led_mode = rospy.get_param('led/mode', None)
         self.battery_state = None
         self.cf_can_fly = False
         self.thrust_buffer.clear()
