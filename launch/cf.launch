@@ -15,7 +15,7 @@
             stabilizer/controller: 1
             stabilizer/estimator: 2
             led/mode: 2
-            led/shared_mask: 3
+            led/shared_mask: 1
             led/color1: 0xFF00FF
             led/sequence: 0
         -
@@ -24,30 +24,18 @@
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
-            blinkM/mode: 1
-            blinkM/solidRed1: 255
-            blinkM/solidGreen1: 0
-            blinkM/solidBlue1: 128
         -
           id: 3
           params:
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
-            blinkM/mode: 1
-            blinkM/solidRed1: 255
-            blinkM/solidGreen1: 0
-            blinkM/solidBlue1: 128
         -
           id: 4
           params:
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
-            blinkM/mode: 1
-            blinkM/solidRed1: 255
-            blinkM/solidGreen1: 0
-            blinkM/solidBlue1: 128
     </rosparam>
     <param name='name' value='cf'/>
   </node>
