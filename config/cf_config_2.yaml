@@ -1,0 +1,16 @@
+radio:
+  id: 0
+  channel: 100
+  bandwidth : 2M
+params: []
+crazyflies:
+  -
+    id: 2
+    params:
+      kalman/thetapix: 3.75
+      stabilizer/controller: 1
+      stabilizer/estimator: 2
+      led/mode: 1
+      led/shared_mask: 3
+      led/color1: 0xFFFF00
+      led/sequence: 0
