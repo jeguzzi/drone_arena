@@ -1,0 +1,76 @@
+<launch>
+  <arg name="cf_name_1" default="cf"/>
+  <arg name="cf_name_2" default="cf2"/>
+  <arg name="cf_config_1" default="cf_config_1"/>
+  <arg name="cf_config_2" default="cf_config_2"/>
+  <node pkg="crazyflie_driver" type="crazyflie_server" name="crazyflie_server" output="screen"/>
+
+  <include file="$(find drone_arena)/launch/single_cf.launch">
+    <arg name="name" value="$(arg cf_name_1)"/>
+    <arg name="config" value="$(arg cf_config_1)"/>
+    <arg name="deadman" value="7"/>
+    <arg name="joy" value="/joy"/>
+  </include>
+
+  <include file="$(find drone_arena)/launch/single_cf.launch">
+    <arg name="name" value="$(arg cf_name_2)"/>
+    <arg name="config" value="$(arg cf_config_2)"/>
+    <arg name="deadman" value="6"/>
+    <arg name="joy" value="/joy"/>
+  </include>
+
+  <rosparam param="" subst_value="True">
+  teleop:
+    takeoff1:
+      type: topic
+      message_type: "std_msgs/Empty"
+      topic_name: $(arg cf_name_1)/safe_takeoff
+      deadman_buttons: [3, 7]  # RT + Y
+      axis_mappings: []
+    land1:
+      type: topic
+      message_type: "std_msgs/Empty"
+      topic_name: $(arg cf_name_1)/safe_land
+      deadman_buttons: [1, 7]  # RT + A
+      axis_mappings: []
+    emergency1:
+      type: topic
+      message_type: "std_msgs/Empty"
+      topic_name: $(arg cf_name_1)/reset
+      deadman_buttons: [2, 7] # RT + B
+      axis_mappings: []
+    takeoff2:
+      type: topic
+      message_type: "std_msgs/Empty"
+      topic_name: $(arg cf_name_2)/safe_takeoff
+      deadman_buttons: [3, 6]  # RT + Y
+      axis_mappings: []
+    land2:
+      type: topic
+      message_type: "std_msgs/Empty"
+      topic_name: $(arg cf_name_2)/safe_land
+      deadman_buttons: [1, 6]  # RT + A
+      axis_mappings: []
+    emergency2:
+      type: topic
+      message_type: "std_msgs/Empty"
+      topic_name: $(arg cf_name_2)/reset
+      deadman_buttons: [2, 6] # RT + B
+      axis_mappings: []
+    </rosparam>
+
+    <include file="$(find drone_arena)/launch/joy_teleop.launch">
+      <arg name="teleop_config" value=""/>
+      <arg name="namespace" value=""/>
+    </include>
+
+  <node pkg="drone_arena" type="multi_cf_led.py" name="blinkstick" output="screen">
+    <param name="leds" value="8"/>
+    <rosparam param="led_map" subst_value="True">
+      $(arg cf_name_1): [1, 2, 3, 4]
+      $(arg cf_name_2): [5, 6, 7, 0]
+    </rosparam>
+    <param name="max_intensity" value="100"/>
+  </node>
+
+</launch>

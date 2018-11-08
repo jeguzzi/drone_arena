@@ -6,8 +6,10 @@
   <arg name="teleop_config" default="" />
   <arg name="namespace"/>
 
-  <group ns="$(arg namespace)">
-    <rosparam file="$(arg teleop_config)" command="load" />
+  <arg name="ns" value="$(eval arg('namespace') if arg('namespace') else '/')"/>
+
+  <group ns="$(arg ns)">
+    <rosparam if="$(eval len(arg('teleop_config')) > 0)" file="$(arg teleop_config)" command="load" />
 
     <node pkg="joy" type="joy_node" name="joy_node">
       <param name="dev" value="$(arg joy_dev)" />

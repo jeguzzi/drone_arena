@@ -60,7 +60,6 @@ class CFLed(blinkstickROS):
         if self.battery.percentage < 0.15:
             color = 'orange'
 
-
         charging = (self.battery.power_supply_status in [BatteryState.POWER_SUPPLY_STATUS_CHARGING,
                                                          BatteryState.POWER_SUPPLY_STATUS_FULL])
         duration = self.battery.percentage * self.period * 1000
@@ -74,7 +73,8 @@ class CFLed(blinkstickROS):
 
     def shutdown(self):
         all = list(range(self.number_of_leds))
-        self.set_color(name='orange', index=all)
+        self.set_color(name='black', index=all)
+
 
 if __name__ == '__main__':
     cfled = CFLed()

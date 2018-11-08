@@ -244,7 +244,6 @@ class Controller(object):
         rospy.Subscriber('safe_takeoff', Empty, button(self.has_received_takeoff), queue_size=1)
         rospy.Subscriber('safe_land', Empty, self.has_received_safe_land, queue_size=1)
         rospy.Subscriber('odom', Odometry, self.has_received_odometry, queue_size=1)
-        rospy.Subscriber('joy', Joy, self.has_received_joy, queue_size=1)
         rospy.Subscriber('hover', Empty, self.has_received_hover, queue_size=1)
         rospy.Subscriber('give_feedback', Empty, Temporized(5)(self.has_received_give_feedback),
                          queue_size=1)
@@ -380,6 +379,8 @@ class Controller(object):
         self.deadman_button = rospy.get_param("~deadman", 7)
         self.joy_axes = rospy.get_param("~joy_axes", [3, 2, 1, 0])
         self.joy_set_teleop_mode = rospy.get_param("~joy_set_teleop_mode", True)
+        joy = rospy.get_param("~joy", 'joy')
+        rospy.Subscriber(joy, Joy, self.has_received_joy, queue_size=1)
 
 # --------------- battery
 

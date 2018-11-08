@@ -1,0 +1,42 @@
+<launch>
+  <arg name="name" default="cf"/>
+  <arg name="config"/>
+  <arg name="deadman" default="7"/>
+  <arg name="joy" default="joy"/>
+  <group ns="$(arg name)">
+    <node name='supervisor' pkg='drone_arena' type='cf_supervisor.py' output="screen">
+      <rosparam command="load" param="" file="$(find drone_arena)/config/$(arg config).yaml"/>
+      <param name="name" value="$(arg name)"/>
+    </node>
+    <node pkg="drone_arena" type="cf_controller.py" name="fence_controller" output="screen">
+      <remap from="cf_odom" to="odom"/>
+      <param name="enable_fence" value="true"/>
+      <param name="frame_id" value="$(arg name)/odom"/>
+      <param name="publish_target" value="False"/>
+      <param name="publish_body_vel" value="True"/>
+      <param name="publish_cmd" value="False"/>
+      <param name="teleop_mode" value="1"/>
+      <param name="max_speed" value="1.2"/>
+      <param name="max_vertical_speed" value="1"/>
+      <param name="max_angular_speed" value="2"/>
+      <param name="tau" value="0.25"/>
+      <param name="eta" value="0.5"/>
+      <param name="delay" value="0"/>
+      <param name="joy_set_teleop_mode" value="true"/>
+      <param name="max_safe_angle" value="0.75"/>
+      <param name="deadman" value="$(arg deadman)"/>
+      <param name="joy" value="$(arg joy)"/>
+      <rosparam param="pos_bounds">
+        - [-inf, inf]
+        - [-inf, inf]
+        - [0.2, 1.0]
+      </rosparam>
+      <rosparam param="feedback">
+        amplitude: 0.5
+        movements: 1
+        up: 0.15
+        down: 0.0
+      </rosparam>
+    </node>
+  </group>
+</launch>
