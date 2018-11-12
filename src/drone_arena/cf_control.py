@@ -477,7 +477,9 @@ class CFController(Controller):
 
     def has_connected(self):
         # type: () -> None
-        self.led_enabled = rospy.get_param('blinkM/blinkM', False)
+        self.led_enabled = (rospy.get_param('blinkM/isInit', False) or
+                            rospy.get_param('ring/isInit', False))
+        rospy.loginfo("Lef is enabled? %d", self.led_enabled)
         self.led_mode = rospy.get_param('led/mode', None)
         self.battery_state = None
         self.cf_can_fly = False

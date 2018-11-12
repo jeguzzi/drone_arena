@@ -30,6 +30,10 @@
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
+            led/mode: 1
+            led/shared_mask: 1
+            led/color1: 0x0080FF
+            led/sequence: 0
         -
           id: 4
           params:
