@@ -33,6 +33,16 @@ class HoverType(enum.Enum):
     velocity = 1
 
 
+def to_ubyte(i):
+    # type: (int) -> int
+    return min(255, max(i, 0))
+
+
+def to_sbyte(i):
+    # type: (int) -> int
+    return min(-127, max(i, 127))
+
+
 class CFController(Controller):
 
     def __init__(self):
@@ -122,7 +132,7 @@ class CFController(Controller):
         # type: (int, int, int) -> None
         with self.param_lock:
             param = 'blinkM/script'
-            data = struct.pack('BBbB', id, repetitions, speed, 0)
+            data = struct.pack('BBbB', to_ubyte(id), to_ubyte(repetitions), to_sbyte(speed), 0)
             value, = struct.unpack('I', data)
             rospy.loginfo("Set blinkM script %d", value)
             rospy.set_param(param, value)
@@ -162,7 +172,8 @@ class CFController(Controller):
         with self.param_lock:
             param = 'led/sequence'
             periods += [0] * (3 - len(periods))
-            data = struct.pack('BBBB', periods[0], periods[1], periods[2], repetitions)
+            data = struct.pack('BBBB', to_ubyte(periods[0]), to_ubyte(periods[1]),
+                               to_ubyte(periods[2]), to_ubyte(repetitions))
             value, = struct.unpack('<i', data)
             rospy.set_param(param, value)
             params = [param]
@@ -170,7 +181,7 @@ class CFController(Controller):
                 if i > 0 and not p:
                     break
                 param = 'led/color%d' % (i + 1)
-                data = struct.pack('BBBB', c[0], c[1], c[2], 0)
+                data = struct.pack('BBBB', to_ubyte(c[0]), to_ubyte(c[1]), to_ubyte(c[2]), 0)
                 value, = struct.unpack('<i', data)
                 rospy.set_param(param, value)
                 params.append(param)
