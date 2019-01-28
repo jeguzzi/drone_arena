@@ -40,7 +40,7 @@ def to_ubyte(i):
 
 def to_sbyte(i):
     # type: (int) -> int
-    return min(-127, max(i, 127))
+    return min(127, max(i, -127))
 
 
 class CFController(Controller):
@@ -583,7 +583,7 @@ class CFController(Controller):
         # type: (Empty) -> None
         with self.lock:
             rospy.loginfo("Takeoff")
-            self.hover(delta=[0, 0, 0.5])
+            self.hover(delta=[0, 0, self.hover_takeoff_altitude])
             self.state = State.taking_off
 
     def stop(self, msg=None):
