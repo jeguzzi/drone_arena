@@ -1,7 +1,5 @@
 import math
 
-from numpy import np  # noqa
-
 import rospy
 from bebop_msgs.msg import \
     Ardrone3PilotingStateFlyingStateChanged as FlyingStateChanged
@@ -36,17 +34,15 @@ class BebopController(Controller):
     # TODO: parametrize
     def give_feedback(self):
         # type: () -> None
-        t = 0.0
-        A = 0.1
-        n = 2
-        omega = 6.0
-        T = 2 * math.pi * n / omega
-        dt = 0.1
-        while t < T:
-            z = (A * omega) * math.sin(t * omega)
-            self.des_cmd_pub.publish(Twist(linear=Vector3(0, 0, z)))
-            t += dt
-            rospy.sleep(dt)
+        A = rospy.get_param('~feedback/amplitude', 1)
+        n = rospy.get_param('~feedback/movements', 1)
+        t_up = rospy.get_param('~feedback/up', 0.15)
+        t_down = rospy.get_param('~feedback/down', 0.5)
+        rospy.loginfo("Start gesture with A %s, n %s, dt (%s, %s)", A, n, t_up, t_down)
+        for _ in range(n):
+            for dz, dt in zip([A, -A], [t_up, t_down]):
+                self.des_cmd_pub.publish(Twist(linear=Vector3(0, 0, dz / dt)))
+                rospy.sleep(dt)
         self.des_cmd_pub.publish(Twist(linear=Vector3(0, 0, 0)))
 
     def stop(self, msg=None):
