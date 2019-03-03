@@ -13,12 +13,12 @@ from crazyflie_driver.msg import FlightState, Hover, Position
 from crazyflie_driver.srv import UpdateParams
 from drone_arena_msgs.msg import BlinkMSequence  # BlinkMScript
 from drone_arena_msgs.srv import SetXY, SetXYRequest, SetXYResponse  # noqa
-from geometry_msgs.msg import PointStamped, Pose
+from geometry_msgs.msg import PointStamped, Pose, PoseStamped, Quaternion  # noqa
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import BatteryState as BatteryStateMsg
 from std_msgs.msg import ColorRGBA, Empty, Int8, UInt8
 
-from .control import BatteryState, Controller, State, button
+from .control import BatteryState, Controller, State, button, if_flying
 
 TAU = 0.02
 ANGLE_TOL = 0.2
@@ -26,6 +26,10 @@ TOL = 0.1
 RESET_TOL = 0.05
 RESET_TIMEOUT = 2
 THRUST_BUFFER_LENGTH = 3  # type: int
+
+# 1 s if odom is published (as default) at 20 Hz
+VZ_BUFFER_LENGTH = 20  # type: int
+MIN_VZ_TO_STOP = -0.01
 
 
 class HoverType(enum.Enum):
@@ -56,6 +60,8 @@ class CFController(Controller):
         self.lock = Lock()  # type: Lock
         self.param_lock = Lock()  # type: Lock
         self.state_estimate = None  # type: Optional[Odometry]
+        self.cf_z_tau = rospy.get_param('cf_z_tau', 2.0)  # type: float
+        self.cf_vz_deadband = rospy.get_param('cf_vz_deadband', 1e-2)  # type: float
         self.hover_timer = None  # type: Optional[rospy.Timer]
         self.hover_distance = None  # type: Optional[float]
         self.hover_target_position = None  # type: Optional[np.ndarray]
@@ -66,11 +72,31 @@ class CFController(Controller):
         self.position_pub = rospy.Publisher('cmd_position', Position, queue_size=1)
         self.hover_pub = rospy.Publisher('cmd_hover', Hover, queue_size=1)
         self.stop_pub = rospy.Publisher('cmd_stop', Empty, queue_size=1)
-        self.external_pose_pub = rospy.Publisher("external_position", PointStamped, queue_size=1)
 
         rospy.wait_for_service('update_params')
         rospy.loginfo("found update_params service")
         self.update_params = rospy.ServiceProxy('update_params', UpdateParams)
+
+        # Set if you want to use the mocap for state estimations. Not stricly needed as the fence
+        # can be anyway defined in World and the tf be connected using the optitrack2odom node
+        mocap_pose_topic = rospy.get_param('~mocap_pose', '')
+        if mocap_pose_topic:
+            self.use_mocap_for_state_estimation = True
+            self.first_mocap_pose = True
+            self.use_mocap_z = rospy.get_param('~use_mocap_z', True)
+            rospy.Subscriber(mocap_pose_topic, PoseStamped, self.has_updated_mocap_pose,
+                             queue_size=1)
+            self.external_position_pub = rospy.Publisher("external_position", PointStamped,
+                                                         queue_size=1)
+        else:
+            self.use_mocap_for_state_estimation = False
+
+        self.land_at_altitude = rospy.get_param('~land_at_altitude', False)
+        if self.land_at_altitude:
+            self.vzs_length = rospy.get_param('land_at_altitude_buffer_length', VZ_BUFFER_LENGTH)
+            self.vzs = deque([], maxlen=self.vzs_length)  # type: deque
+            self.min_vz_to_stop = rospy.get_param(
+                'land_at_altitude_min_vertical_speed', MIN_VZ_TO_STOP)
 
         rospy.Subscriber('state', FlightState, self.update_state, queue_size=1)
         rospy.Subscriber('reset', Empty, self.stop, queue_size=1)
@@ -88,8 +114,64 @@ class CFController(Controller):
         rospy.Subscriber('ring/brightness', UInt8, self.has_updated_led_brightness, 'ring',
                          queue_size=1)
         rospy.Subscriber('blinkM/fade_speed', UInt8, self.has_updated_led_fade_speed, queue_size=1)
+
+        rospy.Subscriber('sound', UInt8, self.has_updated_sound, queue_size=1)
+
         rospy.Service('set_xy', SetXY, self.set_position_service)
         rospy.loginfo('Started set position service')
+
+    def has_updated_sound(self, msg):
+        # type: (UInt8) -> None
+        # 0: off
+        # 1: factory_test, repeated
+        # 2: usb_connect
+        # 3: usb_disconnect
+        # 4: chg_done
+        # 5: lowbatt, repeated
+        # 6: startup
+        # 7: calibrated
+        # 8: range_slow, repeated
+        # 9: range_fast, repeated
+        # 10: starwars, repeated
+        # 11: valkyries, repeated
+        # 12: bypass, repeated
+        # 13: siren, repeated
+        # 14: tilt, repeated
+
+        i = msg.data
+        # TODO: read neffect from params sound/neffect
+        if i > 14:
+            i = 0
+
+        with self.param_lock:
+            param = 'sound/effect'
+            rospy.set_param(param, i)
+            try:
+                self.update_params([param])
+            except rospy.ServiceException:
+                pass
+
+    def has_updated_mocap_pose(self, pose):
+        # type: (PoseStamped) -> None
+        position = pose.pose.position
+        if self.first_mocap_pose:
+            if self.set_position(position.x, position.y,
+                                 position.z if self.use_mocap_z else None,
+                                 orientation=pose.pose.orientation):
+                self.first_mocap_pose = False
+            return
+        msg = PointStamped()
+        msg.header.stamp = rospy.Time.now()
+
+        msg.point.x = position.x
+        msg.point.y = position.y
+        if self.use_mocap_z:
+            msg.point.z = position.z
+        elif self.state_estimate:
+            msg.point.z = self.state_estimate.pose.pose.position.y
+        else:
+            return
+        self.external_position_pub.publish(msg)
 
     def set_led_brightness(self, name, value):
         # type: (str, int) -> None
@@ -227,15 +309,21 @@ class CFController(Controller):
             res.success = r
             return res
 
-    def set_position(self, x, y):
-        # type: (float, float) -> bool
-        if not self.state_estimate or not self.reset_position(x, y):
+    def set_position(self, x, y, z=None, orientation=None):
+        # type: (float, float, Optional[float], Optional[Quaternion]) -> bool
+        if not self.state_estimate:
+            return False
+        if not self.reset_position(x, y, z=z, orientation=orientation):
             return False
         t = rospy.Time.now()
         while (rospy.Time.now() - t).to_sec() < RESET_TIMEOUT:
-            cx = self.state_estimate.pose.position.x
-            cy = self.state_estimate.pose.position.y
-            if abs(x - cx) < RESET_TOL and abs(y - cy) < RESET_TOL:
+            cx = self.state_estimate.pose.pose.position.x
+            cy = self.state_estimate.pose.pose.position.y
+            has_converged = abs(x - cx) < RESET_TOL and abs(y - cy) < RESET_TOL
+            if z is not None:
+                cz = self.state_estimate.pose.pose.position.z
+                has_converged = has_converged and abs(z - cz) < RESET_TOL
+            if has_converged:
                 rospy.loginfo("Position updated")
                 return True
             rospy.sleep(0.1)
@@ -243,6 +331,9 @@ class CFController(Controller):
 
     def update_pose(self, pose, reset=True):
         # type: (Pose, bool) -> bool
+        if self.use_mocap_for_state_estimation:
+            self.first_mocap_pose = True
+            return True
         return self.set_position(x=pose.position.x, y=pose.position.y)
 
     # def update_pose(self, pose, reset=False):
@@ -272,19 +363,25 @@ class CFController(Controller):
         # rospy.logwarn("Pose not updated")
         # return False
 
-    def reset_position(self, x, y):
-        # type: (float, float) -> bool
-        if not self.state_estimate:
-            return False
-
+    def reset_position(self, x, y, z=None, orientation=None):
+        # type: (float, float, Optional[float], Optional[Quaternion]) -> bool
+        if z is None:
+            if not self.state_estimate:
+                return False
+            else:
+                z = self.state_estimate.pose.pose.position.z
+        if orientation is None:
+            if not self.state_estimate:
+                return False
+            else:
+                orientation = self.state_estimate.pose.pose.orientation
         with self.param_lock:
             rospy.loginfo("Reset Kalman filter")
             rospy.set_param("kalman/initialX", x)
             rospy.set_param("kalman/initialY", y)
-            rospy.set_param("kalman/initialZ", self.state_estimate.pose.position.z)
+            rospy.set_param("kalman/initialZ", z)
             params = ["kalman/initialX", "kalman/initialY", "kalman/initialZ"]
 
-            orientation = self.state_estimate.pose.orientation
             rospy.set_param("kalman/initialQx", orientation.x)
             rospy.set_param("kalman/initialQy", orientation.y)
             rospy.set_param("kalman/initialQz", orientation.z)
@@ -301,8 +398,7 @@ class CFController(Controller):
                 return False
 
             rospy.loginfo("Reset pose to (%s, %s, %s), (%s, %s, %s, %s)",
-                          x, y, self.state_estimate.pose.position.z,
-                          orientation.x, orientation.y, orientation.z, orientation.w)
+                          x, y,  z, orientation.x, orientation.y, orientation.z, orientation.w)
 
             return True
 
@@ -353,7 +449,7 @@ class CFController(Controller):
         msg.vx = 0
         msg.vy = 0
         msg.yawrate = 0
-        z = self.state_estimate.pose.position.z
+        z = self.state_estimate.pose.pose.position.z
         with self.lock:
             rospy.loginfo("Start gesture with A %s, n %s, dt (%s, %s)", A, n, t_up, t_down)
             for _ in range(n):
@@ -395,19 +491,29 @@ class CFController(Controller):
         # rospy.loginfo("Publish body vel %s %s", velocity, angular_speed)
         self.stop_hovering()
         super(CFController, self).publish_target_body_vel(velocity, angular_speed)
-        if self.hover_distance is None:
-            if self.state_estimate:
-                self.hover_distance = self.state_estimate.pose.position.z
-            else:
-                rospy.logwarn("No state estimate")
-                return
+
+        if self.state_estimate:
+            z = self.state_estimate.pose.pose.position.z
+        else:
+            rospy.logwarn("No state estimate")
+            return
+
+        if abs(velocity[2]) <= self.cf_vz_deadband:
+            # fly flat, i.e. send a constant msg.zDistance
+            # Remember the first altitude as hover_distance
+            # TODO: not very safe
+            if self.hover_distance is None:
+                self.hover_distance = z
+            z = self.hover_distance
+        else:
+            self.hover_distance = None
+
         msg = Hover()
         msg.header.stamp = rospy.Time.now()
         msg.vx = velocity[0]
         msg.vy = velocity[1]
         msg.yawrate = -180 * angular_speed / np.pi
-        self.hover_distance += velocity[2] * TAU
-        msg.zDistance = self.hover_distance
+        msg.zDistance = z + velocity[2] / self.cf_z_tau
         self.hover_pub.publish(msg)
         self.state = State.flying
         self.hover_target_position = self.hover_target_yaw = None
@@ -426,6 +532,7 @@ class CFController(Controller):
         self.position_pub.publish(msg)
         self.hover_target_position = des_target
         self.hover_target_yaw = des_target_yaw
+        self.hover_distance = None
 
     def publish_target_cmd(self, acc, vert_vel, angular_speed):
         # type: (np.ndarray, float, float) -> None
@@ -441,7 +548,7 @@ class CFController(Controller):
         msg.vx = 0
         msg.vy = 0
         msg.yawrate = 0
-        msg.zDistance = self.state_estimate.pose.position.z + delta[2]
+        msg.zDistance = self.state_estimate.pose.pose.position.z + delta[2]
         self.hover_target_position = [None, None, msg.zDistance]
 
         def callback(event):
@@ -455,8 +562,8 @@ class CFController(Controller):
         # type: (np.ndarray) -> None
         if not self.state_estimate:
             return
-        p = self.state_estimate.pose.position
-        q = self.state_estimate.pose.orientation
+        p = self.state_estimate.pose.pose.position
+        q = self.state_estimate.pose.pose.orientation
         _, _, yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])
         hover_target = np.array([p.x, p.y, p.z]) + delta
 
@@ -485,17 +592,19 @@ class CFController(Controller):
                 self.start_hovering(delta=delta)
             else:
                 self.start_hovering_vel(delta=delta)
+            self.hover_distance = None
 
     def has_connected(self):
         # type: () -> None
         self.led_enabled = (rospy.get_param('blinkM/isInit', False) or
                             rospy.get_param('ring/isInit', False))
-        rospy.loginfo("Lef is enabled? %d", self.led_enabled)
+        rospy.loginfo("Led is enabled? %d", self.led_enabled)
         self.led_mode = rospy.get_param('led/mode', None)
         self.battery_state = None
         self.cf_can_fly = False
         self.thrust_buffer.clear()
         self.state_estimate = None
+        self.first_mocap_pose = True
 
     def update_state(self, msg):
         # type: (FlightState) -> None
@@ -538,9 +647,13 @@ class CFController(Controller):
                     self.last_state_update = None
 
         if self.state in [State.landing] and self.state_estimate is not None:
-            z = self.state_estimate.pose.position.z
+            z = self.state_estimate.pose.pose.position.z
             if z < 0.1:
                 self.stop()
+            if self.land_at_altitude:
+                self.vzs.append(self.state_estimate.twist.twist.linear.z)
+                if len(self.vzs) == self.vzs_length and max(self.vzs) > self.min_vz_to_stop:
+                    self.stop()
         if self.state in [State.taking_off, State.flying]:
             if self.near_target():
                 rospy.loginfo("update_state => is hovering")
@@ -549,7 +662,7 @@ class CFController(Controller):
     def near_target(self):
         # type: () -> bool
         if self.hover_target_position is not None and self.state_estimate is not None:
-            p = self.state_estimate.pose.position
+            p = self.state_estimate.pose.pose.position
             # rospy.loginfo("near target? %s %s", self.target_position, [p.x, p.y, p.z])
             if self.hover_type == HoverType.position:
                 dist = np.linalg.norm(
@@ -561,13 +674,14 @@ class CFController(Controller):
             if dist > TOL:
                 return False
             if self.hover_target_yaw is not None:
-                q = self.state_estimate.pose.orientation
+                q = self.state_estimate.pose.pose.orientation
                 _, _, yaw = euler_from_quaternion([q.x, q.y, q.z, q.w])
                 return abs(np.unwrap([0, self.hover_target_yaw - yaw])[1]) < ANGLE_TOL
             else:
                 return True
         return False
 
+    @if_flying
     def cf_land(self, msg):
         # type: (Empty) -> None
         self.land()
@@ -575,13 +689,19 @@ class CFController(Controller):
     def land(self):
         # type: (Empty) -> None
         rospy.loginfo("Land")
-        p = self.state_estimate.pose.position
+        p = self.state_estimate.pose.pose.position
         self.state = State.landing
         self.hover(delta=[0, 0, -p.z + 0.05])
+        if self.land_at_altitude:
+            self.vzs.clear()
 
     def takeoff(self):
         # type: (Empty) -> None
         with self.lock:
+            if self.use_mocap_for_state_estimation:
+                self.first_mocap_pose = True
+                while self.first_mocap_pose:
+                    rospy.sleep(0.1)
             rospy.loginfo("Takeoff")
             self.hover(delta=[0, 0, self.hover_takeoff_altitude])
             self.state = State.taking_off
@@ -591,8 +711,9 @@ class CFController(Controller):
         self.stop_hovering()
         self.stop_pub.publish()
         self.state = State.landed
+        self.hover_distance = None
         rospy.loginfo("Stop")
 
     def update_odometry(self, msg):
         # type: (Odometry) -> None
-        self.state_estimate = msg.pose
+        self.state_estimate = msg
