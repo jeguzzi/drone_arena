@@ -14,9 +14,10 @@ def uri(radio_id, channel, bandwith, id):
     return "radio://{radio_id}/{channel}/{bandwith}/E7E7E7E7{id:02X}".format(**locals())
 
 
-def connection_request(uri, name):
+def connection_request(uri, name, crazyradio_tx_power=0):
     return AddCrazyflieRequest(
-        uri=uri, tf_prefix=name, enable_logging=True, enable_parameters=True, use_ros_time=True,
+        uri=uri, crazyradio_tx_power=crazyradio_tx_power, tf_prefix=name, enable_logging=True,
+        enable_parameters=True, use_ros_time=True,
         enable_logging_battery=True, enable_logging_odom=True, enable_logging_state=True)
 
 
@@ -76,7 +77,10 @@ class CFSupervisor(object):
         return True
 
     def connect(self, id):
-        req = connection_request(self.uri(id), self.name)
+        uri = self.uri(id)
+        rospy.loginfo('Try to connect to CF @ %s with power %d dB',
+                      self.uri(id), self.crazyradio_tx_power)
+        req = connection_request(uri, self.name, self.crazyradio_tx_power)
         try:
             res = self.add_crazyflie(req)
         except Exception as e:
@@ -89,6 +93,7 @@ class CFSupervisor(object):
         channel = rospy.get_param('~radio/channel')
         bandwidth = rospy.get_param('~radio/bandwidth', '2M')
         radio_id = rospy.get_param('~radio/id', 0)
+        self.crazyradio_tx_power = rospy.get_param('~radio/power_db', 0)
         self.uri = lambda id: uri(radio_id, channel, bandwidth, id)
         params = {}
         self.ids = set([cf['id'] for cf in rospy.get_param('~crazyflies')])
