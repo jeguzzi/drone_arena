@@ -1,0 +1,18 @@
+<launch>
+  <remap from="emergency" to="reset"/>
+  <include file="$(find tello_driver)/launch/tello_node.launch">
+    <arg name="vel_cmd_scale" value="1.0"/>
+    <arg name="connect_timeout_sec" value="3600"/>
+    <arg name="low_bat_threshold" value="5"/>
+    <arg name="altitude_limit" value="3"/>
+    <arg name="attitude_limit" value="25"/>
+  </include>
+  <include file="$(find drone_arena)/launch/joy_teleop.launch">
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-bare.yaml" />
+    <arg name="namespace" value="tello"/>
+  </include>
+  <node name='led' pkg='drone_arena' type='led.py' output="screen" ns="tello">
+     <param name='max_intensity' value="60"/>
+     <param name='leds' value="8"/>
+ </node>
+</launch>

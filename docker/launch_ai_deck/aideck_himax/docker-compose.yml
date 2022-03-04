@@ -1,0 +1,11 @@
+version: '2'
+services:
+  himax:
+    network_mode: host
+    image: jeguzzi/himax:noetic
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - ./main.launch:/root/catkin_ws/src/himax/launch/_main.launch:ro
+    env_file:
+      - ../ros.env
+    command: roslaunch himax _main.launch host:=192.168.201.40

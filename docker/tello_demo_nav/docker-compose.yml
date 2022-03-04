@@ -1,0 +1,22 @@
+version: '2'
+services:
+  controller:
+    network_mode: host
+    privileged: true
+    image: jeguzzi/drone_arena:tello
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - ./demo-nav.launch:/root/catkin_ws/src/drone_arena/launch/tello-demo-nav.launch:ro
+      - ./log710.yaml:/root/catkin_ws/src/drone_arena/config/log710-demo-tello-nav.yaml:ro
+    env_file:
+      - ./ros.env
+    command: roslaunch drone_arena tello-demo-nav.launch joy_dev:=/dev/input/js0
+  navigation:
+    network_mode: host
+    image: jeguzzi/ros:hl_navigation
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - ./navigation.launch:/root/catkin_ws/src/hl_navigation_launch/launch/tello.launch:ro
+    env_file:
+      - ./ros.env
+    command: roslaunch hl_navigation_launch tello.launch

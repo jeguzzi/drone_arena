@@ -1,0 +1,49 @@
+<launch>
+
+  <arg name="use_world_frame" default="True"/>
+    <include file="$(find bebop_driver)/launch/bebop_node.launch"/>
+    <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
+    <node name='fence' pkg='drone_arena' type='bebop_controller.py' output="screen" ns="bebop">
+
+      <remap from="odom" to="mocap_odom" if="$(arg use_world_frame)"/>
+      <param name="enable_fence" value="True"/>
+      <param name="publish_target" value="False"/>
+      <param name="publish_body_vel" value="False"/>
+      <param name="publish_cmd" value="True"/>
+      <param name="teleop_mode" value="1"/>
+      <param name="max_speed" value="0.3"/>
+      <param name="max_vertical_speed" value="0.3"/>
+      <param name="max_angular_speed" value="0.3"/>
+      <param name="tau" value="0.25"/>
+      <param name="eta" value="0.5"/>
+      <param name="delay" value="0"/>
+      <param name="joy_set_teleop_mode" value="true"/>
+      <param name="track_altitude_as_relative" value="true"/>
+      <param name="track_relative_altitude" value="0"/>
+      <param name="track_distance" value="1.5"/>
+      <rosparam param="pos_bounds">
+        - [-2.4, 2.4]
+        - [-2.4, 2.4]
+        - [0.25, 2]
+      </rosparam>
+    </node>
+
+  <include file="$(find drone_arena)/launch/joy_teleop.launch">
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-bebop-pulp.yaml"/>
+    <arg name="namespace" value="bebop"/>
+  </include>
+  <node pkg="himax" name="preprocess" type="preprocess.py" output="screen">
+    <remap from="source" to="/bebop/image_raw/compressed"/>
+    <remap from="sink" to="/bebop/input"/>
+    <param name="raw" value="false"/>
+  </node>
+  <node pkg="himax" name="inference_bebop" type="run_inference.py" output="screen">
+    <param name="model" value="$(find himax)/model/DronetGray.pt"/>
+    <remap from="input" to="/bebop/input"/>
+    <remap from="output" to="/bebop/head_estimation"/>
+  </node>
+  <node pkg="drone_arena" name="front_net2odom" type="front_net2odom.py" output="screen">
+    <remap from="output" to="/bebop/head_estimation"/>
+    <remap from="odom" to="/bebop/head_odom"/>
+  </node>
+</launch>

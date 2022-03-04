@@ -1,0 +1,12 @@
+<launch>
+
+  <group ns="cf">
+    <node pkg="himax" name="inference" type="run_inference.py" output="screen">
+      <param name="model/params" value="$(find himax)/model/PenguiNet160x96.pt"/>
+      <param name="model/name" value="PenguiNet"/>
+      <remap from="input" to="image_raw"/>
+      <remap from="output" to="output_pytorch"/>
+    </node>
+  </group>
+
+</launch>

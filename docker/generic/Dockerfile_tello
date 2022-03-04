@@ -1,49 +1,55 @@
 FROM jeguzzi/ros:melodic-ros-dev
 MAINTAINER Jerome Guzzi "jerome@idsia.ch"
 
+
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+
+RUN echo "deb http://packages.ros.org/ros/ubuntu bionic main" > /etc/apt/sources.list.d/ros1-latest.list
+
 RUN apt-get update && apt-get install -y \
     python-pip \
     libusb-1.0-0-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && apt-get install -y \
-    ros-melodic-image-view \
-    ros-melodic-urdf \
-    ros-melodic-parrot-arsdk \
     ros-melodic-tf2 \
-    ros-melodic-control-msgs \
     ros-melodic-tf2-ros \
     ros-melodic-joy \
     ros-melodic-image-transport \
-    ros-melodic-roslint \
     ros-melodic-tf \
     ros-melodic-angles \
     ros-melodic-tf2-geometry-msgs \
-    ros-melodic-xacro \
     libavcodec-dev \
     libavformat-dev \
     libavutil-dev \
-    libswscale-dev \
     ros-melodic-camera-info-manager \
-    python-pip \
+    ros-melodic-codec-image-transport \
+    ros-melodic-control-msgs \
+    ros-melodic-cv-bridge \
     && rm -rf /var/lib/apt/lists/*
 
+
 RUN pip install blinkstick
+RUN pip install typing
+
+RUN git clone https://github.com/ros-perception/camera_info_manager_py.git src/camera_info_manager_py
 
 COPY teleop_tools src/teleop_tools
-COPY bebop_autonomy src/bebop_autonomy
 COPY optitrack_msgs src/optitrack_msgs
 COPY optitrack_odom src/optitrack_odom
-
 COPY drone_arena_msgs src/drone_arena_msgs
-COPY crazyflie_ros src/crazyflie_ros
-COPY drone_arena src/drone_arena
 COPY lawa src/lawa
+
+RUN git clone https://github.com/yoshito-n-students/codec_image_transport.git
+
+RUN catkin build
+
+COPY hl_navigation_msgs src/hl_navigation_msgs
+COPY tello_driver src/tello_driver
+COPY drone_arena src/drone_arena
+
+RUN catkin build
 
 # RUN apt-get update && \
 #     rosdep update && \
 #     rosdep install --from-paths src -i -y
-
-RUN catkin build
-
-RUN pip install typing

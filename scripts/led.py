@@ -2,24 +2,22 @@
 
 from __future__ import division
 
-from bebop_msgs.msg import CommonCommonStateBatteryStateChanged
 import rospy
+from sensor_msgs.msg import BatteryState
 from nav_msgs.msg import Odometry
 from std_msgs.msg import String
 from lawa.blinkstick_driver import blinkstickROS
 from lawa.battery import line, single
 
 
-class BebopLed(blinkstickROS):
+class DroneLed(blinkstickROS):
     def __init__(self):
-        super(BebopLed, self).__init__()
+        super(DroneLed, self).__init__()
 
         self.battery_percent = None
         self.location = None
         self.last_ping = None
-        rospy.Subscriber('states/common/CommonState/BatteryStateChanged',
-                         CommonCommonStateBatteryStateChanged,
-                         self.has_received_battery)
+        rospy.Subscriber('battery', BatteryState, self.has_received_battery)
         rospy.Subscriber('location', String, self.has_received_location)
         rospy.Subscriber('odom', Odometry, self.has_received_odometry)
 
@@ -36,7 +34,7 @@ class BebopLed(blinkstickROS):
         rospy.Timer(rospy.Duration(self.period), self.update)
 
     def has_received_battery(self, msg):
-        self.battery_percent = msg.percent
+        self.battery_percent = 100 * msg.percentage
 
     def has_received_location(self, msg):
         self.location = msg.data
@@ -77,5 +75,5 @@ class BebopLed(blinkstickROS):
 
 
 if __name__ == '__main__':
-    BebopLed()
+    DroneLed()
     rospy.spin()

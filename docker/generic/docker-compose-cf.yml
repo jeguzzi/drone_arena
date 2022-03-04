@@ -1,11 +1,38 @@
 version: '2'
 services:
   cf:
+    build:
+      context: ../../..
+      dockerfile: drone_arena/docker/generic/Dockerfile_cf
     privileged: true
     network_mode: host
-    image: jeguzzi/drone_arena:melodic
+    image: jeguzzi/drone_arena_cf:melodic
     volumes:
       - ./logs:/root/.ros/log:rw
     env_file:
       - ./ros.env
     command: roslaunch drone_arena cf.launch
+  cf-kinetic:
+    build:
+      context: ../../..
+      dockerfile: drone_arena/docker/generic/Dockerfile_cf_kinetic
+    privileged: true
+    network_mode: host
+    image: jeguzzi/drone_arena_cf:kinetic
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roslaunch drone_arena cf.launch
+  cf-mocap:
+    build:
+      context: ../../..
+      dockerfile: drone_arena/docker/generic/Dockerfile_cf
+    privileged: true
+    network_mode: host
+    image: jeguzzi/drone_arena_cf_mocap:melodic
+    volumes:
+      - ./logs:/root/.ros/log:rw
+    env_file:
+      - ./ros.env
+    command: roslaunch drone_arena cf_mocap.launch

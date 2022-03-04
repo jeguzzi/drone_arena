@@ -1,0 +1,13 @@
+<launch>
+  <node name='fence' pkg='drone_arena' type='bebop_controller.py' output="screen" ns="bebop">
+    <remap from="odom" to="mocap_odom"/>
+    <param name="tau" value="0.5"/>
+    <param name="eta" value="1.0"/>
+    <param name="max_speed" value="1.0"/>
+    <param name="delay" value="0.1"/>
+    <param name='frame_id' value="World"/>
+    <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 1.8], [0.5, 2.0]]</rosparam>
+    <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
+    <remap from="target/odom" to="/head/mocap_odom"/>
+  </node>
+</launch>

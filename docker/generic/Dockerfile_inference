@@ -1,0 +1,14 @@
+FROM jeguzzi/ros:noetic-ros-dev
+MAINTAINER Jerome Guzzi "jerome@idsia.ch"
+
+RUN apt-get update && apt-get install -y \
+    ros-noetic-cv-bridge \
+    ros-noetic-diagnostic-updater \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install torch
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+COPY himax src/himax
+
+RUN catkin build

@@ -1,0 +1,39 @@
+FROM jeguzzi/ros:noetic-ros-dev
+MAINTAINER Jerome Guzzi "jerome@idsia.ch"
+
+RUN apt-get update && apt-get install -y \
+    ros-noetic-urdf \
+    ros-noetic-tf2 \
+    ros-noetic-tf2-geometry-msgs \
+    ros-noetic-tf2-ros \
+    ros-noetic-tf \
+    ros-noetic-control-msgs \
+    ros-noetic-robot-state-publisher \
+    ros-noetic-diagnostic-updater \
+    ros-noetic-roslint \
+    ros-noetic-angles \
+    ros-noetic-xacro \
+    libusb-1.0-0-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install blinkstick
+RUN ln -s /usr/bin/python3 /usr/bin/python
+
+RUN git clone https://github.com/ros-teleop/teleop_tools.git src/teleop_tools
+RUN git clone https://github.com/ros-drivers/joystick_drivers.git src/joystick_drivers
+RUN git clone https://github.com/jeguzzi/lawa.git src/lawa
+
+RUN catkin config --blacklist ps3joy spacenav_node wiimote joystick_drivers
+
+RUN catkin build
+
+COPY optitrack_msgs src/optitrack_msgs
+COPY optitrack_odom src/optitrack_odom
+COPY drone_arena_msgs src/drone_arena_msgs
+
+RUN catkin build
+
+COPY crazyflie_ros src/crazyflie_ros
+COPY drone_arena src/drone_arena
+
+RUN catkin build

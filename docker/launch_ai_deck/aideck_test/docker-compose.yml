@@ -1,0 +1,35 @@
+version: '2'
+services:
+  controller:
+    network_mode: host
+    privileged: true
+    image: jeguzzi/drone_arena_cf:noetic_v1
+    volumes:
+      - ./.ros:/root/.ros:rw
+      - ./main.launch:/root/catkin_ws/src/drone_arena/launch/_main.launch:ro
+      - ./joypad.yaml:/root/catkin_ws/src/drone_arena/config/_joypad.yaml:ro
+      - ./bags:/root/catkin_ws/src/drone_arena/bags:rw
+    env_file:
+      - ../ros.env
+    environment:
+      - PREFIX
+      - ALT
+    command: roslaunch drone_arena _main.launch streaming:=1 rate:=30 bag:=1
+  himax_7:
+    network_mode: host
+    image: jeguzzi/himax:noetic
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - ./main_himax.launch:/root/catkin_ws/src/himax/launch/_main_himax.launch:ro
+    env_file:
+      - ../ros.env
+    command: roslaunch himax _main_himax.launch host:=192.168.201.40 number:=7
+  himax_6:
+    network_mode: host
+    image: jeguzzi/himax:noetic
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - ./main_himax.launch:/root/catkin_ws/src/himax/launch/_main_himax.launch:ro
+    env_file:
+      - ../ros.env
+    command: roslaunch himax _main_himax.launch host:=192.168.201.13 number:=6

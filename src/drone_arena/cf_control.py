@@ -13,12 +13,12 @@ from crazyflie_driver.msg import FlightState, Hover, Position
 from crazyflie_driver.srv import UpdateParams
 from drone_arena_msgs.msg import BlinkMSequence  # BlinkMScript
 from drone_arena_msgs.srv import SetXY, SetXYRequest, SetXYResponse  # noqa
-from geometry_msgs.msg import PointStamped, Pose, PoseStamped, Quaternion  # noqa
+from geometry_msgs.msg import PointStamped, Pose, PoseStamped, Quaternion, Twist  # noqa
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import BatteryState as BatteryStateMsg
-from std_msgs.msg import ColorRGBA, Empty, Int8, UInt8
+from std_msgs.msg import ColorRGBA, Empty, Int8, UInt8, Bool
 
-from .control import BatteryState, Controller, State, button, if_flying
+from .control import BatteryState, Controller, State, button, if_flying, TargetMode
 
 TAU = 0.02
 ANGLE_TOL = 0.2
@@ -71,7 +71,7 @@ class CFController(Controller):
 
         self.position_pub = rospy.Publisher('cmd_position', Position, queue_size=1)
         self.hover_pub = rospy.Publisher('cmd_hover', Hover, queue_size=1)
-        self.stop_pub = rospy.Publisher('cmd_stop', Empty, queue_size=1)
+        self.cf_stop_pub = rospy.Publisher('cmd_stop', Empty, queue_size=1)
 
         rospy.wait_for_service('update_params')
         rospy.loginfo("found update_params service")
@@ -117,8 +117,21 @@ class CFController(Controller):
 
         rospy.Subscriber('sound', UInt8, self.has_updated_sound, queue_size=1)
 
+        rospy.Subscriber('autonomous', Bool, self.autonomy_has_changed, queue_size=1)
+
         rospy.Service('set_xy', SetXY, self.set_position_service)
         rospy.loginfo('Started set position service')
+
+    def autonomy_has_changed(self, msg):
+        # type: (Bool) -> None
+        if msg.data and self.is_flying:
+            self.stop_hovering()
+        if msg.data:
+            self.state = State.flying_autonomously
+            self.target_mode = TargetMode.autonomous
+        else:
+            if self.is_flying:
+                self.hover()
 
     def has_updated_sound(self, msg):
         # type: (UInt8) -> None
@@ -382,14 +395,19 @@ class CFController(Controller):
             rospy.set_param("kalman/initialZ", z)
             params = ["kalman/initialX", "kalman/initialY", "kalman/initialZ"]
 
-            rospy.set_param("kalman/initialQx", orientation.x)
-            rospy.set_param("kalman/initialQy", orientation.y)
-            rospy.set_param("kalman/initialQz", orientation.z)
-            rospy.set_param("kalman/initialQw", orientation.w)
+            # rospy.set_param("kalman/initialQx", orientation.x)
+            # rospy.set_param("kalman/initialQy", orientation.y)
+            # rospy.set_param("kalman/initialQz", orientation.z)
+            # rospy.set_param("kalman/initialQw", orientation.w)
+            q = [orientation.x, orientation.y, orientation.z, orientation.w]
+            _, _, yaw = euler_from_quaternion(q)
+            rospy.set_param("kalman/initialYaw", yaw)
 
             rospy.set_param("kalman/resetEstimation", 1)
-            params += ["kalman/initialQx", "kalman/initialQy", "kalman/initialQz",
-                       "kalman/initialQw"]
+            # params += ["kalman/initialQx", "kalman/initialQy", "kalman/initialQz",
+            #            "kalman/initialQw"]
+
+            params.append("kalman/initialYaw")
 
             try:
                 self.update_params(params)
@@ -398,7 +416,7 @@ class CFController(Controller):
                 return False
 
             rospy.loginfo("Reset pose to (%s, %s, %s), (%s, %s, %s, %s)",
-                          x, y,  z, orientation.x, orientation.y, orientation.z, orientation.w)
+                          x, y, z, orientation.x, orientation.y, orientation.z, orientation.w)
 
             return True
 
@@ -577,22 +595,23 @@ class CFController(Controller):
 
         self.hover_timer = rospy.Timer(rospy.Duration(0.25), callback, oneshot=False)
 
-    def hover(self, delta=[0, 0, 0], type=None):
-        # type: (np.ndarray, Optional[HoverType]) -> None
+    def hover(self, delta=[0, 0, 0], _type=None, state=State.hovering):
+        # type: (np.ndarray, Optional[HoverType], State) -> None
         if not self.state_estimate:
             rospy.logwarn("No state estimate")
             return
         with self.lock:
-            if self.state == State.hovering:
+            if self.state == state:
                 return
             self.stop_hovering()
-            if type is None:
-                type = self.hover_type
-            if type == HoverType.position:
+            if _type is None:
+                _type = self.hover_type
+            if _type == HoverType.position:
                 self.start_hovering(delta=delta)
             else:
                 self.start_hovering_vel(delta=delta)
             self.hover_distance = None
+            self.state = state
 
     def has_connected(self):
         # type: () -> None
@@ -619,7 +638,9 @@ class CFController(Controller):
                 if not msg.battery_low and self.battery_percent > 0.15:
                     self.battery_state = BatteryState.ok
             else:
-                if msg.battery_low or self.battery_percent < 0.05:
+                # HACK
+                # if msg.battery_low or self.battery_percent < 0.05:
+                if msg.battery_low or self.battery_percent < -0.05:
                     rospy.loginfo("update_state => battery critical")
                     self.battery_state = BatteryState.critical
         if self.state not in [State.landed, State.taking_off] and not any(self.thrust_buffer):
@@ -630,6 +651,22 @@ class CFController(Controller):
     def can_fly(self):
         # type: () -> bool
         return super(CFController, self).can_fly() and self.cf_can_fly
+
+    def soft_land(self, max_thrust=60000):
+        # type: (int) -> None
+        self.stop_hovering()
+        if not self.thrust_buffer or self.thrust_buffer[-1] < 0.6:
+            self.stop()
+            return
+        thrust = self.thrust_buffer[-1] / max_thrust
+        print("Start by thrust %.2f\n" % thrust)
+        for i in range(1, 10):
+            s_thrust = 0.6 * i / 10 + thrust * (1 - i / 10)
+            # s_thrust = thrust
+            # print("-> thrust %.2f\n" % s_thrust)
+            self.set_thrust(s_thrust)
+            rospy.sleep(0.1)
+        self.stop()
 
     def update(self, evt):
         # type: (rospy.TimerEvent) -> None
@@ -648,7 +685,8 @@ class CFController(Controller):
 
         if self.state in [State.landing] and self.state_estimate is not None:
             z = self.state_estimate.pose.pose.position.z
-            if z < 0.1:
+            if z < 0.05:
+                # self.soft_land()
                 self.stop()
             if self.land_at_altitude:
                 self.vzs.append(self.state_estimate.twist.twist.linear.z)
@@ -690,10 +728,16 @@ class CFController(Controller):
         # type: (Empty) -> None
         rospy.loginfo("Land")
         p = self.state_estimate.pose.pose.position
-        self.state = State.landing
-        self.hover(delta=[0, 0, -p.z + 0.05])
+        self.hover(delta=[0, 0, -p.z + 0.05], state=State.landing)
         if self.land_at_altitude:
             self.vzs.clear()
+
+    def set_thrust(self, value, max_thrust=60000):
+        # type: (float, float) -> None
+        # param value: percentage of maximal thrust
+        msg = Twist()
+        msg.linear.z = value * max_thrust
+        self.des_cmd_pub.publish(msg)
 
     def takeoff(self):
         # type: (Empty) -> None
@@ -703,13 +747,19 @@ class CFController(Controller):
                 while self.first_mocap_pose:
                     rospy.sleep(0.1)
             rospy.loginfo("Takeoff")
-            self.hover(delta=[0, 0, self.hover_takeoff_altitude])
-            self.state = State.taking_off
+            # we prespin to avoid shutting down NINA :-/
+            for _ in range(10):
+                self.set_thrust(0)
+                rospy.sleep(0.01)
+            for i in range(1, 20):
+                self.set_thrust(i * 0.8 / 20)
+                rospy.sleep(0.1)
+            self.hover(delta=[0, 0, self.hover_takeoff_altitude], state=State.taking_off)
 
     def stop(self, msg=None):
         # type: (Optional[Empty]) -> None
         self.stop_hovering()
-        self.stop_pub.publish()
+        self.cf_stop_pub.publish()
         self.state = State.landed
         self.hover_distance = None
         rospy.loginfo("Stop")

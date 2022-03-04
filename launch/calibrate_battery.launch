@@ -1,0 +1,5 @@
+<launch>
+  <node name='test' pkg='drone_arena' type='calibrate_battery.py' output="screen" ns="cf">
+  </node>
+  <!-- <node name='bag' pkg="rosbag" type="record" args='-o $(find drone_arena)/bags/test/takeoff -j -a -x "(.*)/camera"'/> -->
+</launch>

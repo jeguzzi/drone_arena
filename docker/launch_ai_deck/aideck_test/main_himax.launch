@@ -1,0 +1,10 @@
+<launch>
+
+  <arg name="host" default="192.168.201.40"/>
+  <arg name="number" default="7"/>
+  <node required="true" pkg="himax" name="$(eval 'himax' + str(arg('number')))" type="himax_driver.py" output="screen" ns="cf">
+    <param name="pipe" value=""/>
+    <param name="host" value="$(arg host)"/>
+  </node>
+
+</launch>

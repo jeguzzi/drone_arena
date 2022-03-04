@@ -3,12 +3,12 @@ services:
   controller:
     build:
       context: ../../..
-      dockerfile: drone_arena/docker/generic/Dockerfile
+      dockerfile: drone_arena/docker/generic/Dockerfile_tello
     privileged: true
     network_mode: host
-    image: jeguzzi/drone_arena:melodic
+    image: jeguzzi/drone_arena:tello
     volumes:
       - ./logs:/root/.ros/log:rw
     env_file:
       - ./ros.env
-    command: roslaunch drone_arena bebop_mocap.launch
+    command: roslaunch drone_arena tello.launch joy_dev:=/dev/input/js0

@@ -1,0 +1,33 @@
+<launch>
+
+  <arg name="host" default="192.168.201.50"/>
+
+  <node pkg="crazyflie_driver" type="crazyflie_server" name="crazyflie_server" output="screen"/>
+  <node clear_params="true" name='supervisor' pkg='drone_arena' type='cf_supervisor.py' output="screen" ns="cf">
+    <param name='name' value='cf'/>
+    <rosparam subst_value="true" param="">
+      radio:
+        id: 0
+        channel: 100
+        bandwidth : 2M
+      params: []
+      crazyflies:
+        -
+          id: 6
+          front_net: 0
+          front_net_frame: base_stabilized
+          params:
+            aideck_HIMAX/fps: 30
+            aideck_inference/active: 0
+            aideck_stream/on: 1
+    </rosparam>
+  </node>
+
+  <node required="true" pkg="himax" name="himax" type="himax_driver.py" output="screen" ns="cf">
+    <param name="pipe" value=""/>
+    <param name="host" value="$(arg host)"/>
+  </node>
+
+  <!-- <node name='bag' pkg="rosbag" type="record" args="-a -j"/> -->
+
+</launch>

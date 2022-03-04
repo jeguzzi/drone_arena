@@ -1,5 +1,5 @@
 import math
-
+import numpy as np
 import rospy
 from bebop_msgs.msg import \
     Ardrone3PilotingStateFlyingStateChanged as FlyingStateChanged
@@ -8,6 +8,7 @@ from bebop_msgs.msg import \
 from geometry_msgs.msg import Twist, Vector3
 from std_msgs.msg import Empty
 from typing import Tuple  # noqa
+from sensor_msgs.msg import BatteryState as BatteryStateMsg
 
 from .control import BatteryState, Controller, State
 
@@ -66,6 +67,15 @@ class BebopController(Controller):
     def __init__(self):
         # type: () -> None
         super(BebopController, self).__init__()
+        self.battery_pub = rospy.Publisher('battery', BatteryStateMsg, queue_size=1, latch=True)
+        self.battery_msg = BatteryStateMsg()
+        self.battery_msg.header.frame_id = 'battery'
+        self.battery_msg.voltage = 12.6
+        self.battery_msg.current = self.battery_msg.charge = self.battery_msg.capacity = float('nan')
+        self.battery_msg.design_capacity = float('nan')
+        self.power_supply_status = BatteryStateMsg.POWER_SUPPLY_STATUS_DISCHARGING
+        self.battery_msg.present = True
+
         rospy.set_param('bebop_driver/states/enable_pilotingstate_flyingstatechanged', True)
         rospy.Subscriber('states/ardrone3/PilotingState/FlyingStateChanged', FlyingStateChanged,
                          self.state_has_changed)
@@ -84,6 +94,8 @@ class BebopController(Controller):
         if msg.percent < 2 and self.battery_state == BatteryState.critical:
             self.battery_state = BatteryState.empty
         self.battery_percent = msg.percent
+        self.battery_msg.percentage = msg.percent / 100.0
+        self.battery_pub.publish(self.battery_msg)
 
     def state_has_changed(self, msg):
         # type: (FlyingStateChanged) -> None

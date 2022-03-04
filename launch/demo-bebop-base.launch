@@ -1,0 +1,12 @@
+<launch>
+  <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
+  <include file="$(find bebop_driver)/launch/bebop_node.launch"/>
+  <remap from="cmd_vel" to="cmd_vel/safe"/>
+  <remap from="takeoff" to="takeoff/safe"/>
+  <include file="$(find bebop_tools)/launch/joy_teleop.launch">
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-generic.yaml" />
+  </include>
+  <node name='diagnostics' pkg='drone_arena' type='diagnostics.py' output="screen" ns="bebop">
+  </node>
+  <!-- <node name='bag' pkg="rosbag" type="record" args='-o $(find drone_arena)/bags/demo -j -a -x "(.*)/camera"'/> -->
+</launch>

@@ -9,75 +9,15 @@
       params: []
       crazyflies:
         -
-          id: 1
-          params:
-            kalman/thetapix: 3.75
-            stabilizer/controller: 1
-            stabilizer/estimator: 2
-            led/mode: 1
-            led/shared_mask: 2
-            led/color1: 0x00FF00
-            led/sequence: 0
-        -
-          id: 2
-          params:
-            kalman/thetapix: 3.75
-            stabilizer/controller: 1
-            stabilizer/estimator: 2
-            led/mode: 1
-            led/shared_mask: 2
-            led/color1: 0x00FF00
-            led/sequence: 0
-        -
           id: 3
           params:
             kalman/thetapix: 3.75
             stabilizer/controller: 1
             stabilizer/estimator: 2
-            led/mode: 1
-            led/shared_mask: 2
-            led/color1: 0x00FF00
-            led/sequence: 0
-        -
-          id: 4
-          params:
-            kalman/thetapix: 3.75
-            stabilizer/controller: 1
-            stabilizer/estimator: 2
-            led/mode: 1
-            led/shared_mask: 2
-            led/color1: 0x00FF00
-            led/sequence: 0
-        -
-          id: 5
-          params:
-            kalman/thetapix: 3.75
-            stabilizer/controller: 1
-            stabilizer/estimator: 2
-            led/mode: 1
-            led/shared_mask: 2
-            led/color1: 0x00FF00
-            led/sequence: 0
-        -
-          id: 6
-          params:
-            kalman/thetapix: 3.75
-            stabilizer/controller: 1
-            stabilizer/estimator: 2
-            led/mode: 1
-            led/shared_mask: 2
-            led/color1: 0x00FF00
-            led/sequence: 0
-        -
-          id: 7
-          params:
-            kalman/thetapix: 3.75
-            stabilizer/controller: 1
-            stabilizer/estimator: 2
-            led/mode: 1
-            led/shared_mask: 2
-            led/color1: 0x00FF00
-            led/sequence: 0
+            blinkM/mode: 1
+            blinkM/solidRed1: 255
+            blinkM/solidGreen1: 0
+            blinkM/solidBlue1: 128
     </rosparam>
     <param name='name' value='cf'/>
   </node>
@@ -98,11 +38,10 @@
     <param name="delay" value="0"/>
     <param name="joy_set_teleop_mode" value="true"/>
     <param name="max_safe_angle" value="0.75"/>
-    <param name="takeoff_altitude" value="0.3"/>
     <rosparam param="pos_bounds">
       - [-inf, inf]
       - [-inf, inf]
-      - [0.3, 1.0]
+      - [0.2, 1.0]
     </rosparam>
     <rosparam param="feedback">
       amplitude: 0.5

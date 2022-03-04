@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<launch>
+    <arg name="name" default="tello"/>
+    <group ns="$(arg name)">
+        <node name="navigation" pkg="hl_navigation" type="controller" output="screen" required="true">
+            <param name="type" value="HOLONOMIC"/>
+            <param name="resolution" value="100"/>
+            <param name="behavior" value="HL"/>
+            <param name="maximal_speed" value="1.5"/>
+            <param name="maximal_angular_speed" value="1"/>
+            <param name="optimal_speed" value="1.5"/>
+            <param name="optimal_vertical_speed" value="0.3"/>
+            <param name="optimal_angular_speed" value="0.5"/>
+            <!-- tau = 0 as we already relax velocity in the fence controller! -->
+            <param name="tau" value="0.0"/>
+            <param name="eta" value="1.0"/>
+            <!-- rotation_tau = 0 as we compute vertical speed here -->
+            <param name="tauZ" value="0.5"/>
+            <!-- rotation_tau = 0.5 as we compute angular speed here, aiming for the target! -->
+            <param name="point_target" value="True"/>
+            <param name="rotation_tau" value="0.5"/>
+            <param name="safety_margin" value="0.5"/>
+            <param name="horizon" value="8"/>
+            <param name="radius" value="0.1"/>
+            <remap from="cmd/velocity" to="target/body_vel"/>
+            <remap from="odom" to="mocap_odom"/>
+            <param name="rate" value="20.0"/>
+        </node>
+        <node name="optitrack_obstacles" pkg="optitrack_obstacles" type="optitrack_obstacles" output="screen">
+            <param name="name" value="$(arg name)"/>
+            <param name="rate" value="20.0"/>
+            <!-- The tracker rigid bodies should be head* -->
+            <rosparam param="rigid_bodies_prefixes">
+              head: human
+            </rosparam>
+            <rosparam param="rigid_bodies">
+              human:
+                radius: 0.4
+                social_margin: 0.3
+                minZ: -0.1
+                minZ_relative: false
+                maxZ: 2.5
+                maxZ_relative: false
+            </rosparam>
+        </node>
+    </group>
+</launch>

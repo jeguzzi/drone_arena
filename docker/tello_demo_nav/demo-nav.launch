@@ -1,0 +1,48 @@
+<launch>
+    <arg name="joy_dev" default="/dev/input/js1"/>
+    <remap from="emergency" to="reset"/>
+    <include file="$(find tello_driver)/launch/tello_node.launch">
+      <arg name="vel_cmd_scale" value="1.0"/>
+      <arg name="connect_timeout_sec" value="3600"/>
+      <arg name="low_bat_threshold" value="5"/>
+      <arg name="altitude_limit" value="3"/>
+      <arg name="attitude_limit" value="25"/>
+      <arg name="publish_raw_image" value="True"/>
+    </include>
+    <node pkg="drone_arena" type="tello_controller.py" name="fence_controller" output="screen" ns="tello">
+      <!-- we use the angular component of target speed to control yaw -->
+      <param name="target_angle_mode" value="0"/>
+      <param name="enable_fence" value="true"/>
+      <param name="frame_id" value="World"/>
+      <remap from="odom" to="mocap_odom"/>
+      <param name="publish_target" value="False" />
+      <param name="publish_body_vel" value="False" />
+      <param name="publish_cmd" value="True" />
+      <param name="teleop_mode" value="0"/>
+      <param name="max_speed" value="1.0"/>
+      <param name="max_vertical_speed" value="1.0"/>
+      <param name="max_angular_speed" value="2.0"/>
+      <param name="tau" value="0.5"/>
+      <param name="eta" value="1.0"/>
+      <param name="delay" value="0"/>
+      <param name="joy_set_teleop_mode" value="true"/>
+      <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam>
+      <rosparam param="pos_bounds">[[-2.4, 2.4], [-2.4, 2.4], [0.2, 2.2]]</rosparam>
+    </node>
+    <include file="$(find drone_arena)/launch/joy_teleop.launch">
+      <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-tello-nav.yaml" />
+      <arg name="namespace" value="tello"/>
+      <arg name="joy_dev" value="$(arg joy_dev)"/>
+    </include>
+    <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
+   <node name='led' pkg='drone_arena' type='led.py' output="screen" ns="tello">
+       <param name='max_intensity' value="60"/>
+       <param name='leds' value="8"/>
+   </node>
+   <node name="nav_planner" pkg='drone_arena' type='test_nav_client.py' output="screen" ns="tello">
+     <rosparam param="nav_plan">
+       - [2, 2, 1.5]
+       - [-2, -2, 1.5]
+     </rosparam>
+   </node>
+</launch>

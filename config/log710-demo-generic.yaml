@@ -1,0 +1,50 @@
+# Logitech F710 wireless controller
+# Deadman (enable) button: Right Trigger
+# D<>X button (located on the back panel) must be set to D
+teleop:
+  takeoff:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: safe_takeoff
+    deadman_buttons: [3, 7]  # RT + Y
+    axis_mappings: []
+  land:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: land
+    deadman_buttons: [1, 7]  # RT + A
+    axis_mappings: []
+  emergency:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: reset
+    deadman_buttons: [2, 7] # RT + B
+    axis_mappings: []
+  flattrim:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: flattrim
+    deadman_buttons: [0, 7] # RT + X
+    axis_mappings: []
+  follow_on:
+    type: topic
+    message_type: "drone_arena_msgs/TargetSource"
+    topic_name: "target_source"
+    message_value:
+      - target: mode
+        value: 6
+      - target: topic
+        value: /head/mocap_odom
+    deadman_buttons: [3, 6]
+  land_home:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "safe_land"
+    deadman_buttons: [1, 6]
+    axis_mappings: []
+  feedback:
+      type: topic
+      message_type: "std_msgs/Empty"
+      topic_name: "give_feedback"
+      deadman_buttons: [0, 6]
+      axis_mappings: []

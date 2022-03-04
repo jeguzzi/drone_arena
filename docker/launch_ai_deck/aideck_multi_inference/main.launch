@@ -1,0 +1,44 @@
+<launch>
+
+  <launch>
+
+    <group ns="cf">
+
+      <node pkg="himax" name="inference" type="run_inferences.py" output="screen">
+        <rosparam param="models" subst_value="true">
+          -
+            name: PenguiNet160x96x32_Nicky
+            width: 160
+            height: 96
+            channels: 32
+            fc_size: 1920
+            params: $(find himax)/model/PenguiNet160x96x32_Nicky.pt
+          -
+            name: PenguiNet160x96x32_Others
+            width: 160
+            height: 96
+            channels: 32
+            fc_size: 1920
+            params: $(find himax)/model/PenguiNet160x96x32_Nicky.pt
+          -
+            name: PenguiNet160x96x16_Others
+            width: 160
+            height: 96
+            channels: 16
+            fc_size: 960
+            params: $(find himax)/model/PenguiNet160x96x16_Others.pt
+          -
+            name: PenguiNet80x48x32_Others
+            width: 80
+            height: 48
+            channels: 32
+            fc_size: 768
+            params: $(find himax)/model/PenguiNet80x48x32_Others.pt
+        </rosparam>
+        <remap from="input" to="image_raw"/>
+      </node>
+
+    </group>
+  </launch>
+
+</launch>

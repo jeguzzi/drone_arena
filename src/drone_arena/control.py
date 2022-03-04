@@ -35,6 +35,15 @@ from typing import (Any, Callable, Dict, Generator, List, Optional,  # noqa
 from .fence_control import angular_control, fence_control, inside_fence_margin
 
 
+def wrap(x):  # type:(float) -> float
+    x = np.fmod(x, 2 * math.pi)
+    if x < -math.pi:
+        x += 2 * math.pi
+    if x > math.pi:
+        x -= 2 * math.pi
+    return x
+
+
 class BatteryState(enum.Enum):
     ok = 0
     critical = 1
@@ -48,16 +57,17 @@ class TargetMode(enum.Enum):
     vel = 4
     body_vel = 5
     odom = 6
+    autonomous = 7
 
 
 class TargetAngleMode(enum.Enum):
     sync = 0
     teleop = 1
     cmd = 2
-    point = 3
-    vel = 4
-    target_point = 5
-    target_orientation = 6
+    vel = 3
+    target_point = 4
+    target_orientation = 5
+    autonomous = 6
 
 
 class TeleopMode(enum.Enum):
@@ -77,6 +87,7 @@ class State(enum.Enum):
     hovering = 2
     flying = 3
     landing = 4
+    flying_autonomously = 5
     # flying_home = 5
 
 
@@ -85,7 +96,15 @@ button = Temporized(1)
 
 def if_flying(f):  # type:(Callable) -> Callable
     def g(self, *args, **kwargs):  # type: (Any, *Any, **Any)  -> None
-        if self.state not in [State.flying, State.hovering]:
+        if self.state not in (State.flying, State.hovering, State.flying_autonomously):
+            return
+        return f(self, *args, **kwargs)
+    return g
+
+
+def if_flying_controlled(f):  # type:(Callable) -> Callable
+    def g(self, *args, **kwargs):  # type: (Any, *Any, **Any)  -> None
+        if self.state not in (State.flying, State.hovering):
             return
         return f(self, *args, **kwargs)
     return g
@@ -185,6 +204,14 @@ def target_yaw_to_observe(observer_point, target_point):  # type: (np.ndarray, n
 class Controller(object):
     __metaclass__ = ABCMeta
 
+    @property
+    def is_flying(self):  # type:() -> Bool
+        return self.state in (State.flying, State.hovering, State.flying_autonomously)
+
+    @property
+    def is_flying_controlled(self):  # type:() -> Bool
+        return self.state in (State.flying, State.hovering)
+
     """docstring for Controller"""
     def __init__(self):
         # type: () -> None
@@ -201,6 +228,7 @@ class Controller(object):
         self._state = State.landed  # type: State
 
         self.state_pub = rospy.Publisher("flight_state", StateMsg, queue_size=1, latch=True)
+        self.stop_pub = rospy.Publisher("stop", Empty, queue_size=1, latch=True)
 
         self.should_publish_cmd = rospy.get_param("~publish_cmd", True)
         self.should_publish_body_vel = rospy.get_param("~publish_body_vel", True)
@@ -229,7 +257,7 @@ class Controller(object):
         self.config = None  # type: Optional[Dict[str, Any]]
 
         self.observe_point = None
-        self.head_point = None
+        # self.head_point = None
 
         self.init_battery()
         self.init_localization()
@@ -248,7 +276,7 @@ class Controller(object):
         rospy.Subscriber('give_feedback', Empty, Temporized(5)(self.has_received_give_feedback),
                          queue_size=1)
 
-        # rospy.Subscriber('target', PoseStamped, self.has_received_target)
+        rospy.Subscriber('observe', PointStamped, self.has_received_observe_point)
         # rospy.Subscriber('target/body_vel', Twist, self.has_received_target_body_vel)
         # rospy.Subscriber('target/vel', TwistStamped, self.has_received_target_vel)
         # rospy.Subscriber('target/odom', Odometry, self.has_received_target_odom)
@@ -353,7 +381,7 @@ class Controller(object):
             Odometry: TargetMode.odom}.get(msg, None)
 
     def target_callback(self, mode
-                        ):  # type: (TargetMode) -> Tuple[Optional[function], Any]
+                        ):  # type: (TargetMode) -> Tuple[Optional[Callable], Any]
         return {
             TargetMode.pos: (self.has_received_target, PoseStamped),
             TargetMode.cmd: (self.has_received_target_cmd, Twist),
@@ -370,7 +398,8 @@ class Controller(object):
                     TargetMode.pos: TargetAngleMode.target_orientation,
                     TargetMode.vel: TargetAngleMode.vel,
                     TargetMode.body_vel: TargetAngleMode.vel,
-                    TargetMode.odom: TargetAngleMode.target_point}[self.target_mode]
+                    TargetMode.odom: TargetAngleMode.target_point,
+                    TargetMode.autonomous: TargetAngleMode.autonomous}[self.target_mode]
         return self.target_angle_mode
 
 # --------------- teleop
@@ -397,9 +426,17 @@ class Controller(object):
         if value != self._battery_state:
             self._battery_state = value
             rospy.loginfo("Battery state %s", value)
-            if value == BatteryState.critical and self.state in [State.flying, State.hovering]:
-                self.go_home_and_land()
-            if value == BatteryState.empty and self.state not in [State.landing, State.landed]:
+            if value == BatteryState.critical:
+                if self.is_flying_controlled:
+                    self.go_home_and_land()
+                if self.state == State.flying_autonomously:
+                    self.stop_pub.publish(Empty())
+                    self.land()
+            if value == BatteryState.empty and self.state not in (State.landing, State.landed):
+                if self.state == State.flying_autonomously:
+                    self.stop_pub.publish(Empty())
+                    # self.state = State.hovering
+                    # TODO(Jerome): maybe wait until it changes state
                 self.land()
 
 # --------------- dynamic reconfig
@@ -525,10 +562,10 @@ class Controller(object):
 # --------------- Localization
 
     def init_localization(self):  # type: () -> None
-        self.pitch = self.roll = self.yaw = 0
+        self.pitch = self.roll = self.yaw = 0.0
         self.orientation_is_safe = False
         self.max_safe_pitch = self.max_safe_roll = rospy.get_param(
-            '~max_safe_angle', math.pi * 0.5)
+            '~max_safe_angle', math.pi * 0.25)
         self.localization_pub = rospy.Publisher('location', String, queue_size=1, latch=True)
         self._localized = None  # type: Optional[bool]
         self.localized = False
@@ -623,7 +660,7 @@ class Controller(object):
         y = self.target_yaw
 
         if p is None or y is None:
-            rospy.logerror("invalid target")
+            rospy.logerr("invalid target")
             return
 
         r = rospy.Rate(20)
@@ -718,7 +755,14 @@ class Controller(object):
         if self.pitch is None or self.roll is None:
             return
         # rospy.loginfo('update_safety %s %s', self.pitch, self.roll)
-        if abs(self.pitch) > self.max_safe_pitch or abs(self.roll) > self.max_safe_roll:
+        pitch_is_safe = (abs(self.pitch) < self.max_safe_pitch or
+                         abs(wrap(self.pitch - math.pi)) < self.max_safe_pitch)
+        roll_is_safe = (abs(self.roll) < self.max_safe_roll or
+                        abs(wrap(self.roll - math.pi)) < self.max_safe_roll)
+        if not (pitch_is_safe and roll_is_safe):
+            rospy.logwarn(
+                'Orientation with pitch={0:.3f} and roll={1:.3f} is not safe'.format(
+                    self.pitch, self.roll))
             self.orientation_is_safe = False
         else:
             self.orientation_is_safe = True
@@ -729,14 +773,19 @@ class Controller(object):
         self.update_safety()
 
         if not self.can_fly() and self.state != State.landed:
+            rospy.logwarn('Not safe to fly => will stop')
+            if self.state == State.flying_autonomously:
+                self.stop_pub.publish(Empty())
             self.stop()
             return
-
-        if self.state == State.flying:
+        if self.state in (State.flying, State.flying_autonomously):
             if self.enforce_fence and self.localized and not self.inside_fence:
                 rospy.logwarn("Outside fence => switch to hovering")
+                if self.state == State.flying_autonomously:
+                    self.stop_pub.publish(Empty())
                 self.hover()
                 return
+        if self.state == State.flying:
             if not self.target_source_is_active:
                 rospy.logwarn("No recent control => switch to hovering")
                 self.hover()
@@ -764,7 +813,7 @@ class Controller(object):
         self.target_source_is_active = False
 
 # ----------------- Flying
-    @if_flying
+    @if_flying_controlled
     def update_control(self):  # type: () -> None
 
         # rospy.loginfo("State %s, target mode %s", self.state, self.target_mode)
@@ -780,6 +829,9 @@ class Controller(object):
             fence = self.pos_bounds  # type: Optional[List[Tuple[float, float]]]
         else:
             fence = None
+
+        if self.observe_point is not None:
+            self.target_yaw = target_yaw_to_observe(self.position, self.observe_point)
 
         des_target, des_velocity, des_acceleration = fence_control(
             self.position, self.velocity, self.target_position, self.target_velocity,
@@ -881,7 +933,7 @@ class Controller(object):
     #             pass
     #             # rospy.loginfo("Do not propagate")
 
-    @if_flying
+    @if_flying_controlled
     def has_received_give_feedback(self, msg):  # type: (Empty) -> None
         # rospy.loginfo("Got a gesture message")
         self.blocking_give_feedback()
@@ -902,6 +954,21 @@ class Controller(object):
         self.giving_feedback = False
         return True
 
+    @if_flying_controlled
+    def has_received_observe_point(self, msg):  # type: (PointStamped) -> None
+        point = point_in_frame(self.tf_buffer, msg, self.frame_id)
+        if not point:
+            rospy.logwarn("Has received target pose but cannot transform %s to %s",
+                          msg, self.frame_id)
+            self.observe_point = None
+            self.target_angle_mode = TargetAngleMode.sync
+            return
+
+        _p = point.point
+        self.observe_point = np.array([_p.x, _p.y, _p.z])
+        self.target_angle_mode = TargetAngleMode.target_point
+        self.target_angular_speed = None
+
     @if_flying
     def has_received_hover(self, msg):  # type: (Empty) -> None
         self.hover()
@@ -916,6 +983,8 @@ class Controller(object):
 
         if self.target_mode != TargetMode.teleop and self.joy_set_teleop_mode:
             self.set_target_source(TargetMode.teleop, '')
+            self.target_angle_mode = TargetAngleMode.sync
+            self.stop_pub.publish(Empty())
 
         values = [msg.axes[axis] for axis in self.joy_axes]
 
@@ -958,7 +1027,7 @@ class Controller(object):
         else:
             return vec
 
-    @if_flying
+    @if_flying_controlled
     def has_received_target_cmd(self, msg):  # type: (Twist) -> None
         if not (self.target_mode == TargetMode.cmd or
                 self.effective_angular_target_mode == TargetAngleMode.cmd):
@@ -974,7 +1043,7 @@ class Controller(object):
         if self.effective_angular_target_mode == TargetAngleMode.cmd:
             self.target_angular_speed = ang_speed
 
-    @if_flying
+    @if_flying_controlled
     def has_received_target(self, msg):  # type: (PoseStamped) -> None
         # rospy.loginfo("has_received_target")
         target_pose = pose_in_frame(self.tf_buffer, msg, self.frame_id)
@@ -1016,13 +1085,15 @@ class Controller(object):
             self.target_angular_speed = omega
             self.target_yaw = None
 
+    @if_flying_controlled
     def has_received_target_body_vel(self, msg):  # type: (Twist) -> None
 
-        if self.state not in [State.flying, State.hovering]:
+        rospy.loginfo('has_received_target_body_vel %s %s %d',
+                      self.state.name, self.target_mode.name, self.localized)
+
+        if self.target_mode != TargetMode.body_vel or not self.localized:
             return
 
-        if self.target_mode != TargetMode.vel or not self.localized:
-            return
         # convert in world frame
         vel = [msg.linear.x, msg.linear.y, msg.linear.z]
         ang_vel = [msg.angular.x, msg.angular.y, msg.angular.z]
@@ -1030,7 +1101,7 @@ class Controller(object):
         omega_world = rotate(ang_vel, self.q, inverse=True)[2]
         self.has_received_target_vel_in_world_frame(vel_world, omega_world)
 
-    @if_flying
+    @if_flying_controlled
     def has_received_target_vel(self, msg):   # type: (TwistStamped) -> None
         if self.target_mode != TargetMode.vel:
             return
@@ -1047,7 +1118,7 @@ class Controller(object):
         omega_world = twist_s.twist.angular.z
         self.has_received_target_vel_in_world_frame(vel_world, omega_world)
 
-    @if_flying
+    @if_flying_controlled
     def has_received_target_odom(self, msg):  # type: (Odometry) -> None
         odom = odometry_in_frame(self.tf_buffer, msg, self.frame_id, self.frame_id)
         if not odom:
@@ -1099,7 +1170,14 @@ class Controller(object):
         # position in world_frame
         self.position = [_p.x, _p.y, _p.z]
         self.inside_fence = inside_fence_margin(self.position, self.pos_bounds, self.fence_margin)
-        self.pitch, self.roll, self.yaw = euler_from_quaternion([o.x, o.y, o.z, o.w])
+        self.roll, self.pitch, self.yaw = euler_from_quaternion([o.x, o.y, o.z, o.w])
+        # CHANGED: to avoid 180, 180, 180 repr of id
+        if abs(self.pitch) > math.pi / 2 and abs(self.roll) > math.pi / 2:
+            rospy.logwarn('Invert pitch/roll/yaw {0:.3f} {1:.3f} {2:.3f}'.format(
+                self.pitch, self.roll, self.yaw))
+            self.yaw = wrap(self.yaw + math.pi)
+            self.pitch = wrap(self.pitch + math.pi)
+            self.roll = wrap(self.roll + math.pi)
         self.q = quaternion_from_euler(0, 0, self.yaw)
 
         # velocity in world frame
@@ -1110,7 +1188,7 @@ class Controller(object):
 # ----------------- Land/Takeoff
 
     def blocking_land(self):  # type: () -> bool
-        if self.state not in [State.flying, State.hovering]:
+        if not self.is_flying:
             return False
         while self.state != State.landing:
             if self.state == State.landed:
@@ -1131,7 +1209,7 @@ class Controller(object):
             rospy.sleep(0.1)
         return True
 
-    @if_flying
+    @if_flying_controlled
     def go_home_and_land(self):  # type: () -> None
         rospy.loginfo("Go home and land")
         if self.home is None or self.go_to_pose_no_feedback(self.home):
@@ -1192,5 +1270,6 @@ class Controller(object):
     @abstractmethod
     def stop(self, msg=None):  # type: (Optional[Empty]) -> None
         pass
+        # self.stop_pub.publish(Empty())
 
 # ----------------- TODO: Observe

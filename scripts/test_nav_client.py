@@ -10,6 +10,7 @@ from actionlib_msgs.msg import GoalStatus
 from std_msgs.msg import Empty
 
 from drone_arena.temporized import Temporized
+from drone_arena_msgs.msg import TargetSource
 
 button = Temporized(1)
 
@@ -53,6 +54,8 @@ class Planner():
         self.landing = False
         self.next_waypoint = None
         self.last_input = None
+        self.source_pub = rospy.Publisher("target_source", TargetSource, queue_size=1)
+        self.source_msg = TargetSource(mode=TargetSource.BodyVel, topic='target/body_vel')
         rospy.Subscriber("start_nav", Empty, button(self.start_path))
         rospy.loginfo("nav_client init done")
         while not rospy.is_shutdown():
@@ -72,8 +75,7 @@ class Planner():
     def move(self, goal):
         rospy.loginfo("Move to Goal %s", goal)
         self.client.send_goal(goal)
-        finished_within_time = self.client.wait_for_result(
-            rospy.Duration(60))
+        finished_within_time = self.client.wait_for_result(rospy.Duration(60))
         # If we don't get there in time, abort the goal
         if not finished_within_time:
             self.client.cancel_goal()
@@ -102,6 +104,7 @@ class Planner():
             return
         rospy.loginfo("(re)Start a path")
         self.running = True
+        self.source_pub.publish(self.source_msg)
         if not self.loop and self.done:
             self.done = False
             self.next_waypoint = None

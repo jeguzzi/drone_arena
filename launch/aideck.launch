@@ -1,0 +1,125 @@
+<launch>
+  <node pkg="crazyflie_driver" type="crazyflie_server" name="crazyflie_server" output="screen"/>
+  <arg name="use_mocap_for_state_estimation" default="False"/>
+  <arg name="use_world_frame" default="False"/>
+  <arg name="ground_truth" default="0"/>
+  <arg name="inference" default="1"/>
+  <arg name="streaming" default="0"/>
+  <arg name="filter" default="1"/>
+  <arg name="rate" default="30"/>
+
+  <include file="$(find drone_arena)/launch/test_optitrack_odom.launch" if="$(arg use_world_frame)"/>
+
+  <include file="$(find crazyflie_description)/launch/model.launch">
+    <arg name="name" value="cf"/>
+    <arg name="camera" value="true"/>
+  </include>
+
+  <node clear_params="true" name='supervisor' pkg='drone_arena' type='cf_supervisor.py' output="screen" ns="cf">
+    <param name='name' value='cf'/>
+    <rosparam subst_value="true" param="">
+      radio:
+        id: 0
+        channel: 100
+        bandwidth : 2M
+      params: []
+      crazyflies:
+        -
+          id: 7
+          front_net: true
+          front_net_frame: base_stabilized
+          front_net_rate: $(arg rate)
+          params:
+            kalman/thetapix: 3.75
+            stabilizer/controller: 1
+            stabilizer/estimator: 2
+            aideck_HIMAX/fps: $(arg rate)
+            aideck_inference/active: $(arg inference)
+            aideck_stream/on: $(arg streaming)
+        -
+          id: 6
+          front_net: true
+          front_net_frame: base_stabilized
+          front_net_rate: $(arg rate)
+          params:
+            kalman/thetapix: 3.75
+            stabilizer/controller: 1
+            stabilizer/estimator: 2
+            aideck_HIMAX/fps: $(arg rate)
+            aideck_inference/active: $(arg inference)
+            aideck_stream/on: $(arg streaming)
+    </rosparam>
+  </node>
+
+  <node name="pose2odom" pkg="drone_arena" type="pose2odom.py" output="screen" ns="cf" unless="$(arg filter)">
+    <remap from="pose" to="head"/>
+    <remap from="odom" to="head_odom"/>
+    <param name="theta" value="3.14159265"/>
+  </node>
+
+  <node name="prediction2odom" pkg="drone_arena" type="front_net2odom_kalman.py" output="screen" ns="cf" if="$(arg filter)">
+    <remap from="prediction" to="output"/>
+    <remap from="filtered_odom" to="head_odom"/>
+  </node>
+
+  <node pkg="drone_arena" type="cf_controller.py" name="fence_controller" output="screen" ns="cf">
+    <!-- <param name="mocap_pose" value="/optitrack/cf" if="$(arg use_mocap_for_state_estimation)"/> -->
+    <param name="use_mocap_z" value="False"/>
+    <param name="frame_id" value="$(eval 'World' if arg('use_world_frame') else 'cf/odom')"/>
+    <remap from="odom" to="mocap_odom" if="$(arg use_world_frame)"/>
+    <remap from="cf_odom" to="odom"/>
+    <param name="enable_fence" value="True"/>
+    <param name="publish_target" value="False"/>
+    <param name="publish_body_vel" value="True"/>
+    <param name="publish_cmd" value="False"/>
+    <param name="teleop_mode" value="1"/>
+    <param name="max_speed" value="1.0"/>
+    <param name="max_vertical_speed" value="0.8"/>
+    <param name="max_angular_speed" value="0.8"/>
+    <param name="tau" value="0.5"/>
+    <param name="eta" value="1.0"/>
+    <param name="delay" value="0"/>
+    <param name="joy_set_teleop_mode" value="true"/>
+    <param name="max_safe_angle" value="0.75"/>
+    <param name="takeoff_altitude" value="0.3"/>
+    <param name="land_at_altitude" value="false"/>
+    <param name="track_altitude" value="1.40"/>
+    <param name="track_altitude_as_relative" value="false"/>
+    <param name="track_relative_altitude" value="0.0"/>
+    <param name="track_distance" value="1.3"/>
+    <rosparam param="pos_bounds">
+      - [-100, 100]
+      - [-100, 100]
+      - [0.25, 2]
+    </rosparam>
+    <!-- <rosparam param="pos_bounds">
+      - [-2.4, 2.4]
+      - [-2.4, 2.4]
+      - [0.25, 2]
+    </rosparam> -->
+    <!-- <rosparam param="home">[1.8, -1.8, 1, 1.57]</rosparam> -->
+  </node>
+
+  <include file="$(find drone_arena)/launch/joy_teleop.launch">
+    <arg name="teleop_config" default="$(find drone_arena)/config/log710-demo-pulp.yaml"/>
+    <arg name="namespace" value="cf"/>
+    <arg name="joy_dev" value="/dev/input/js1"/>
+  </include>
+
+  <!-- <node pkg="drone_arena" type="cf_led.py" name="blinkstick" output="screen" ns="cf">
+    <param name="leds" value="8"/>
+    <param name="max_intensity" value="100"/>
+    <param name="ns" value="cf"/>
+  </node> -->
+
+  <group if="$(arg ground_truth)">
+    <include file="$(find drone_arena)/launch/test_optitrack_odom.launch"/>
+
+    <node clear_params="true" pkg="drone_arena" type="frontnet_gt.py" name="frontnet_gt" output="screen" ns="cf">
+      <param name="reference" value="cf/base_stabilized"/>
+      <param name="object" value="head"/>
+      <param name="period" value="0.05"/>
+    </node>
+  </group>
+
+</launch>

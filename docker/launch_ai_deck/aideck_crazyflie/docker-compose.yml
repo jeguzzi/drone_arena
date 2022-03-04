@@ -1,0 +1,13 @@
+version: '2'
+services:
+  controller:
+    network_mode: host
+    privileged: true
+    image: jeguzzi/drone_arena_cf:noetic
+    volumes:
+      - ./logs:/root/.ros/log:rw
+      - ./main.launch:/root/catkin_ws/src/drone_arena/launch/_main.launch:ro
+      - ./joypad.yaml:/root/catkin_ws/src/drone_arena/config/_joypad.yaml:ro
+    env_file:
+      - ../ros.env
+    command: roslaunch drone_arena _main.launch inference:=1 streaming:=1 ground_truth:=1

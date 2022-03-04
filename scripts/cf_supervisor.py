@@ -4,7 +4,7 @@ import rospy
 
 from crazyflie_driver.srv import AddCrazyflie, RemoveCrazyflie, UpdateParams
 from crazyflie_driver.srv import AddCrazyflieRequest, RemoveCrazyflieRequest
-from crazyflie_driver.msg import FlightState
+from crazyflie_driver.msg import FlightState, LogBlock
 from std_msgs.msg import Bool
 import diagnostic_msgs
 import diagnostic_updater
@@ -14,11 +14,17 @@ def uri(radio_id, channel, bandwith, id):
     return "radio://{radio_id}/{channel}/{bandwith}/E7E7E7E7{id:02X}".format(**locals())
 
 
-def connection_request(uri, name, crazyradio_tx_power=0):
+def connection_request(uri, name, crazyradio_tx_power=0, enable_logging_front_net=False,
+                       front_net_frame='base_link', front_net_rate=10, topics={}):
+    # frequency is in ms
+    log_blocs = [LogBlock(topic_name=topic, frequency=vs['period'], variables=vs['variables'])
+                 for topic, vs in topics.items()]
     return AddCrazyflieRequest(
         uri=uri, crazyradio_tx_power=crazyradio_tx_power, tf_prefix=name, enable_logging=True,
         enable_parameters=True, use_ros_time=True,
-        enable_logging_battery=True, enable_logging_odom=True, enable_logging_state=True)
+        enable_logging_battery=True, enable_logging_odom=True, enable_logging_state=True,
+        enable_logging_front_net=enable_logging_front_net, front_net_frame=front_net_frame,
+        front_net_rate=front_net_rate, log_blocks=log_blocs)
 
 
 class CFSupervisor(object):
@@ -78,9 +84,18 @@ class CFSupervisor(object):
 
     def connect(self, id):
         uri = self.uri(id)
-        rospy.loginfo('Try to connect to CF @ %s with power %d dB',
-                      self.uri(id), self.crazyradio_tx_power)
-        req = connection_request(uri, self.name, self.crazyradio_tx_power)
+        log_front_net = self.front_net.get(id, False)
+        front_net_frame = self.front_net_frame.get(id, 'base_link')
+        front_net_rate = self.front_net_rate.get(id, 10)
+        topics = self.topics.get(id, {})
+        rospy.loginfo('Try to connect to CF @ %s with power %d dB', self.uri(id),
+                      self.crazyradio_tx_power)
+        if log_front_net:
+            rospy.loginfo('and front net wrt frame %s' % front_net_frame)
+        req = connection_request(uri, self.name, self.crazyradio_tx_power,
+                                 enable_logging_front_net=log_front_net,
+                                 front_net_frame=front_net_frame,
+                                 front_net_rate=front_net_rate, topics=topics)
         try:
             res = self.add_crazyflie(req)
         except Exception as e:
@@ -97,7 +112,16 @@ class CFSupervisor(object):
         self.uri = lambda id: uri(radio_id, channel, bandwidth, id)
         params = {}
         self.ids = set([cf['id'] for cf in rospy.get_param('~crazyflies')])
-        self.params = {cf['id']: dict((cf.get('params', {}).items()) + params.items())
+        self.params = {cf['id']: dict((cf.get('params', {}).items()))
+                       for cf in rospy.get_param('~crazyflies')}
+        self.params.update(params)
+        self.front_net = {cf['id']: cf.get('front_net', False)
+                          for cf in rospy.get_param('~crazyflies')}
+        self.front_net_frame = {cf['id']: cf.get('front_net_frame', 'base_link')
+                                for cf in rospy.get_param('~crazyflies')}
+        self.front_net_rate = {cf['id']: cf.get('front_net_rate', 10)
+                               for cf in rospy.get_param('~crazyflies')}
+        self.topics = {cf['id']: cf.get('topics', {})
                        for cf in rospy.get_param('~crazyflies')}
         self.current_id = None
         self.retry_interval = rospy.get_param('~retry_interval', 10)

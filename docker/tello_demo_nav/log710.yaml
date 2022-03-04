@@ -1,0 +1,40 @@
+# Logitech F710 wireless controller
+# Deadman (enable) button: Right Trigger
+# D<>X button (located on the back panel) must be set to D
+teleop:
+  takeoff:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: safe_takeoff
+    deadman_buttons: [3, 7]  # RT + Y
+    axis_mappings: []
+  land:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: land
+    deadman_buttons: [1, 7]  # RT + A
+    axis_mappings: []
+  emergency:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: reset
+    deadman_buttons: [2, 7] # RT + B
+    axis_mappings: []
+  sync:
+    type: topic
+    message_type: "geometry_msgs/Point"
+    topic_name: "set_position"
+    deadman_buttons: [0, 7]
+    message_value:
+      - target: x
+        value: 0
+      - target: y
+        value: 0
+      - target: z
+        value: 0
+  start_navigation:
+    type: topic
+    message_type: "std_msgs/Empty"
+    topic_name: "start_nav"
+    deadman_buttons: [0, 6]
+    axis_mappings: []
